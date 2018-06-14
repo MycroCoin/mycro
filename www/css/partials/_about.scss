@@ -1,0 +1,50 @@
+#about {
+
+  &.about-1 {
+    position: relative;
+    padding-top: 80px;
+    margin-bottom: 40px;
+
+    @media (max-width: 1199px) {
+      padding-top: 60px;
+    }
+
+    > .container {
+      transform: translateY(40px);
+
+      .about-player {
+        position: relative;
+        border-radius: $border-radius*1.5;
+        background: url(../images/player.jpeg) no-repeat center;
+        background-size: cover;
+        box-shadow: $box-shadow;
+
+        &__icon {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 7.4em;
+          height: 7.4em;
+          background: $white;
+          border-radius: 50%;
+          cursor: pointer;
+
+          &:before {
+            position: absolute;
+            margin-top: -3px;
+            margin-left: -4px;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px 0 6px 12px;
+            border-color: transparent transparent transparent #333;
+            content: '';
+          }
+        }
+      }
+    }
+  }
+}

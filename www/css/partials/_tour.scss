@@ -1,0 +1,254 @@
+#tour {
+
+  &.tour-1 {
+    position: relative;
+    padding: 0 0 120px 0;
+    background-image: linear-gradient(-180deg, $body-bg 30%, $white 100%);
+
+    .tour-card {
+      position: relative;
+      padding: 30px;
+      margin-bottom: 30px;
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: $box-shadow;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      p {
+        margin-bottom: 0;
+      }
+    }
+
+    .btn {
+      padding: 10px 25px;
+    }
+  }
+
+  &.tour-2 {
+
+    .nav {
+
+       li {
+
+         @media (max-width: 767px) {
+           flex: 100%;
+         }
+
+         a {
+           padding-bottom: 50px;
+           border-bottom: 1px solid darken($body-bg, 3%);
+
+           @media (max-width: 767px) {
+             padding: 20px 0;
+           }
+
+           &:hover {
+
+             .icon {
+               color: $blue-2;
+             }
+
+             span {
+               color: $blue-2;
+             }
+           }
+
+           &.active {
+             position: relative;
+             border-color: $blue-2;
+
+             &:before {
+               position: absolute;
+               bottom: -1px;
+               height: 0;
+               width: 0;
+               border: 10px solid transparent;
+               border-bottom: 7px solid #fafcfd;
+               visibility: visible;
+               z-index: 1;
+               content: " ";
+             }
+
+             &:after {
+               position: absolute;
+               bottom: 0;
+               height: 0;
+               width: 0;
+               margin-top: 28px;
+               border: 10px solid transparent;
+               border-bottom: 7px solid $blue-2;
+               transition: left .5s;
+               content: "";
+             }
+
+             .icon {
+               color: $blue-2;
+             }
+
+             span {
+               color: $blue-2;
+             }
+           }
+
+           .icon {
+             color: darken($body-bg,30%);
+             opacity: .5;
+             transition: .2s ease-in;
+           }
+
+           span {
+             color: $text-color;
+             transition: .2s ease-in;
+           }
+         }
+       }
+    }
+
+    .tab-pane {
+      margin-top: 80px;
+
+      @media (max-width: 991px) {
+        margin-top: 60px;
+      }
+
+      p:not(.lead):last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &.tour-3 {
+
+    .tour-part {
+
+      .preamble {
+        margin-bottom: 30px;
+      }
+
+      img {
+        max-width: 90%;
+      }
+
+      .tour__list {
+
+        li {
+          padding: 4px 0;
+          display: block;
+
+          .icon {
+            margin-right: 0.75rem;
+            color: $green;
+            font-weight: bold;
+          }
+
+          span {
+            color: $header-color;
+            font-size: 1.1rem;
+          }
+        }
+      }
+
+      .btn {
+        margin-top: 30px;
+      }
+    }
+  }
+
+  &.tour-4 {
+    overflow: hidden;
+
+    &:after {
+      position: relative;
+      height: 45px;
+      width: 100%;
+      content: '';
+      display: block;
+      background: $white;
+
+      @media (max-width: 991px) {
+        display: none;
+      }
+    }
+
+    .left-side {
+      padding-top: 120px;
+      padding-bottom: 100px;
+
+      @media (max-width: 1199px) {
+        padding-top: 100px;
+        padding-bottom: 80px;
+      }
+
+      @media (max-width: 991px) {
+        padding-top: 80px;
+        padding-bottom: 60px;
+      }
+
+      @media (max-width: 767px) {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+
+      .preamble {
+        margin-bottom: 60px;
+      }
+
+      .tour__tabs {
+        border: none;
+
+        .nav-item {
+          padding: 1.5rem 2.5rem;
+          border-radius: $border-radius;
+          border: none;
+
+          &.active {
+            background: rgba(0,0,0,.1);
+          }
+
+          .icon {
+            margin-right: 2rem;
+            color: $white;
+          }
+
+          .header {
+            color: $white;
+          }
+
+          p {
+            margin-bottom: 0;
+            color: rgba(255,255,255,.8);
+          }
+        }
+      }
+    }
+
+    .right-side {
+      position: relative;
+      z-index: 99;
+
+      img {
+        position: absolute;
+        transform: translateY(120px);
+        z-index: 99;
+
+        @media (max-width: 1199px) {
+          transform: translateY(100px);
+        }
+
+        @media (max-width: 991px) {
+          position: relative;
+          margin-top: 80px;
+          max-width: 100%;
+          transform: translateY(0);
+        }
+
+        @media (max-width: 767px) {
+          margin-top: 60px;
+        }
+      }
+    }
+  }
+}

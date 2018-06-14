@@ -1,0 +1,64 @@
+#contact {
+
+  &.contact-2 {
+    position: relative;
+    overflow-x: hidden;
+
+    &:before {
+      position: relative;
+      height: 30px;
+      width: 100%;
+      display: block;
+      content: "";
+    }
+
+    &:after {
+      position: absolute;
+      left: -5%;
+      right: 0;
+      top: -95px;
+      height: 230px;
+      width: 120%;
+      transform: rotate(-5deg);
+      background-image: linear-gradient(-180deg, $white 70%, $body-bg 100%);
+      content: "";
+    }
+
+    .contact__card {
+      position: relative;
+      padding: 40px 50px 40px 110px;
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: 0 15px 35px rgba(23, 28, 33, .1), 0 5px 15px rgba(23, 28, 33, .06);
+      overflow-x: hidden;
+      z-index: 99;
+
+      @media (max-width: 565px) {
+        padding: 30px;
+      }
+
+      .icon {
+        position: absolute;
+        top: 50%;
+        left: 20px;
+        transform: translate(-50%, -50%);
+        font-size: 6.5rem;
+
+        @media (max-width: 565px) {
+          display: none;
+        }
+      }
+
+      p {
+        font-size: 1.0rem;
+        line-height: 1.7;
+
+        small {
+          font-size: 1rem;
+          color: $header-color;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}

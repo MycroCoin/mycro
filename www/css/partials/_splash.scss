@@ -1,0 +1,47 @@
+.splash {
+  background: $body-bg;
+
+  #wrapper {
+    width: 85%;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+
+    .choose {
+      width: 100%;
+      padding: 60px 0;
+      background: $white;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .options {
+
+      .option {
+        padding: 40px 80px;
+        border-bottom: 1px solid #e0e0e0;
+        background: #f6fafd;
+        transition: .2s ease-in;
+
+        &:hover {
+          background: $white;
+        }
+
+        &:nth-child(odd) {
+          border-right: 1px solid #e0e0e0;
+        }
+
+        img {
+          box-shadow: $box-shadow;
+        }
+      }
+    }
+
+    #footer {
+      width: 100%;
+      background: $white;
+
+      img {
+        max-height: 150px;
+      }
+    }
+  }
+}

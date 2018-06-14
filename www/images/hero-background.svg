@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="2880px" height="1994px" viewBox="0 0 2880 1994" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.1 (51147) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <radialGradient cx="84.7173438%" cy="125.761275%" fx="84.7173438%" fy="125.761275%" r="140.3811%" gradientTransform="translate(0.847173,1.257613),scale(0.692298,1.000000),rotate(-62.518616),translate(-0.847173,-1.257613)" id="radialGradient-1">
+            <stop stop-color="#DBF6C8" offset="0%"></stop>
+            <stop stop-color="#1CAFC6" offset="49.5356715%"></stop>
+            <stop stop-color="#012690" offset="100%"></stop>
+        </radialGradient>
+        <path d="M0,0 L2880,0 L2880,381 L266.550995,1979.13157 C231.300199,2000.68753 186.421765,1998.34348 153.608435,1973.23246 L0,1855.68068 L0,0 Z" id="path-2"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group">
+            <mask id="mask-3" fill="white">
+                <use xlink:href="#path-2"></use>
+            </mask>
+            <use id="Rectangle" fill="url(#radialGradient-1)" xlink:href="#path-2"></use>
+            <polygon id="Rectangle-7" fill-opacity="0.1" fill="#2C2C2C" opacity="0.5" mask="url(#mask-3)" points="389.417813 631.011398 1202.82967 216 1202.82967 677.141386 389.417813 1146"></polygon>
+            <path d="M2301,64.1638392 C2353.93382,24.073596 2388.00657,3.20611849 2403.21825,1.56140681 C2418.42992,-0.0833048655 2577.35718,-0.0833048655 2880,1.56140681 L2880,131 L2301,482.639991 L2301,64.1638392 Z" id="Rectangle-2" fill-opacity="0.1" fill="#0E4272" mask="url(#mask-3)"></path>
+            <polygon id="Rectangle-3" fill-opacity="0.05" fill="#D8D8D8" mask="url(#mask-3)" points="0 186 270 51.9017166 270 302 0 450.227674"></polygon>
+            <polygon id="Rectangle-4" fill-opacity="0.05" fill="#2C2C2C" mask="url(#mask-3)" points="117 1562.46461 573 1287.41449 573 1562.46461 117 1836.48269"></polygon>
+            <polygon id="Rectangle-5" fill-opacity="0.05" fill="#2C2C2C" mask="url(#mask-3)" points="265.467664 1679.08547 977 1261.89575 977 1543 265.467664 1978.99942"></polygon>
+            <polygon id="Rectangle-6" fill-opacity="0.1" fill="#2C2C2C" opacity="0.5" mask="url(#mask-3)" points="1002.91916 549.507707 1339 373 1339 647.172226 1002.91916 834"></polygon>
+        </g>
+    </g>
+</svg>

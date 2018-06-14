@@ -1,0 +1,558 @@
+#pricing {
+
+  &.pricing-1 {
+    position: relative;
+    padding: 0;
+    background: $body-bg;
+    z-index: 1;
+
+    .pricing-card {
+      position: relative;
+      padding: 40px 30px 40px 30px;
+      margin-top: -280px;
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: $box-shadow;
+
+      @media (max-width: 991px) {
+        margin-top: 40px;
+      }
+
+      &-first {
+
+        @media (max-width: 991px) {
+          margin-top: -180px;
+        }
+      }
+
+      &-highlighted {
+        transform: scale(1.05);
+
+        @media (max-width: 991px) {
+          transform: scale(1);
+        }
+
+        .ribbon {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          width: 170px;
+          text-align: center;
+          transform: translateX(-50%);
+
+          h6 {
+            padding: 0 15px;
+            color: $white;
+            background: $green;
+            border-bottom-left-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+          }
+        }
+      }
+
+      &__title {
+        text-align: center;
+      }
+
+      &__value {
+        text-align: center;
+
+        .pricing-currency {
+          margin-top: -14px;
+          margin-right: 4px;
+          display: inline-block;
+          vertical-align: top;
+          font-size: 18px;
+        }
+
+        .pricing-cost {
+          margin-top: -5px;
+          font-size: 56px;
+          font-weight: 600;
+        }
+
+        .pricing-period {
+          margin-left: 5px;
+          margin-top: 13px;
+          display: inline-block;
+          font-weight: 400;
+          font-size: 18px;
+          opacity: .6;
+          vertical-align: top;
+        }
+      }
+
+      &__list {
+        padding-top: 30px;
+        margin-top: 25px;
+        border-top: 1px solid #ececec;
+
+        li {
+          padding: 4px 0;
+          display: block;
+
+          @media (max-width: 1366px) {
+            font-size: 15px;
+          }
+
+          @media (max-width: 1200px) {
+            font-size: 14px;
+          }
+
+          strong {
+            color: #666;
+          }
+
+          .pricing-icon {
+            position: relative;
+            height: 17px;
+            width: 17px;
+            border-radius: 50%;
+
+            &:before {
+              position: absolute;
+              font-size: 11px;
+              width: 100%;
+              top: -4px;
+              left: 3px;
+              color: $white;
+              content: '\2713';
+
+              @media (max-width: 991px) {
+                top: -2px;
+              }
+            }
+
+            &__true {
+              background: $green;
+
+              &:before {
+                content: '\2713';
+              }
+            }
+
+            &__false {
+              background: $red;
+
+              &:before {
+                top: -5px;
+                left: 5.5px;
+                content: "x";
+                font-style: normal;
+
+                @media (max-width: 991px) {
+                  top: -4px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.pricing-2 {
+    position: relative;
+    background: linear-gradient(-180deg, $body-bg 30%, #FFFFFF 100%);
+    overflow: hidden;
+
+    @media (max-width: 1199px) {
+      padding-top: 100px;
+    }
+
+    @media (max-width: 991px) {
+      padding-top: 140px;
+    }
+
+    @media (max-width: 767px) {
+      padding-top: 150px;
+    }
+
+    .owl-stage-outer {
+      overflow: visible;
+    }
+
+    .owl-item {
+      opacity: 0;
+      transition: opacity 200ms;
+
+      &.active {
+        opacity: 1;
+      }
+    }
+
+    .pricing-card {
+      position: relative;
+      padding: 40px 0;
+      transform: translateY(-9px);
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: $box-shadow;
+
+      &__header {
+        padding: 0 30px;
+
+        img {
+          margin-bottom: 20px;
+          height: 20px;
+          width: auto;
+        }
+      }
+
+      &__value {
+        margin: 25px 0 15px 0;
+
+        &:after {
+          position: relative;
+          display: block;
+          margin: 20px auto 20px auto;
+          width: 60px;
+          height: 1px;
+          background: #e0e0e0;
+          content: "";
+        }
+
+        .pricing-currency {
+          margin-top: -8px;
+          margin-right: 4px;
+          display: inline-block;
+          vertical-align: top;
+          font-size: 18px;
+        }
+
+        .pricing-cost {
+          margin-top: -5px;
+          font-size: 42px;
+          font-weight: 600;
+        }
+
+        .pricing-period {
+          margin-left: 5px;
+          margin-top: 18px;
+          line-height: 20px;
+          display: inline-block;
+          font-weight: 400;
+          font-size: 16px;
+          opacity: .6;
+          vertical-align: top;
+        }
+      }
+
+      &__footer {
+        padding: 0 30px;
+        margin-top: 35px;
+        width: 100%;
+      }
+    }
+  }
+
+  &.pricing-3 {
+    position: relative;
+    background: linear-gradient(-180deg, $body-bg 60%, #FFFFFF 100%);
+    z-index: 99;
+
+    .pricing-card {
+      padding: 40px 30px;
+      margin-top: -50%;
+      text-align: center;
+      transform: scale(1);
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: 0 4px 9px 0 rgba(23, 28, 33, .06);
+
+      @media (max-width: 991px) {
+        margin-bottom: 40px;
+        margin-top: 0;
+      }
+
+      &__first {
+
+        @media (max-width: 991px) {
+          margin-top: -100px
+        }
+      }
+
+      &-highlighted {
+        transform: scale(1.1);
+
+        @media (max-width: 991px) {
+          transform: scale(1);
+        }
+
+        .box {
+
+          .ribbon {
+            position: absolute;
+            right: -5px;
+            top: -6px;
+            width: 117px;
+            height: 120px;
+            text-align: right;
+            overflow: hidden;
+            z-index: 1;
+
+            span {
+              position: absolute;
+              top: 24px;
+              right: -28px;
+              width: 130px;
+              display: block;
+              font-size: 13px;
+              font-weight: bold;
+              color: $white;
+              text-transform: uppercase;
+              text-align: center;
+              line-height: 28px;
+              transform: rotate(45deg);
+              background: #79A70A;
+              background: linear-gradient(#3ECF8E 0%, #3ECF8E 100%);
+              box-shadow: 0 3px 10px -5px rgba(0, 0, 0, .3);
+
+              &:before {
+                position: absolute;
+                left: 0;
+                top: 100%;
+                border-left: 3px solid #3ECF8E;
+                border-right: 3px solid transparent;
+                border-bottom: 3px solid transparent;
+                border-top: 3px solid #3ECF8E;
+                content: "";
+                z-index: -1;
+              }
+
+              &:after {
+                position: absolute;
+                right: 0;
+                top: 100%;
+                border-left: 3px solid transparent;
+                border-right: 3px solid #3ECF8E;
+                border-bottom: 3px solid transparent;
+                border-top: 3px solid #3ECF8E;
+                content: "";
+                z-index: -1;
+              }
+            }
+          }
+        }
+      }
+
+      &__value {
+        margin-bottom: 0;
+        text-align: center;
+
+        .pricing-currency {
+          margin-top: -14px;
+          margin-right: 4px;
+          display: inline-block;
+          vertical-align: top;
+          font-size: 18px;
+        }
+
+        .pricing-cost {
+          margin-top: -5px;
+          font-size: 56px;
+          font-weight: 600;
+        }
+
+        .pricing-period {
+          margin-left: 5px;
+          margin-top: 13px;
+          display: inline-block;
+          font-weight: 400;
+          font-size: 18px;
+          opacity: .6;
+          vertical-align: top;
+        }
+      }
+
+      &__footer {
+
+        &:before {
+          position: relative;
+          margin: 18px auto 0 auto;
+          width: 50%;
+          height: 1px;
+          display: block;
+          background: #e0e0e0;
+          content: "";
+        }
+      }
+
+      .btn {
+        padding: 12px 40px;
+        margin: 10px auto 0 auto;
+        width: 75%;
+      }
+    }
+
+    .pricing-features {
+      margin-top: 60px;
+
+      @media (max-width: 991px) {
+        margin-top: 20px;
+      }
+
+      @media (max-width: 767px) {
+        margin-top: 0;
+      }
+
+      .pricing-feature {
+
+        .icon {
+          margin-right: 0.5rem;
+          color: $green;
+          font-size: 18px;
+          font-weight: bold;
+        }
+
+        p {
+          margin-bottom: 0;
+
+          @media (max-width: 1199px) {
+            font-size: 12px;
+          }
+
+          @media (max-width: 991px) {
+            font-size: 15px;
+          }
+        }
+      }
+    }
+  }
+
+  &.pricing-4 {
+
+
+    .pricing-card {
+      position: relative;
+      padding: 40px 30px 40px 30px;
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: $box-shadow;
+
+      &-highlighted {
+        transform: scale(1.05);
+
+        @media (max-width: 991px) {
+          transform: scale(1);
+        }
+
+        .ribbon {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          width: 170px;
+          text-align: center;
+          transform: translateX(-50%);
+
+          h6 {
+            padding: 0 15px;
+            color: $white;
+            background: $green;
+            border-bottom-left-radius: $border-radius;
+            border-bottom-right-radius: $border-radius;
+          }
+        }
+      }
+
+      &__title {
+        text-align: center;
+      }
+
+      &__value {
+        text-align: center;
+
+        .pricing-currency {
+          margin-top: -14px;
+          margin-right: 4px;
+          display: inline-block;
+          vertical-align: top;
+          font-size: 18px;
+        }
+
+        .pricing-cost {
+          margin-top: -5px;
+          font-size: 56px;
+          font-weight: 600;
+        }
+
+        .pricing-period {
+          margin-left: 5px;
+          margin-top: 13px;
+          display: inline-block;
+          font-weight: 400;
+          font-size: 18px;
+          opacity: .6;
+          vertical-align: top;
+        }
+      }
+
+      &__list {
+        padding-top: 30px;
+        margin-top: 25px;
+        border-top: 1px solid #ececec;
+
+        li {
+          padding: 4px 0;
+          display: block;
+
+          @media (max-width: 1366px) {
+            font-size: 15px;
+          }
+
+          @media (max-width: 1200px) {
+            font-size: 14px;
+          }
+
+          strong {
+            color: #666;
+          }
+
+          .pricing-icon {
+            position: relative;
+            height: 17px;
+            width: 17px;
+            border-radius: 50%;
+
+            &:before {
+              position: absolute;
+              font-size: 11px;
+              width: 100%;
+              top: -4px;
+              left: 3px;
+              color: $white;
+              content: '\2713';
+
+              @media (max-width: 991px) {
+                top: -2px;
+              }
+            }
+
+            &__true {
+              background: $green;
+
+              &:before {
+                content: '\2713';
+              }
+            }
+
+            &__false {
+              background: $red;
+
+              &:before {
+                top: -5px;
+                left: 5.5px;
+                content: "x";
+                font-style: normal;
+
+                @media (max-width: 991px) {
+                  top: -4px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

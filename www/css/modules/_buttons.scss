@@ -1,0 +1,79 @@
+.btn {
+  font-weight: 600;
+  font-size: 13px;
+  font-family: 'open sans', sans-serif;
+  text-transform: uppercase;
+  transition: .2s ease-in;
+
+  &.btn--lg {
+    padding: 14px 40px;
+  }
+
+  &.btn--md {
+    padding: 12px 25px;
+  }
+
+  &.btn--secondary {
+    background: $dark-blue;
+    border-color: $dark-blue;
+    color: $white;
+
+    &:hover {
+      background: darken($dark-blue, 5%)
+    }
+  }
+
+  &.btn--primary {
+    background: $light-blue;
+    border-color: $light-blue;
+    color: $blue;
+
+    &:hover {
+      background: lighten($light-blue, 1.5%);
+      color: lighten($blue, 2%);
+    }
+  }
+
+  &.btn-third {
+    background: transparent;
+    border: 2px solid $white;
+    color: $white;
+
+    &:hover {
+      background: $white;
+      color: $green;
+    }
+  }
+
+  &.btn--green {
+    background: $green;
+    border-color: $green;
+    color: $white;
+
+    &:hover {
+      background: darken($green, 5%)
+    }
+  }
+
+  &.btn--blue {
+    background: $blue-2;
+    border: 2px solid $blue-2;
+    color: $white;
+
+    &:hover {
+      background: darken($blue-2, 2%);
+      color: $white;
+    }
+  }
+
+  &.btn--white {
+    background: transparent;
+    border: 2px solid $white;
+    color: $white;
+
+    &:hover {
+      background: $white;
+      color: $green;
+    }
+  }
+}

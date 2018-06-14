@@ -1,0 +1,178 @@
+#locations {
+  position: relative;
+  background-image: linear-gradient(-180deg, $body-bg 30%, #FFFFFF 100%);
+
+  .map {
+    width: 100%;
+
+    @media (max-width: 767px) {
+      display: none;
+    }
+  }
+
+  .location {
+    position: absolute;
+    z-index: 0;
+    height: 12px;
+    width: 12px;
+
+    @media (max-width: 767px) {
+      position: relative;
+      float: left;
+      width: 50%;
+      height: auto;
+      top: auto !important;
+      left: auto !important;
+      bottom: auto !important;
+      right: auto !important;
+    }
+
+    @media (max-width: 460px) {
+      width: 100%;
+    }
+
+    &:hover {
+
+      > .location__name {
+        visibility: visible;
+      }
+    }
+
+    &__name {
+      position: absolute;
+      padding: 5px;
+      margin-left: 8px;
+      top: -45px;
+      transform: translateX(-50%);
+      background: $white;
+      border-radius: $border-radius;
+      box-shadow: 0 20px 40px 0 rgba(0,0,0,.05);
+      visibility: hidden;
+      z-index: 999;
+    }
+
+    &-amsterdam {
+      top: 32%;
+      left: 48%;
+    }
+
+    &-paris {
+      top: 34.5%;
+      left: 47%;
+    }
+
+    &-sydney {
+      bottom: 18%;
+      right: 11.5%;
+    }
+
+    &-singapore {
+      top: 61%;
+      right: 25%;
+    }
+
+    &-tokyo {
+      top: 42%;
+      right: 15%;
+    }
+
+    &-losangeles {
+      top: 40%;
+      left: 13.5%;
+    }
+
+    &-miami {
+      top: 49%;
+      left: 24.5%;
+    }
+
+    &-seattle {
+      top: 35%;
+      left: 13.5%;
+    }
+
+    &__pin {
+      position: relative;
+      z-index: 0;
+      display: block;
+      height: 12px;
+      width: 12px;
+      background-color: $blue-2;
+      border-radius: 50%;
+
+      @media (max-width: 767px) {
+        display: none;
+      }
+
+      &:after {
+        position: absolute;
+        margin: -11px 0 0 -11px;
+        top: 50%;
+        left: 50%;
+        height: 22px;
+        width: 22px;
+        display: block;
+        background-color: $blue-2;
+        border-radius: 50%;
+        animation: pulsate 2s linear;
+        animation-iteration-count: infinite;
+        content: "";
+      }
+    }
+  }
+}
+
+@keyframes pulsate{
+  0% {
+    transform: scale(0);
+    opacity: .05;
+  }
+  20% {
+    transform: scale(0.7);
+    opacity: .1;
+  }
+  40% {
+    transform: scale(0.9);
+    opacity: .2;
+  }
+  60% {
+    transform: scale(1.1);
+    opacity: .3;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.tooltip {
+
+  &.tooltip-location {
+
+    &.show {
+      opacity: 1;
+    }
+
+    .arrow {
+
+      &:before {
+        border-top-color: $white;
+        border-bottom-color: $white;
+      }
+    }
+
+    .tooltip-inner {
+      padding: 14px;
+      width: 240px;
+      max-width: 240px;
+      text-align: left;
+      background: $white;
+      box-shadow: 0 0 20px rgba(0,0,0,.05);
+
+      p {
+        margin-bottom: 0;
+        color: $text-color;
+      }
+    }
+  }
+}

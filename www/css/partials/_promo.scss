@@ -1,0 +1,25 @@
+#promo {
+  position: relative;
+  padding: 12px 0;
+  background: darken(#012690, 5%);
+
+  p {
+    color: $white;
+    font-size: 14px;
+
+    .badge {
+      margin-bottom: 0;
+      background: $green;
+    }
+  }
+
+  .icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $white;
+    font-size: 21px;
+    cursor: pointer;
+  }
+}

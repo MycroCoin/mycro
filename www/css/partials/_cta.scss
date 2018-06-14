@@ -1,0 +1,75 @@
+#cta {
+
+  &.cta-1 {
+
+    .footer-form {
+      margin: 0 auto;
+      width: 400px;
+
+      @media (max-width: 460px) {
+        width: 100%;
+      }
+
+      &__label {
+        text-transform: uppercase;
+        font-weight: 600;
+        color: $white;
+        font-size: 12px;
+        letter-spacing: .02rem;
+
+        > .required {
+          color: red;
+        }
+      }
+
+      &__input {
+        height: 50px;
+        background-color: rgba(19, 40, 77, 0.6);
+        border: none;
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05), inset 0 1px 2px 0 rgba(0, 0, 0, 0.15);
+        transition: .2s ease-in;
+
+        &:focus {
+          background-color: $white;
+        }
+      }
+
+      small {
+        margin-bottom: 0;
+        line-height: 22px;
+        color: $white;
+        opacity: .8;
+      }
+    }
+  }
+
+  &.cta-2 {
+    position: relative;
+    padding: 60px 0 0 0;
+
+    .preamble {
+
+      p {
+        font-size: 1.3rem;
+        line-height: 1.7;
+      }
+    }
+
+    .btn {
+
+      @media (max-width: 575px) {
+        width: 100%;
+      }
+
+      &--green {
+        border: 2px solid $green;
+      }
+    }
+
+    hr {
+      padding: 0;
+      margin: 60px 0 0 0;
+      border-color: rgba(255,255,255,.2);
+    }
+  }
+}

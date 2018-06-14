@@ -1,0 +1,22 @@
+#faq {
+
+  &.faq-1 {
+    position: relative;
+    z-index: 1;
+
+    .question {
+      margin-bottom: 30px;
+    }
+  }
+
+  &.faq-2 {
+
+    .question {
+      margin-bottom: 30px;
+
+      p {
+        padding-right: 1rem;
+      }
+    }
+  }
+}

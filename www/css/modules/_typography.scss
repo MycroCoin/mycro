@@ -1,0 +1,170 @@
+html {
+  font-size: 100%;
+
+  @media all and (max-width: 768px) {
+    font-size: 87.5%;
+  }
+}
+
+body {
+  font-family: 'Open Sans', 'Helvetica', 'Arial', sans-serif;
+  font-size: 1em;
+  line-height: 1.6em;
+  color: $text-color;
+  font-weight: 400;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-family: 'Montserrat', 'Helvetica', 'Arial', sans-serif;
+  font-weight: 700;
+  color: $header-color;
+  font-variant-ligatures: common-ligatures;
+}
+
+h1, .h1 {
+  font-size: 4em;
+  line-height: 1.0em;
+}
+
+h2, .h2 {
+  font-size: 2.8em;
+  line-height: 1.15em;
+}
+
+h3, .h3 {
+  font-size: 2em;
+  line-height: 1.4em;
+}
+
+h4, .h4 {
+  font-size: 1.4em;
+  line-height: 1.4em;
+}
+
+h5, .h5 {
+  font-size: 1em;
+  line-height: 1.6em;
+}
+
+h6, .h6 {
+  font-size: 0.6em;
+  line-height: 2.6em;
+}
+
+.lead {
+  font-size: 1.4em;
+  line-height: 1.7em;
+}
+
+@media all and (max-width: 767px) {
+  h1, .h1 {
+    font-size: 2.8em;
+    line-height: 1.15em;
+  }
+
+  h2, .h2 {
+    font-size: 2em;
+    line-height: 1.42em;
+  }
+
+  h3, .h3 {
+    font-size: 1.4em;
+    line-height: 1.6em;
+  }
+
+  .lead {
+    font-size: 1.4em;
+    line-height: 1.4em;
+  }
+}
+
+@media all and (max-width: 1024px) {
+  html {
+    font-size: 87.5%;
+  }
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+  margin-top: 0;
+}
+
+h1, .h1 {
+  margin-bottom: 1.6em;
+}
+
+h2, .h2 {
+  margin-bottom: 1.1em;
+}
+
+h3, .h3 {
+  margin-bottom: 0.7125em;
+}
+
+h4, .h4 {
+  margin-bottom: 0.5em;
+}
+
+h5, .h5 {
+  margin-bottom: 0.4em;
+}
+
+h6, .h6 {
+  margin-bottom: 2.3em;
+  letter-spacing: 1px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+@media all and (max-width: 767px) {
+  h1, .h1 {
+    font-size: 2em;
+    line-height: 1.4em;
+  }
+}
+
+.lead {
+  margin-bottom: 1.13em;
+  font-weight: 400;
+}
+
+.preamble {
+  margin-bottom: 100px;
+  text-align: center;
+
+  @media (max-width: 1199px) {
+    margin-bottom: 80px;
+  }
+
+  @media (max-width: 991px) {
+    margin-bottom: 60px;
+  }
+
+  @media (max-width: 767px) {
+    margin-bottom: 40px;
+  }
+
+  &--light {
+
+    .title {
+      color: $white;
+    }
+
+    p {
+      color: rgba(255,255,255,.85);
+    }
+  }
+}
+
+a {
+  color: $blue-2;
+  transition: .2s ease-in;
+}
+
+a:hover {
+  color: lighten($blue-2, 15%);
+  text-decoration: none;
+}

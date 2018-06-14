@@ -1,0 +1,124 @@
+.fill-flex {
+  flex: 1;
+}
+
+.icon {
+
+  &--lg {
+    font-size: 3.5rem;
+  }
+
+  &--md {
+    font-size: 2.8125em;
+  }
+
+  &--color {
+    color: $blue-2;
+  }
+}
+
+.color {
+
+  &--white {
+    color: $white;
+  }
+}
+
+.gradient-wrapper {
+  background-image: radial-gradient(ellipse farthest-side at 100% 100%, #1cafc6 20%, #007fb2 50%, #012690 110%);
+}
+
+.section {
+
+  &--padding {
+    padding: 120px 0;
+
+    @media (max-width: 1199px) {
+      padding: 100px 0;
+    }
+
+    @media (max-width: 991px) {
+      padding: 80px 0;
+    }
+
+    @media (max-width: 767px) {
+      padding: 60px 0;
+    }
+  }
+
+  &--padding__bottom {
+    padding-bottom: 120px;
+
+    @media (max-width: 1199px) {
+      padding-bottom: 100px;
+    }
+
+    @media (max-width: 991px) {
+      padding-bottom: 80px;
+    }
+
+    @media (max-width: 767px) {
+      padding-bottom: 60px;
+    }
+  }
+
+  &--padding__top {
+    padding-top: 120px;
+
+    @media (max-width: 1199px) {
+      padding-top: 100px;
+    }
+
+    @media (max-width: 991px) {
+      padding-top: 80px;
+    }
+
+    @media (max-width: 767px) {
+      padding-top: 60px;
+    }
+  }
+
+  &--padding__wmargin {
+    padding-top: 120px;
+    padding-bottom: 80px;
+
+    @media (max-width: 1199px) {
+      padding-top: 100px;
+      padding-bottom: 60px;
+    }
+
+    @media (max-width: 991px) {
+      padding-top: 80px;
+      padding-bottom: 40px;
+    }
+
+    @media (max-width: 767px) {
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+  }
+
+  &--gradient__1 {
+    background-image: radial-gradient(ellipse farthest-side at 100% 100%, #ffb29b 10%, #e56699 30%, #341e7e 109%);
+  }
+
+  &--gradient__2 {
+    background-image: radial-gradient(ellipse farthest-side at 100% 100%,#97c9d5 5%,#1b5494 60%,#1f2e5a 120%);
+  }
+
+  &--gradient__3 {
+    background-image: radial-gradient(ellipse farthest-side at 100% 100%, #1cafc6 20%, #007fb2 50%, #012690 110%);
+  }
+
+  &--gradient__4 {
+    background-image: linear-gradient(-180deg, $white 30%, $body-bg 100%);
+  }
+
+  &--gradient__5 {
+    background-image: linear-gradient(-180deg, $body-bg 30%, #FFFFFF 100%);
+  }
+
+  &--gradient__6 {
+    background-image: radial-gradient(ellipse farthest-side at 100% 100%,#97c9d5 5%,#1b5494 60%,#1f2e5a 120%);
+  }
+}

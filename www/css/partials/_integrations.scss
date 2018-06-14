@@ -1,0 +1,54 @@
+#integrations {
+  position: relative;
+
+  @media (max-width: 991px) {
+    padding: 80px 0;
+  }
+
+  .features {
+
+    li {
+      margin-bottom: 1.5rem;
+      display: block;
+
+      &:last-child {
+        margin-bottom: 0;
+
+        p {
+          margin-bottom: 0;
+        }
+      }
+
+      .icon {
+        color: $white;
+      }
+
+      h5 {
+        color: $white;
+      }
+
+      p {
+        color: rgba(255,255,255,.8);
+      }
+    }
+  }
+
+  .illustration {
+    position: relative;
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .illustration__icons {
+
+      img {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    }
+  }
+}

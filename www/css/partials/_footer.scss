@@ -1,0 +1,180 @@
+#footer {
+
+  &.footer-1 {
+    padding: 30px 0;
+    background: $body-bg;
+    font-size: 15px;
+
+    .footer__contact {
+
+      i {
+        font-size: 16px;
+      }
+    }
+
+    .footer__social {
+
+      li {
+        margin: 0 10px;
+
+        &:last-child {
+          margin-right: 0;
+        }
+
+        a {
+
+          i {
+            color: lighten($text-color, 15%);
+            font-size: 16px;
+
+            &:hover {
+              color: $blue-2;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.footer-2 {
+    padding: 75px 0 120px 0;
+
+    @media (max-width: 767px) {
+      padding-bottom: 60px;
+    }
+
+    .row-top {
+      margin-bottom: 75px;
+
+      @media (max-width: 767px) {
+        margin-bottom: 45px;
+      }
+
+      .footer-widget {
+
+        &__title {
+          color: $white;
+        }
+
+        &__nav {
+
+          li {
+            padding: 4px 0;
+            display: block;
+
+            a {
+              color: rgba(255,255,255,.8);
+            }
+          }
+        }
+
+        &__address {
+          margin-bottom: 0;
+          color: rgba(255,255,255,.8);
+        }
+      }
+    }
+
+    .row-bottom {
+
+      .footer__social {
+
+        li {
+          margin: 0 15px;
+
+          &:last-child {
+            margin-right: 0;
+          }
+
+          a {
+
+            i {
+              color: $white;
+              font-size: 18px;
+
+              &:hover {
+                color: $blue-2;
+              }
+            }
+          }
+        }
+      }
+
+      .footer__copyrights {
+        font-size: 13px;
+        color: rgba(255,255,255, .8);
+      }
+    }
+  }
+
+  &.footer-3 {
+
+    .preamble {
+      margin-bottom: 3em;
+    }
+
+    .footer__form {
+      margin-bottom: 2.5em;
+
+      .row {
+        margin: 0 -8px;
+      }
+
+      .col-lg-3 {
+        padding: 0 8px;
+      }
+
+      input {
+        padding-left: 1rem;
+        height: 49px;
+        border: none;
+
+        @media (max-width: 991px) {
+          margin: 0 auto;
+          width: 400px;
+        }
+
+        @media (max-width: 460px) {
+          width: 100%;
+        }
+      }
+
+      .btn {
+
+        @media (max-width: 991px) {
+          margin: 0 auto;
+          width: 400px !important;
+        }
+
+        @media (max-width: 460px) {
+          width: 100% !important;
+        }
+      }
+    }
+
+    p {
+      color: rgba(255,255,255,.8);
+
+      a {
+        color: $white;
+      }
+    }
+
+    .footer__logo {
+      margin: 6rem auto 1rem auto;
+      max-height: 46px;
+
+      @media (max-width: 1199px) {
+        margin-bottom: 2rem;
+      }
+
+      @media (max-width: 991px) {
+        margin-top: 4.5rem;
+      }
+
+      @media (max-width: 767px) {
+        margin-bottom: 3rem;
+      }
+    }
+  }
+}
