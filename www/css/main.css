@@ -2102,3 +2102,15 @@ a:hover {
       background: #fff; }
       .splash #wrapper #footer img {
         max-height: 150px; }
+.questions {
+  display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    text-decoration: underline;
+  }
+
+.questions a {
+    color: #ffffff;
+
+}
