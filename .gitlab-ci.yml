@@ -1,0 +1,11 @@
+image: mycro/solc-python:latest
+
+stages:
+  - test
+
+unit test backend:
+  script:
+    - cd backend
+    - pip install -q -r requirements.txt
+    - cd tests
+    - python -m unittest discover -v
