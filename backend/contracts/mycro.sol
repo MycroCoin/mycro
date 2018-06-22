@@ -28,9 +28,12 @@ contract MycroCoin is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public _totalSupply;
+    address[] action_smart_contracts;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
+    mapping(address => address[]) asc_votes;
+
 
 
     // ------------------------------------------------------------------------
@@ -144,4 +147,25 @@ contract MycroCoin is ERC20Interface, Owned, SafeMath {
     function transferAnyERC20Token(address tokenAddress, uint tokens) public onlyOwner returns (bool success) {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
+
+    function propose(address asc_address) public {
+        // TODO prevent same contract from being proposed twice
+        action_smart_contracts.push(asc_address);
+    }
+
+    function get_proposals() public view returns (address[]) {
+        return action_smart_contracts;
+    }
+
+    function vote(address proposal) {
+        // TODO prevent users from voting for same asc twice
+        asc_votes[proposal].push(msg.sender);
+
+        // TODO auto pass asc once it passes a threshold
+    }
+
+    function get_num_votes(address asc_address) public view returns (uint256) {
+        return asc_votes[asc_address].length;
+    }
+
 }

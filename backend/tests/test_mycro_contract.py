@@ -7,7 +7,6 @@ from web3.contract import ConciseContract
 from backend.tests.util.contract_compiler import ContractCompiler
 import unittest
 
-
 class TestMycro(unittest.TestCase):
 
     def setUp(self):
@@ -30,10 +29,21 @@ class TestMycro(unittest.TestCase):
 
         # Contract instance in concise mode
         abi = self.contract_interface['abi']
-        contract_instance = self.w3.eth.contract(address=contract_address, abi=abi,ContractFactoryClass=ConciseContract)
+        self.contract_instance = self.w3.eth.contract(address=contract_address, abi=abi,ContractFactoryClass=ConciseContract)
 
-        # Getters + Setters for web3.eth.contract object
-        print('Contract value: {}'.format(contract_instance.totalSupply()))
+    def test_can_propose(self):
 
-    def test_lol(self):
-        pass
+        asc_address = self.w3.eth.accounts[1]
+        self.contract_instance.propose(asc_address, transact={'from': self.w3.eth.accounts[0]})
+        proposals = self.contract_instance.get_proposals()
+
+        self.assertEqual(1, len(proposals))
+        self.assertEqual(str(asc_address), proposals[0])
+
+    def test_can_vote(self):
+        asc_address = self.w3.eth.accounts[1]
+        self.contract_instance.vote(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
+        self.assertEqual(1, self.contract_instance.get_num_votes(asc_address))
+
+
