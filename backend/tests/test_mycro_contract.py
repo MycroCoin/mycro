@@ -3,70 +3,37 @@ import web3
 
 from web3 import Web3, HTTPProvider
 from web3.providers.eth_tester import EthereumTesterProvider
-from solc import compile_source, compile_files
 from web3.contract import ConciseContract
-import os
+from backend.tests.util.contract_compiler import ContractCompiler
+import unittest
 
 
-class ContractCompiler:
-    backend_root = os.path.dirname(os.path.dirname(__file__))
-    contracts_root = os.path.join(backend_root, 'contracts')
+class TestMycro(unittest.TestCase):
 
-    def __init__(self):
-        self.contracts = None
+    def setUp(self):
 
-    def compile_contracts(self):
-        self.contracts = compile_files(self.get_contract_files())
+        self.compiler = ContractCompiler()
+        self.contract_interface = self.compiler.get_contract_interface("mycro.sol", "MycroCoin")
 
-    def get_contract_files(self):
-        contracts = []
+        # web3.py instance
+        self.w3 = Web3(EthereumTesterProvider())
 
-        for root, dirs, files in os.walk(self.contracts_root):
-            for file in files:
-                contracts.append(os.path.join(root, file))
+        # Instantiate and deploy contract
+        contract = self.w3.eth.contract(abi=self.contract_interface['abi'], bytecode=self.contract_interface['bin'])
 
-        return contracts
+        # Get transaction hash from deployed contract
+        tx_hash = contract.deploy(transaction={'from': self.w3.eth.accounts[0]})
 
-    def get_contract_interface(self, contract_file_name, contract_name):
-        if self.contracts is None:
-            self.compile_contracts()
+        # Get tx receipt to get contract address
+        tx_receipt = self.w3.eth.getTransactionReceipt(tx_hash)
+        contract_address = tx_receipt['contractAddress']
 
-        contract_path = self.find_contract(contract_file_name)
+        # Contract instance in concise mode
+        abi = self.contract_interface['abi']
+        contract_instance = self.w3.eth.contract(address=contract_address, abi=abi,ContractFactoryClass=ConciseContract)
 
-        if contract_path is None:
-            raise ValueError(f"contract {contract_file_name} doesn't exist")
+        # Getters + Setters for web3.eth.contract object
+        print('Contract value: {}'.format(contract_instance.totalSupply()))
 
-        return self.contracts[f'{contract_path}:{contract_name}']
-
-    def find_contract(self, contract_file_name):
-
-        for root, dirs, files in os.walk(self.contracts_root):
-            for file in files:
-                if file == contract_file_name:
-                    return os.path.join(root, contract_file_name)
-
-        return None
-
-
-compiler = ContractCompiler()
-contract_interface = compiler.get_contract_interface("mycro.sol", "MycroCoin")
-
-# web3.py instance
-w3 = Web3(EthereumTesterProvider())
-
-# Instantiate and deploy contract
-contract = w3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
-
-# Get transaction hash from deployed contract
-tx_hash = contract.deploy(transaction={'from': w3.eth.accounts[0]})
-
-# Get tx receipt to get contract address
-tx_receipt = w3.eth.getTransactionReceipt(tx_hash)
-contract_address = tx_receipt['contractAddress']
-
-# Contract instance in concise mode
-abi = contract_interface['abi']
-contract_instance = w3.eth.contract(address=contract_address, abi=abi,ContractFactoryClass=ConciseContract)
-
-# Getters + Setters for web3.eth.contract object
-print('Contract value: {}'.format(contract_instance.totalSupply()))
+    def test_lol(self):
+        pass
