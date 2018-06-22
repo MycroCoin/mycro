@@ -1,11 +1,20 @@
-image: mycro/solc-python:latest
+image: docker:latest
+
+variables:
+  DOCKER_DRIVER: overlay2
+
+  TEST_IMAGE_NAME: registry.gitlab.com/mycro/mycro/tests:$CI_COMMIT_REF_NAME
 
 stages:
   - test
 
-unit test backend:
+unit_test_backend:
+  services:
+    - docker:dind
   script:
     - cd backend
-    - pip install -q -r requirements.txt
-    - cd tests
-    - python -m unittest discover -v
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker pull $TEST_IMAGE_NAME || true
+    - docker build --cache-from $TEST_IMAGE_NAME -t $TEST_IMAGE_NAME -f tests.Dockerfile .
+    - docker run $TEST_IMAGE_NAME
+    - docker push $TEST_IMAGE_NAME
