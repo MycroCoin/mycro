@@ -17,6 +17,7 @@ import "./safe_math.sol";
 import "./erc20_interface.sol";
 import "./approve_and_call_fallback.sol";
 import "./owned.sol";
+import "./ASC_interface.sol";
 
 
 // ----------------------------------------------------------------------------
@@ -39,7 +40,7 @@ contract MycroCoin is ERC20Interface, Owned, SafeMath {
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    function MycroCoin() public {
+    constructor() {
         symbol = "myc";
         name = "MycroCoin";
         decimals = 18;
@@ -166,6 +167,13 @@ contract MycroCoin is ERC20Interface, Owned, SafeMath {
 
     function get_num_votes(address asc_address) public view returns (uint256) {
         return asc_votes[asc_address].length;
+    }
+
+    function execute_asc(address asc_address) returns (uint){
+        // TODO this should not be a public function and should only be executed internally when a vote passes
+        ASC_interface asc = ASC_interface(asc_address);
+
+        asc.execute();
     }
 
 }
