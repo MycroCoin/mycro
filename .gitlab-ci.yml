@@ -9,6 +9,7 @@ stages:
   - test
 
 unit_test_backend:
+  stage: test
   services:
     - docker:dind
   script:

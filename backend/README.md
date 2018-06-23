@@ -2,12 +2,11 @@
 Inspired by https://www.jetbrains.com/help/pycharm/using-docker-as-a-remote-interpreter.html
 Below instructions are unnecessary if working purely in docker, which you should
 1. install docker
-2. run `docker build mycro-tests:latest -f test.Dockerfile .`
+1. cd mycro/backend
+2. run `docker build -t mycro-tests:latest -f tests.Dockerfile .`
 3. Add a project interpreter in pycharm and set it up like so: https://imgur.com/a/QdGeoFK
 4. Create a run configuration for the tests by right clicking the tests directory and hitting "run all tests"
 5. Edit the run configuration and make sure that it uses the docker interpreter: https://imgur.com/a/dsZXXId
-6. create a dockerfile configuration like so: https://imgur.com/a/T1jicf0
-7. Add a "before launch" for the tests to build the image, like so: https://imgur.com/a/3EOuKOT
 
 Ok, now whenever you run tests, you'll build the latest image and run them in the docker container, I think.
 
