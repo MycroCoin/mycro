@@ -3,7 +3,7 @@ image: docker:latest
 variables:
   DOCKER_DRIVER: overlay2
 
-  TEST_IMAGE_NAME: registry.gitlab.com/mycro/mycro/tests:$CI_COMMIT_REF_NAME
+  TEST_IMAGE: registry.gitlab.com/mycro/mycro/tests
 
 stages:
   - test
@@ -14,7 +14,12 @@ unit_test_backend:
   script:
     - cd backend
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - docker pull $TEST_IMAGE_NAME || true
-    - docker build --cache-from $TEST_IMAGE_NAME -t $TEST_IMAGE_NAME -f tests.Dockerfile .
-    - docker run $TEST_IMAGE_NAME
-    - docker push $TEST_IMAGE_NAME
+
+    # need to support branches with / in the their name. Do this by replacing / with -
+    - TAG=$(echo $CI_COMMIT_REF_NAME | sed "s/\//-/g")
+    - IMAGE_WITH_TAG=$TEST_IMAGE:$TAG
+
+    - docker pull $IMAGE_WITH_TAG || true
+    - docker build --cache-from $IMAGE_WITH_TAG -t $IMAGE_WITH_TAG -f tests.Dockerfile .
+    - docker run $IMAGE_WITH_TAG
+    - docker push $IMAGE_WITH_TAG
