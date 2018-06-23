@@ -1,26 +1,21 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN apt-get update     \
 && apt-get install -yyq --no-install-recommends     \
 automake     \
 build-essential     \
-pkg-config     \
-libtool     \
 libffi-dev     \
-libssl-dev     \
 libgmp-dev     \
+libsecp256k1-dev \
+libssl-dev     \
+libtool     \
+pkg-config     \
+python3-dev \
+python3-pip \
 software-properties-common     \
 && add-apt-repository ppa:ethereum/ethereum     \
 && apt-get update     \
-&& apt-get install -yyq --no-install-recommends solc     \
-&& add-apt-repository ppa:deadsnakes/ppa \
-&& apt update     \
-&& apt install -yyq --no-install-recommends     \
-python3.6     \
-python3.6-dev     \
-wget     \
-&& wget https://bootstrap.pypa.io/get-pip.py     \
-&& python3.6 get-pip.py     \
-&& ln -s /usr/bin/python3.6 /usr/local/bin/python3     \
-&& ln -s /usr/local/bin/python3 /usr/bin/python     \
+&& apt-get install -yyq solc \
 && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip setuptools
