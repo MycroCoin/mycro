@@ -10,6 +10,12 @@ Below instructions are unnecessary if working purely in docker, which you should
 
 Ok, now whenever you run tests, you'll build the latest image and run them in the docker container, I think.
 
+# Docker Compose Watch tests
+
+cd mycro/backend
+docker build -t mycro-tests:latest -f tests.Dockerfile .
+docker-compose run tests
+
 # Installation instructions OSX
 ```bash
 python3 -m virtualenv venv
