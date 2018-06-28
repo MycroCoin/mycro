@@ -42,3 +42,13 @@ sudo apt-get install solc
 Try running a test
 `python tests/test_mycro_contract.py`
 
+# App Frontend
+This is code debt for now the front end of our app lives in the backend directory.
+
+Useful truffle commands:
+```bash
+truffle compile
+truffle migrate
+```
+
+note that we don't use truffle test as truffle tests aren't stateless.
