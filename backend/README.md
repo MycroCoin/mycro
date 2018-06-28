@@ -43,7 +43,7 @@ Try running a test
 `python tests/test_mycro_contract.py`
 
 # App Frontend
-This is code debt for now the front end of our app lives in the backend directory.
+This is code debt due to the way truffle works. For now the front end of our app relies on the build and migrations directory in our in the backend directory.
 
 Useful truffle commands:
 ```bash
