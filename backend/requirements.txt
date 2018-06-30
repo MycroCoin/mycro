@@ -22,6 +22,8 @@ py-solc==3.1.0
 pycparser==2.18
 pycryptodome==3.6.1
 pyethash==0.1.27
+PyGithub==1.40
+PyJWT==1.6.4
 pysha3==1.0.2
 PyYAML==3.12
 repoze.lru==0.7
