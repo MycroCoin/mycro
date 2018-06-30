@@ -2,8 +2,8 @@
 Inspired by https://www.jetbrains.com/help/pycharm/using-docker-as-a-remote-interpreter.html
 Below instructions are unnecessary if working purely in docker, which you should
 1. install docker
-1. cd mycro/backend
-2. run `docker build -t mycro-tests:latest -f tests.Dockerfile .`
+1. `cd mycro`
+2. run `docker build -t mycro-tests:latest -f backend/tests.Dockerfile .`
 3. Add a project interpreter in pycharm and set it up like so: https://imgur.com/a/QdGeoFK
 4. Create a run configuration for the tests by right clicking the tests directory and hitting "run all tests"
 5. Edit the run configuration and make sure that it uses the docker interpreter: https://imgur.com/a/dsZXXId
@@ -12,9 +12,11 @@ Ok, now whenever you run tests, you'll build the latest image and run them in th
 
 # Docker Compose Watch tests
 
-cd mycro/backend
-docker build -t mycro-tests:latest -f tests.Dockerfile .
-docker-compose run tests
+```
+cd mycro
+docker build -t mycro-tests:latest -f backend/tests.Dockerfile .
+docker-compose -f backend/docker-compose.yml run tests
+```
 
 # Installation instructions OSX
 ```bash

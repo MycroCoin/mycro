@@ -13,7 +13,6 @@ unit_test_backend:
   services:
     - docker:dind
   script:
-    - cd backend
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
 
     # need to support branches with / in the their name. Do this by replacing / with -
@@ -21,6 +20,6 @@ unit_test_backend:
     - IMAGE_WITH_TAG=$TEST_IMAGE:$TAG
 
     - docker pull $IMAGE_WITH_TAG || true
-    - docker build --cache-from $IMAGE_WITH_TAG -t $IMAGE_WITH_TAG -f tests.Dockerfile .
-    - docker run $IMAGE_WITH_TAG
+    - docker build --cache-from $IMAGE_WITH_TAG -t $IMAGE_WITH_TAG -f backend/tests.Dockerfile .
     - docker push $IMAGE_WITH_TAG
+    - docker run $IMAGE_WITH_TAG

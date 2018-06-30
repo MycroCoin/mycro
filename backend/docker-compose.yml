@@ -3,10 +3,10 @@ version: '2'
 services:
   tests:
     build: 
-      context: .
-      dockerfile: tests.Dockerfile
+      context: ..
+      dockerfile: backend/tests.Dockerfile
     command: >
-      watch -n 1 python3 -m unittest discover -v -s backend/tests
+      watch -n 1 ./manage.py test
     volumes: 
       - '.:/mycro/backend'
 

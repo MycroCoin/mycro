@@ -1,0 +1,4 @@
+*.sqlite3
+frontend/*
+www/*
+backend/venv/

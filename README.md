@@ -45,3 +45,16 @@ You should see
   }
 }
 ```
+
+## Mutations with django
+Right now we support project creation mutations:
+
+```
+mutation {
+  createProject(repoName: "testing", daoAddress: "wut", githubAccessToken:"wtf") {
+    newProject {
+      name
+    }
+  }
+}
+```

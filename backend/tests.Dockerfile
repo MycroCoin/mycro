@@ -6,7 +6,12 @@ WORKDIR mycro
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
-COPY . backend
+# needed for django
+RUN ln -s $(which python3) /usr/bin/python
+
+COPY backend backend/
+COPY manage.py .
 ENV TERM xterm
 
-CMD ["python3", "-m", "unittest", "discover", "-v", "-s", "backend/tests"]
+# This is how tests are run in the django world
+CMD ["./manage.py", "test"]

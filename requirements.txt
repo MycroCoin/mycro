@@ -18,12 +18,10 @@ eth-utils==1.0.3
 ethereum==1.6.1
 Flask==1.0.2
 Flask-GraphQL==1.4.1
-graphql-relay==0.4.5
-
-graphene==2.1.0
+graphene==2.1
 graphene-django==2.0.0
-graphql-core==2.0.0
-
+graphql-core==2.0
+graphql-relay==0.4.5
 hexbytes==0.1.0
 idna==2.7
 iso8601==0.1.12
