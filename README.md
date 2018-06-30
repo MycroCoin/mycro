@@ -1,22 +1,47 @@
 Mycro: A Platform for Open-Source Consumer Application
 
-# Flask backend
-The backend of this project uses a flask server. To get started follow the docs at http://flask.pocoo.org/docs/1.0/quickstart/
+# Django backend
+I'm not 100% sure how to get started. I followed http://docs.graphene-python.org/projects/django/en/latest/tutorial-plain/
 
-To run the backend do:
-```shell
-$ cd backend
-$ FLASK_APP="src/server/app.py" flask run
+I think the only commands you need to do are:
+
+```python
+$ python manage.py migrate
+$ python ./manage.py loaddata projects
+$ python ./manage.py runserver
 ```
 
-If you use Pycharm, open up settings and enable flask integration:
+Then visit `localhost:8000/graphql` and enter the following as your query to
+see if it works:
 
-![Imgur](https://i.imgur.com/fWoFh6G.png)
+```
+query {
+  allProjects {
+    name,
+    id
+  }
+}
+```
 
-Next, right click on `app.py` and create a flask configuration
+You should see
 
-![Imgur](https://i.imgur.com/i423eVz.png)
-
-And tune the configuration by enabling debug:
-
-![Imgur](https://i.imgur.com/e1fWBYz.png)
+```
+{
+  "data": {
+    "allProjects": [
+      {
+        "name": "paymahn",
+        "id": "1"
+      },
+      {
+        "name": "aaron",
+        "id": "2"
+      },
+      {
+        "name": "kyle",
+        "id": "3"
+      }
+    ]
+  }
+}
+```

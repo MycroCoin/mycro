@@ -1,0 +1,29 @@
+[
+  {
+    "model": "server.project",
+    "pk": 1,
+    "fields": {
+      "name": "paymahn",
+      "github_access_token": "fake",
+      "dao_address": "0x111"
+    }
+  },
+  {
+    "model": "server.project",
+    "pk": 2,
+    "fields": {
+      "name": "aaron",
+      "github_access_token": "news",
+      "dao_address": "0x3333"
+    }
+  },
+  {
+    "model": "server.project",
+    "pk": 3,
+    "fields": {
+      "name": "kyle",
+      "github_access_token": "haha",
+      "dao_address": "0x2222"
+    }
+  }
+]
