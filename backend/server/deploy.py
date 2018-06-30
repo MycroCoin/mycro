@@ -1,7 +1,7 @@
 from web3 import Web3
 from web3.providers import HTTPProvider
-from backend.src.utils.contract_compiler import ContractCompiler
-from backend.src.utils.utils import deploy_contract
+from backend.server.utils.contract_compiler import ContractCompiler
+from backend.server.utils.utils import deploy_contract
 import logging
 import sys
 import os
