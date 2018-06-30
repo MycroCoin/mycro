@@ -8,13 +8,11 @@ contract DummyASC is ASC_interface {
 
     event Execution();
 
-    constructor(){
-        merge_module = new MergeModule();
+    constructor(address _merge_module){
+        merge_module = MergeModule(_merge_module);
     }
 
     function execute() public {
-        // TODO this should execute a module instead of do nothing
-        // TODO this emits an Execution event while we wait for @kyle to finish off the merge_module event
-        emit Execution();
+        merge_module.execute();
     }
 }

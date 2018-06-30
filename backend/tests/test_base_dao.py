@@ -40,7 +40,9 @@ class TestBaseDao(unittest.TestCase):
 
     def test_vote_fails_when_voting_second_time(self):
         asc_interface = self.compiler.get_contract_interface("dummy_asc.sol", "DummyASC")
-        _, asc_address, _ = deploy_contract(W3, asc_interface)
+
+        # passing dummy address for merge module
+        _, asc_address, _ = deploy_contract(W3, asc_interface, W3.eth.accounts[0])
 
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
@@ -57,7 +59,6 @@ class TestBaseDao(unittest.TestCase):
         with self.assertRaises(TransactionFailed):
             self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
-
     def test_starting_balance(self):
         balance = self.dao_instance.balanceOf(W3.eth.accounts[7])
 
@@ -70,12 +71,16 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertTrue(self.dao_instance.isModuleRegistered(module))
 
+
     def test_vote_passes_threshold_executes_asc(self):
         asc_interface = self.compiler.get_contract_interface("dummy_asc.sol", "DummyASC")
+        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
 
-        asc_contract, asc_address, asc_instance = deploy_contract(W3, asc_interface)
-        event_filter = asc_contract.events.Execution.createFilter(argument_filters={'filter': {'event': 'Execution'}},
-                                                                  fromBlock=0)
+        merge_contract, merge_address, merge_instance = deploy_contract(W3, merge_module_interface, 1)
+        _, asc_address, asc_instance = deploy_contract(W3, asc_interface, merge_address)
+
+        event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
+                                                                fromBlock=0)
 
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
         self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[7]})
@@ -84,5 +89,7 @@ class TestBaseDao(unittest.TestCase):
 
         self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[8]})
 
-        events = event_filter.get_new_entries()
-        self.assertEqual(1, len(events))
+        entries = event_filter.get_new_entries()
+
+        self.assertEqual(1, len(entries))
+        self.assertEqual(1, entries[0]["args"]["pr_id"])

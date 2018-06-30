@@ -52,8 +52,8 @@ contract MycroCoin is BaseDao{
         registeredProjects.push(project);
     }
 
+
     function getProjects() public view returns (address[]) {
         return registeredProjects;
     }
-
 }
