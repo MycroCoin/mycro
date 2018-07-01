@@ -38,3 +38,9 @@ class TestMycro(unittest.TestCase):
 
         # should not fail
         self.mycro_instance.execute_asc(asc_address);
+
+    def test_give_initial_balance(self):
+
+        balance = self.mycro_instance.balanceOf("0x364ca3F935E88Fbc9e041d2032F996CAc69452e6")
+
+        self.assertEqual(self.mycro_instance.totalSupply(), balance)

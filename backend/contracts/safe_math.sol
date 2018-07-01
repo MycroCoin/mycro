@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.24;
 
 contract SafeMath {
     function safeAdd(uint a, uint b) public pure returns (uint c) {

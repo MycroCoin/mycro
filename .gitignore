@@ -2,3 +2,5 @@
 .python-version
 .DS_Store
 *.sqlite3
+.coverage
+backend/coverage/

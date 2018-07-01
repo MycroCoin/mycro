@@ -9,7 +9,7 @@ class ContractCompiler:
         self.contracts = None
 
     def compile_contracts(self):
-        self.contracts = compile_files(self.get_contract_files())
+        self.contracts = compile_files(self.get_contract_files(), evm_version='homestead')
 
     def get_contract_files(self):
         contracts = []
