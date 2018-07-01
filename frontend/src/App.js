@@ -5,6 +5,7 @@ import './App.css';
 import Home from './home/Home.js';
 import Projects from './projects/Projects.js';
 import Project from './projects/Project.js';
+import CreateProject from './projects/CreateProject.js';
 import Asc from './projects/Asc.js';
 
 class App extends Component {
@@ -20,9 +21,11 @@ class App extends Component {
 
             <Link to="/home">Home</Link>
             <Link to="/projects">Projects</Link>
+            <Link to="/projects/create">New Project</Link>
 
           </header>
           <Switch>
+            <Route path="/projects/create" component={CreateProject}/>
             <Route path="/projects/:projectId/asc/:ascId" component={Asc}/>
             <Route path="/projects/:id" component={Project}/>
             <Route path="/projects" component={Projects}/>
