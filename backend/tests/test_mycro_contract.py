@@ -44,3 +44,11 @@ class TestMycro(unittest.TestCase):
         balance = self.mycro_instance.balanceOf("0x364ca3F935E88Fbc9e041d2032F996CAc69452e6")
 
         self.assertEqual(self.mycro_instance.totalSupply(), balance)
+
+    def test_register_project(self):
+        project_address = self.w3.eth.accounts[1]
+        self.mycro_instance.registerProject(project_address, transact={'from': self.w3.eth.accounts[0]})
+
+        projects = self.mycro_instance.getProjects()
+        self.assertEqual(project_address, projects[0])
+

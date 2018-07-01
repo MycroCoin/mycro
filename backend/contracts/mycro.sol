@@ -22,6 +22,9 @@ contract MycroCoin is BaseDao{
     uint[] initialBalances;
     bool initialized = false;
 
+    address[] registeredProjects;
+
+
 
     constructor() BaseDao("myc", "MycroCoin", 18, 100000000000000000000000000, getInitialAddresses(), getInitialBalances()) public{
         initialized = true;
@@ -45,6 +48,14 @@ contract MycroCoin is BaseDao{
         initialBalances.push(100000000000000000000000000);
 
         return initialBalances;
+    }
+
+    function registerProject(address project) public {
+        registeredProjects.push(project);
+    }
+
+    function getProjects() public view returns (address[]) {
+        return registeredProjects;
     }
 
 }
