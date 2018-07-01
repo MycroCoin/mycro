@@ -1,0 +1,14 @@
+[run]
+omit =
+    */venv/*
+    /Applications/PyCharm.app/*
+
+
+[report]
+omit =
+    */venv/*
+    /Applications/PyCharm.app/*
+
+[html]
+directory = backend/coverage
+

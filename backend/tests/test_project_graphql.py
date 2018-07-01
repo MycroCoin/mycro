@@ -1,15 +1,17 @@
 from django.test import TestCase, Client
 import json
-from backend.server.models import Project
+from backend.server.models import Project, ASC
 
 PROJECT_NAME = 'mycro'
 DAO_ADDRESS = '123'
 GITHUB_ACCESS_TOKEN = 'fake'
+ASC_ADDRESS = '456'
 
 class TestProjectGraphQL(TestCase):
     def setUp(self):
         self._client = Client()
-        Project.objects.create(repo_name=PROJECT_NAME, dao_address=DAO_ADDRESS)
+        self.project = Project.objects.create(repo_name=PROJECT_NAME, dao_address=DAO_ADDRESS)
+        self.asc = ASC.objects.create(address=ASC_ADDRESS, project=self.project)
 
     def query(self, query: str, op_name: str = None, input: dict = None):
         '''
@@ -44,7 +46,7 @@ class TestProjectGraphQL(TestCase):
         self.assertNotIn('errors', resp, 'Response had errors')
         self.assertEqual(resp['data'], expected, 'Response has correct data')
 
-    def test_login_mutation_successful(self):
+    def test_get_all_projects(self):
         resp = self.query(
             '''
 query {
@@ -56,6 +58,18 @@ query {
             '''
         )
         self.assertResponseNoErrors(resp, {'allProjects': [{'daoAddress': DAO_ADDRESS, 'repoName': PROJECT_NAME }]})
+
+    def test_get_all_ascs(self):
+        resp = self.query(
+            '''
+query {
+  allAscs {
+    address
+  }
+}
+            '''
+        )
+        self.assertResponseNoErrors(resp, {'allAscs': [{'address': ASC_ADDRESS}]})
 
 
     def test_create_project(self):
@@ -101,3 +115,64 @@ query {{
             '''
         )
         self.assertResponseNoErrors(resp, {'project': {'id': "1"}})
+
+    def test_get_asc_by_project_id(self):
+        resp = self.query(
+            '''
+query {
+  ascForProject(projectId: "1") {
+    project {
+        repoName
+    }
+  }
+}
+            '''
+        )
+
+        self.assertResponseNoErrors(resp, {'ascForProject': [{'project': {'repoName': PROJECT_NAME}}]})
+
+    def test_get_asc_by_id(self):
+        resp = self.query(
+            '''
+query {
+  asc(ascId: "1") {
+     address
+  }
+}
+            '''
+        )
+
+        self.assertResponseNoErrors(resp, {'asc': {'address': ASC_ADDRESS}})
+
+    def test_get_asc_by_address(self):
+        resp = self.query(
+            f'''
+query {{
+  asc(address: "{ASC_ADDRESS}") {{
+     id
+  }}
+}}
+            '''
+        )
+
+        self.assertResponseNoErrors(resp, {'asc': {'id': "1"}})
+
+    def test_create_asc(self):
+        ASC.objects.filter().delete()
+        # need to double up on braces because of f-strings
+        resp = self.query(f"""
+mutation {{
+  createAsc(address: "{ASC_ADDRESS}", projectId: "1")  {{
+    newAsc {{
+      address
+    }}
+  }}
+}}
+""")
+        self.assertResponseNoErrors(resp, {'createAsc': {'newAsc': {'address': ASC_ADDRESS}}})
+
+        all_ascs = ASC.objects.all()
+
+        self.assertEqual(1, len(all_ascs))
+        self.assertEqual(PROJECT_NAME, all_ascs[0].project.repo_name)
+        self.assertEqual(ASC_ADDRESS, all_ascs[0].address)

@@ -54,3 +54,11 @@ truffle migrate
 ```
 
 note that we don't use truffle test as truffle tests aren't stateless.
+
+# Code coverage
+To get code coverage results do the following:
+
+```
+$ cd mycro
+$ coverage erase && coverage run --source='.' manage.py test backend.tests && coverage html && open backend/coverage/index.html
+```
