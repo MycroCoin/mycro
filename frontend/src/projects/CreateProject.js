@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom'
+import { Contracts, deployHelper } from '../Contracts.js'
 import PropTypes from 'prop-types'
 
 class CreateProject extends Component {
@@ -24,7 +25,21 @@ class CreateProject extends Component {
 
   handleSubmit(){
     //TODO(peddle) submit here
-    this.props.history.push('/projects/new-project-id');
+    deployHelper(Contracts.BaseDao, 
+      this.state.projectName, //symbol
+      this.state.projectName, //name
+      1000, //decimals
+      1000, //total supply
+      window.web3.eth.accounts, //initial addresses
+      [1000] //initial balance
+    ).then(instance => {
+      const address = instance.address;
+      Contracts.MycroCoin.deployed()
+        .then(mycro => {
+          mycro.registerProject(address)
+            .then(() => this.props.history.push('/projects/new-project-id'));
+        });
+    });
   }
 
   render() {
