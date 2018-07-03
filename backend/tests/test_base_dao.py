@@ -2,6 +2,7 @@ from web3 import Web3
 from web3.providers.eth_tester import EthereumTesterProvider
 from backend.server.utils.contract_compiler import ContractCompiler
 from backend.server.utils.utils import deploy_contract
+from eth_tester.exceptions import TransactionFailed
 import unittest
 
 SYMBOL = 'lol'
@@ -33,11 +34,31 @@ class TestBaseDao(unittest.TestCase):
         self.assertEqual(1, len(proposals))
         self.assertEqual(str(asc_address), proposals[0])
 
-    def test_can_vote(self):
+    def test_vote_fails_for_unproposed_asc(self):
         asc_address = self.w3.eth.accounts[1]
+
+        with self.assertRaises(TransactionFailed):
+            self.dao_instance.vote(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
+    def test_vote_fails_when_voting_second_time(self):
+        asc_interface = self.compiler.get_contract_interface("dummy_asc.sol", "DummyASC")
+        _, asc_address, _ = deploy_contract(self.w3, asc_interface)
+
+        self.dao_instance.propose(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
         self.dao_instance.vote(asc_address, transact={'from': self.w3.eth.accounts[0]})
 
-        self.assertEqual(1, self.dao_instance.get_num_votes(asc_address))
+        with self.assertRaises(TransactionFailed):
+            self.dao_instance.vote(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
+    def test_propose_same_asc_twice_fails(self):
+        asc_address = self.w3.eth.accounts[1]
+
+        self.dao_instance.propose(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
+        with self.assertRaises(TransactionFailed):
+            self.dao_instance.propose(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
 
     def test_starting_balance(self):
         balance = self.dao_instance.balanceOf(INITIAL_ADDRESS)

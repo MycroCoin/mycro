@@ -165,7 +165,8 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     }
 
     function propose(address asc_address) public {
-        // TODO prevent same contract from being proposed twice
+        require(indexOf(asc_address, action_smart_contracts) == -1);
+        
         action_smart_contracts.push(asc_address);
     }
 
@@ -174,8 +175,9 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     }
 
     function vote(address proposal) {
-        // TODO prevent users from voting for same asc twice
-        // TODO prevent voting for unproposed ASC
+        require(indexOf(proposal, action_smart_contracts) != -1);
+        require(indexOf(msg.sender, asc_votes[proposal]) == -1);
+
         asc_votes[proposal].push(msg.sender);
 
         if (shouldExecuteAsc(proposal)) {
@@ -214,7 +216,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return -1;
     }
 
-    function shouldExecuteAsc(address asc) internal returns (bool) {
+    function shouldExecuteAsc(address asc) internal view returns (bool) {
         if (asc_votes[asc].length >= 2) {
             return true;
         }
