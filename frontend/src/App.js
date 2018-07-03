@@ -7,6 +7,11 @@ import Projects from './projects/Projects.js';
 import Project from './projects/Project.js';
 import CreateProject from './projects/CreateProject.js';
 import Asc from './projects/Asc.js';
+import { Contracts, deployHelper } from './Contracts.js';
+
+//TODO remove these (here for debugging). access contracts/deployer as needed within scope
+window.deployHelper = deployHelper;
+window.Contracts = Contracts;
 
 class App extends Component {
   render() {
