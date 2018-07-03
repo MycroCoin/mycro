@@ -30,6 +30,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     uint8 public decimals;
     uint public totalSupply;
     address[] action_smart_contracts;
+    address[] registeredModules;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -185,6 +186,27 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         ASC_interface asc = ASC_interface(asc_address);
 
         asc.execute();
+    }
+
+    function registerModule(address module) public {
+        registeredModules.push(module);
+    }
+
+
+    function isModuleRegistered(address module) public view returns (bool) {
+        return indexOf(module, registeredModules) != -1;
+    }
+
+    function indexOf(address needle, address[] haystack) internal pure returns (int) {
+
+        // TODO make this more efficient
+        for(uint i = 0; i < haystack.length; i++) {
+            if (haystack[i] == needle) {
+                return int(i);
+            }
+        }
+
+        return -1;
     }
 
 }

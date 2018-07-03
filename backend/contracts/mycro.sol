@@ -24,8 +24,6 @@ contract MycroCoin is BaseDao{
 
     address[] registeredProjects;
 
-
-
     constructor() BaseDao("myc", "MycroCoin", 18, 100000000000000000000000000, getInitialAddresses(), getInitialBalances()) public{
         initialized = true;
     }
