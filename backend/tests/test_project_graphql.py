@@ -9,7 +9,7 @@ GITHUB_ACCESS_TOKEN = 'fake'
 class TestProjectGraphQL(TestCase):
     def setUp(self):
         self._client = Client()
-        Project.objects.create(name=PROJECT_NAME, github_access_token=GITHUB_ACCESS_TOKEN, dao_address=DAO_ADDRESS)
+        Project.objects.create(repo_name=PROJECT_NAME, dao_address=DAO_ADDRESS)
 
     def query(self, query: str, op_name: str = None, input: dict = None):
         '''
@@ -49,34 +49,33 @@ class TestProjectGraphQL(TestCase):
             '''
 query {
   allProjects {
-    name,
+    repoName,
     daoAddress,
-    githubAccessToken
   }
 }
             '''
         )
-        self.assertResponseNoErrors(resp, {'allProjects': [{'daoAddress': DAO_ADDRESS, 'name': PROJECT_NAME, 'githubAccessToken': GITHUB_ACCESS_TOKEN}]})
+        self.assertResponseNoErrors(resp, {'allProjects': [{'daoAddress': DAO_ADDRESS, 'repoName': PROJECT_NAME }]})
 
 
     def test_create_project(self):
         Project.objects.filter().delete()
         # need to double up on braces because of f-strings
         resp = self.query(f"""
-mutation maker {{
-  createProject(repoName: "{PROJECT_NAME}", daoAddress: "{DAO_ADDRESS}", githubAccessToken:"{GITHUB_ACCESS_TOKEN}") {{
+mutation {{
+  createProject(repoName: "{PROJECT_NAME}", daoAddress: "{DAO_ADDRESS}") {{
     newProject {{
-      name
+      repoName
     }}
   }}
 }}
 """)
-        self.assertResponseNoErrors(resp, {'createProject': {'newProject': {'name': PROJECT_NAME}}})
+        self.assertResponseNoErrors(resp, {'createProject': {'newProject': {'repoName': PROJECT_NAME}}})
 
         all_projects = Project.objects.all()
 
         self.assertEqual(1, len(all_projects))
-        self.assertEqual(PROJECT_NAME, all_projects[0].name)
+        self.assertEqual(PROJECT_NAME, all_projects[0].repo_name)
 
 
     def test_get_project_by_id(self):
@@ -84,18 +83,18 @@ mutation maker {{
             '''
 query {
   project(id: "1") {
-    name
+    repoName
   }
 }
             '''
         )
-        self.assertResponseNoErrors(resp, {'project': {'name': PROJECT_NAME}})
+        self.assertResponseNoErrors(resp, {'project': {'repoName': PROJECT_NAME}})
 
     def test_get_project_by_name(self):
         resp = self.query(
             f'''
 query {{
-  project(name: "{PROJECT_NAME}") {{
+  project(repoName: "{PROJECT_NAME}") {{
     id
   }}
 }}
