@@ -12,6 +12,7 @@ INITIAL_ADDRESS = '0x1111111111111111111111111111111111111111'
 INITIAL_ADDRESSES = [INITIAL_ADDRESS]
 INITIAL_BALANCES = [TOTAL_SUPPLY]
 
+
 class TestBaseDao(unittest.TestCase):
 
     def setUp(self):
@@ -21,8 +22,8 @@ class TestBaseDao(unittest.TestCase):
         self.w3 = Web3(EthereumTesterProvider())
 
         contract_interface = self.compiler.get_contract_interface("base_dao.sol", "BaseDao")
-        _, _, self.dao_instance = deploy_contract(self.w3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY, INITIAL_ADDRESSES, INITIAL_BALANCES)
-
+        _, _, self.dao_instance = deploy_contract(self.w3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY,
+                                                  INITIAL_ADDRESSES, INITIAL_BALANCES)
 
     def test_can_propose(self):
         asc_address = self.w3.eth.accounts[1]
@@ -38,16 +39,7 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertEqual(1, self.dao_instance.get_num_votes(asc_address))
 
-    def test_execute_asc(self):
-        asc_interface = self.compiler.get_contract_interface("dummy_asc.sol", "DummyASC")
-
-        _, asc_address, asc_instance = deploy_contract(self.w3, asc_interface)
-
-        # should not fail
-        self.dao_instance.execute_asc(asc_address)
-
     def test_starting_balance(self):
-
         balance = self.dao_instance.balanceOf(INITIAL_ADDRESS)
 
         self.assertEqual(self.dao_instance.totalSupply(), balance)
@@ -58,3 +50,20 @@ class TestBaseDao(unittest.TestCase):
         self.dao_instance.registerModule(module, transact={'from': self.w3.eth.accounts[0]})
 
         self.assertTrue(self.dao_instance.isModuleRegistered(module))
+
+    def test_vote_passes_threshold_executes_asc(self):
+        asc_interface = self.compiler.get_contract_interface("dummy_asc.sol", "DummyASC")
+
+        asc_contract, asc_address, asc_instance = deploy_contract(self.w3, asc_interface)
+        event_filter = asc_contract.events.Execution.createFilter(argument_filters={'filter': {'event': 'Execution'}},
+                                                                  fromBlock=0)
+
+        self.dao_instance.propose(asc_address, transact={'from': self.w3.eth.accounts[0]})
+        self.dao_instance.vote(asc_address, transact={'from': self.w3.eth.accounts[0]})
+
+        self.assertEqual(0, len(event_filter.get_new_entries()))
+
+        self.dao_instance.vote(asc_address, transact={'from': self.w3.eth.accounts[1]})
+
+        events = event_filter.get_new_entries()
+        self.assertEqual(1, len(events))

@@ -31,6 +31,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     uint public totalSupply;
     address[] action_smart_contracts;
     address[] registeredModules;
+    uint threshold;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -59,6 +60,8 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
             balances[currentAddress] = currentBalance;
             Transfer(address(0), currentAddress, currentBalance);
         }
+
+        threshold = 2;
     }
 
 
@@ -172,17 +175,19 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
 
     function vote(address proposal) {
         // TODO prevent users from voting for same asc twice
+        // TODO prevent voting for unproposed ASC
         asc_votes[proposal].push(msg.sender);
 
-        // TODO auto pass asc once it passes a threshold
+        if (shouldExecuteAsc(proposal)) {
+            execute_asc(proposal);
+        }
     }
 
     function get_num_votes(address asc_address) public view returns (uint256) {
         return asc_votes[asc_address].length;
     }
 
-    function execute_asc(address asc_address) returns (uint){
-        // TODO this should not be a public function and should only be executed internally when a vote passes
+    function execute_asc(address asc_address) internal returns (uint){
         ASC_interface asc = ASC_interface(asc_address);
 
         asc.execute();
@@ -207,6 +212,14 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         }
 
         return -1;
+    }
+
+    function shouldExecuteAsc(address asc) internal returns (bool) {
+        if (asc_votes[asc].length >= 2) {
+            return true;
+        }
+
+        return false;
     }
 
 }
