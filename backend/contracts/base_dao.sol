@@ -31,7 +31,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     uint public totalSupply;
     address[] action_smart_contracts;
     address[] registeredModules;
-    uint threshold;
+    uint public threshold;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -61,7 +61,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
             Transfer(address(0), currentAddress, currentBalance);
         }
 
-        threshold = 2;
+        threshold = totalSupply / 2 + 1;
     }
 
 
@@ -166,7 +166,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
 
     function propose(address asc_address) public {
         require(indexOf(asc_address, action_smart_contracts) == -1);
-        
+
         action_smart_contracts.push(asc_address);
     }
 
@@ -217,7 +217,14 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     }
 
     function shouldExecuteAsc(address asc) internal view returns (bool) {
-        if (asc_votes[asc].length >= 2) {
+        uint sum = 0;
+
+        // TODO make this more efficient
+        for (uint i = 0; i < asc_votes[asc].length; i++) {
+            sum += balances[asc_votes[asc][i]];
+        }
+
+        if (sum >= threshold) {
             return true;
         }
 
