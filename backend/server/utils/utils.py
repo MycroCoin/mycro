@@ -5,10 +5,10 @@ def deploy_contract(w3, contract_interface, *args):
     contract = w3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
 
     # Get transaction hash from deployed contract
-    tx_hash = contract.constructor(*args).transact()
+    tx_hash = contract.constructor(*args).transact(transaction={'from': w3.eth.accounts[0]})
 
     # Get tx receipt to get contract address
-    tx_receipt = w3.eth.getTransactionReceipt(tx_hash)
+    tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
     contract_address = tx_receipt['contractAddress']
 
     # Contract instance in concise mode

@@ -2,6 +2,8 @@ from web3 import Web3
 from web3.providers import HTTPProvider
 from backend.server.utils.contract_compiler import ContractCompiler
 from backend.server.utils.utils import deploy_contract
+from web3.middleware import geth_poa_middleware
+
 import logging
 import sys
 import os
@@ -17,7 +19,8 @@ def get_kaleido_username_password():
 def deploy_to_kaleido(contract_interface):
     user, password = get_kaleido_username_password()
 
-    w3 = Web3(HTTPProvider(f"https://{user}:{password}@u0telyzine-u0lq1q8otp-rpc.us-east-2.kaleido.io"))
+    w3 = Web3(HTTPProvider(f"https://{user}:{password}@u0a9n6r4oc-u0qutwl2df-rpc.us-east-2.kaleido.io"))
+    w3.middleware_stack.inject(geth_poa_middleware, layer=0)
 
     return w3, deploy_contract(w3, contract_interface)
 
