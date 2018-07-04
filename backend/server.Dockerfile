@@ -13,5 +13,4 @@ COPY backend backend/
 COPY manage.py .
 ENV TERM xterm
 
-# This is how tests are run in the django world
-CMD ["./manage.py", "test"]
+

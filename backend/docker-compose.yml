@@ -1,12 +1,23 @@
 version: '2'
 
 services:
+  server:
+    build: 
+      context: ..
+      dockerfile: backend/server.Dockerfile
+    ports:
+      - "8000:8000"
+    # https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
+    command: >
+      bash -c "./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
+    volumes: 
+      - '.:/mycro/backend'
   tests:
     build: 
       context: ..
-      dockerfile: backend/tests.Dockerfile
+      dockerfile: backend/server.Dockerfile
     command: >
-      watch -n 1 ./manage.py test
+      ./manage.py test
     volumes: 
       - '.:/mycro/backend'
 
