@@ -2,9 +2,11 @@ import graphene
 
 import backend.server.schemas.project
 import backend.server.schemas.asc
+import backend.server.schemas.mycro_dao
 
 
-class Query(backend.server.schemas.project.Query, backend.server.schemas.asc.Query, graphene.ObjectType):
+class Query(backend.server.schemas.project.Query, backend.server.schemas.asc.Query,
+            backend.server.schemas.mycro_dao.Query, graphene.ObjectType):
     # This class will inherit from multiple Queries
     # as we begin to add more apps to our project
     pass
