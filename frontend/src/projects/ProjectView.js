@@ -35,7 +35,7 @@ class Project extends Component {
     const id = this.state.project.id;
     const project = this.state.project; 
     const ascs = project.ascs.map( asc => (
-      <div>
+      <div key={asc.id}>
         <Link to={"/projects/"+id+"/asc/"+asc.id}>
           <h3>{asc.name}</h3>
         </Link>

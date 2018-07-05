@@ -67,7 +67,7 @@ class Projects extends Component {
     );
       
     const projects = 
-      this.state.projects.map(project => (<Project project={project}/>));
+      this.state.projects.map(project => (<Project key={project.id} project={project}/>));
     return (
       <div className="Page">
         <h1>Projects</h1>
