@@ -4,6 +4,7 @@ from graphene_django.types import DjangoObjectType
 from graphene import ObjectType
 
 from backend.server.models import ASC, Project
+from backend.server.utils.contract_compiler import ContractCompiler
 
 
 class AscType(DjangoObjectType):
@@ -19,6 +20,8 @@ class Query(ObjectType):
     asc_for_project = graphene.List(AscType,
                                     project_id=graphene.String())
     all_ASCs = graphene.List(AscType)
+
+    get_merge_asc_abi = graphene.JSONString()
 
     def resolve_all_ASCs(self, info):
         all_ascs = ASC.objects.all()
@@ -40,6 +43,12 @@ class Query(ObjectType):
     def resolve_asc_for_project(self, info, project_id):
         ascs = ASC.objects.filter(project__pk=project_id)
         return ascs
+
+    def resolve_get_merge_asc_abi(self, info):
+        contract_compiler = ContractCompiler()
+
+        asc_interface = contract_compiler.get_contract_interface("merge_asc.sol", "MergeASC")
+        return asc_interface['abi']
 
 
 class CreateASC(graphene.Mutation):

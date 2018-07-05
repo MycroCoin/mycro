@@ -82,3 +82,14 @@ mutation {{
         self.assertEqual(1, len(all_ascs))
         self.assertEqual(constants.PROJECT_NAME, all_ascs[0].project.repo_name)
         self.assertEqual(constants.ASC_ADDRESS, all_ascs[0].address)
+
+    def test_get_merge_asc_abi(self):
+        resp = self.query("""
+query {
+    getMergeAscAbi
+} 
+        """)
+
+        # basically just testing that nothing errors out
+        # don't want to assert anything on the returned abi because that will make this test brittle
+        self.assertNotIn('errors', resp)
