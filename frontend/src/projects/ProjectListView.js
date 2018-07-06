@@ -28,33 +28,16 @@ class Projects extends Component {
 
   loadProjects(){
     Contracts.MycroCoin.deployed().then(mycro => {
-      mycro.getProjects().then(projectAddresses => {
-        const projectPromises = projectAddresses.map(getProjectForAddress);
-        Promise.all(projectPromises).then(projectContracts => {
-          Promise.all(projectContracts.map(projectContractToProjectJson))
-            .then( projects => this.setState({projects}));
-        });
-      });
+      return mycro.getProjects();
+    }).then(projectAddresses => {
+      return Promise.all(projectAddresses.map(getProjectForAddress));
+    }).then(projectContracts => {
+      return Promise.all(projectContracts.map(projectContractToProjectJson));
+    }).then(projects => {
+      return this.setState({projects});
     });
-
-    return [
-      {
-        name: "foo",
-        id: 1,
-        githubUrl: "github.com/peddle/unix-dev-config"
-      },
-      {
-        name: "bar",
-        id: 2,
-        githubUrl: "github.com/peddle/unix-dev-config"
-      },
-      {
-        name: "baz",
-        id: 3,
-        githubUrl: "github.com/peddle/unix-dev-config"
-      },
-    ]
   }
+
   render() {
     const Project = (props) => (
       <div>
