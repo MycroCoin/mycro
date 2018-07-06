@@ -25,21 +25,20 @@ class CreateProject extends Component {
 
   handleSubmit(){
     //TODO(peddle) submit here
+    var address = null;
     deployHelper(Contracts.BaseDao, 
       this.state.projectName, //symbol
       this.state.projectName, //name
       1000, //decimals
       1000, //total supply
-      window.web3.eth.accounts, //initial addresses
+      [window.web3.eth.accounts[0]], //initial addresses
       [1000] //initial balance
     ).then(instance => {
-      const address = instance.address;
-      Contracts.MycroCoin.deployed()
-        .then(mycro => {
-          mycro.registerProject(address)
-            .then(() => this.props.history.push('/projects/new-project-id'));
-        });
-    });
+      address = instance.address;
+      return Contracts.MycroCoin.deployed()
+    }).then(mycro => {
+      return mycro.registerProject(address)
+    }).then(() => this.props.history.push('/projects/'+address));
   }
 
   render() {

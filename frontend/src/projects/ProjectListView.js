@@ -1,18 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {Contracts} from '../Contracts.js';
-
-const getProjectForAddress = (address) => {
-  return Contracts.BaseDao.at(address);
-}
-
-const projectContractToProjectJson = (contract) => {
-  return new Promise( (resolve) => {
-    contract.name().then(name => {
-      resolve({id: contract.address, name: name, githubUrl: ""});
-    });
-  });
-}
+import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
 
 class Projects extends Component {
   constructor(props) {

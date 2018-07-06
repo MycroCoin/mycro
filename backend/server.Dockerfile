@@ -14,9 +14,5 @@ COPY manage.py .
 RUN ./manage.py migrate
 ENV TERM xterm
 
-<<<<<<< HEAD:backend/server.Dockerfile
-=======
 # This is how tests are run in the django world
 CMD ["./manage.py", "test"]
->>>>>>> store current state of this branch:backend/tests.Dockerfile
-

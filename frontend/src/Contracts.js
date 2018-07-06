@@ -8,6 +8,18 @@ import BaseDaoData from './build/contracts/BaseDao.json';
 const provider = window.web3.currentProvider;
 const web3 = window.web3;
 
+const createTruffleContract = (data) => {
+  const contract = TruffleContract(data);
+  contract.setProvider(provider);
+  contract.defaults({from: web3.eth.defaultAccount});
+  return contract;
+};
+
+const deployHelper = (contract, ...args) => {
+    //TODO use a promise here to avoid race condition
+    return deployer.deploy(contract, ...args);
+};
+
 var deployer = null;
 web3.version.getNetwork(function(err, id) {
       const network_id = id;
@@ -27,18 +39,13 @@ const Contracts = {
 };
 
 //add providers
-Object.keys(Contracts).forEach(contract => {
-  Contracts[contract].setProvider(provider);
-  Contracts[contract].defaults({from: web3.eth.defaultAccount});
+Object.keys(Contracts).forEach((contract) => {
+  Contracts[contract] = createTruffleContract(Contracts[contract]);
 });
-
-const deployHelper = (contract, ...args) => {
-    //TODO use a promise here to avoid race condition
-    return deployer.deploy(contract, ...args);
-};
 
 export {
   Contracts,
-  deployHelper
+  deployHelper,
+  createTruffleContract
 };
 

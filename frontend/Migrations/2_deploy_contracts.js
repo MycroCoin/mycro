@@ -1,11 +1,11 @@
 var contracts = [
-  "MergeModule",
-  "MycroCoin",
+  ["MergeModule", 1],
+  ["MycroCoin"],
 ];
 
 const imported = 
-  contracts.map( (contract) => artifacts.require(contract));
+  contracts.map( ([contract, ...args]) => [artifacts.require(contract), ...args]);
 
 module.exports = function(deployer) {
-  imported.map( (contract) => deployer.deploy(contract));
+  imported.map( ([contract, ...args]) => deployer.deploy(contract, ...args));
 };

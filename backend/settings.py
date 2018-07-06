@@ -134,7 +134,34 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 CORS_ORIGIN_WHITELIST = (
-    'localhost:3000',
-    '127.0.0.1:3000'
+    'localhost:3000'
 )
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT'
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+CSRF_TRUSTED_ORIGINS = (
+    'localhost:3000',
+    '127.0.0.1:3000',
+)
+
+CORS_ALLOW_CREDENTIALS = True
 

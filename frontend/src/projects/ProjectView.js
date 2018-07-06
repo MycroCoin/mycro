@@ -1,13 +1,20 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
+import client from '../GraphqlClient.js';
+import { createTruffleContract, deployHelper } from '../Contracts.js';
+import gql from 'graphql-tag';
+import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
+
 
 class Project extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      projectContract: null,
       project: this.getProject(this.props.match.params.id),
     }
+    this.loadProject();
   }
 
   getProject(id){
@@ -30,6 +37,31 @@ class Project extends Component {
     }
   }
 
+  loadProject(){
+    const address = this.props.match.params.id;
+    var projectContract = null;
+    getProjectForAddress(address).then(contract => {
+      projectContract = contract
+      return projectContractToProjectJson(contract);
+    }).then((project) => {
+      this.setState({project, projectContract});
+    });
+  }
+
+  createPullRequest(){
+    const query = gql`query{
+      getMergeAscAbi
+    }`;
+    client.query({query}).then(({data: {getMergeAscAbi: ascData}}, error) => {
+        const asc = createTruffleContract(JSON.parse(ascData));
+        return deployHelper(asc, 1);
+    }).then((asc) => {
+      return this.state.projectContract.propose(asc.address)
+    }).then(() => {
+      console.log("proposed");
+      this.loadProject();
+    });;
+  }
 
   render() {
     const id = this.state.project.id;
@@ -49,6 +81,8 @@ class Project extends Component {
           <h2>Open ASCs</h2>
           {ascs}
         </div>
+
+        <button onClick={() => this.createPullRequest()}>Create Pull Request</button>
       </div>
     );
   }
