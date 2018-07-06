@@ -48,7 +48,7 @@ class Query(ObjectType):
         contract_compiler = ContractCompiler()
 
         asc_interface = contract_compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        return asc_interface['abi']
+        return { 'abi': asc_interface['abi'], 'unlinked_binary': asc_interface['bin']}
 
 
 class CreateASC(graphene.Mutation):
