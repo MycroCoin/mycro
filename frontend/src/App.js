@@ -9,6 +9,16 @@ import {
   CreateProjectView,
   AscView} from './projects';
 
+import gql from 'graphql-tag';
+import {graphql} from 'react-apollo';
+const query = gql`query{
+  getMergeAscAbi
+}`;
+const queryHandler = ({ data: {loading, error, getMergeAscAbi }}) => {
+  window.asc = getMergeAscAbi;
+}
+graphql(query)(queryHandler);
+
 class App extends Component {
   render() {
     return (
