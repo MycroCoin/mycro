@@ -11,6 +11,7 @@ contract MergeASC is ASC_interface {
     }
 
     function execute() public {
-        merge_module.execute();
+        // TODO take PR ID in constructor and pass it here
+        merge_module.merge(1);
     }
 }

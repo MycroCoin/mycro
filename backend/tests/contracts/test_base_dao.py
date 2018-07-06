@@ -76,7 +76,7 @@ class TestBaseDao(unittest.TestCase):
         asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
         merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
 
-        merge_contract, merge_address, merge_instance = deploy_contract(W3, merge_module_interface, 1)
+        merge_contract, merge_address, merge_instance = deploy_contract(W3, merge_module_interface)
         _, asc_address, asc_instance = deploy_contract(W3, asc_interface, merge_address)
 
         event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
