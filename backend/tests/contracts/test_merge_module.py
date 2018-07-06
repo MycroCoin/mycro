@@ -15,4 +15,4 @@ class TestMergeModule(unittest.TestCase):
 
 
     def test_get_name(self):
-        self.assertEqual("MergeModule", self.merge_module_instance.getName())
+        self.assertEqual(1, self.merge_module_instance.getCode())

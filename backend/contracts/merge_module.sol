@@ -13,7 +13,7 @@ contract MergeModule {
         emit Merge(pr_id);
     }
 
-    function getName() public returns (string) {
-        return "MergeModule";
+    function getCode() public returns (uint) {
+        return 1;
     }
 }

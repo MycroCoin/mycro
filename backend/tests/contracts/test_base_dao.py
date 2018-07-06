@@ -65,11 +65,16 @@ class TestBaseDao(unittest.TestCase):
         self.assertEqual(33, balance)
 
     def test_register_module(self):
-        module = W3.eth.accounts[1]
 
-        self.dao_instance.registerModule(module, transact={'from': W3.eth.accounts[0]})
+        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
+        merge_contract, merge_address, merge_instance = deploy_contract(W3, merge_module_interface)
+        self.dao_instance.registerModule(merge_address, transact={'from': W3.eth.accounts[0]})
 
-        self.assertTrue(self.dao_instance.isModuleRegistered(module))
+        dummy_module_interface = self.compiler.get_contract_interface("dummy_module.sol", "DummyModule")
+        _, dummy_module_address, _ = deploy_contract(W3, dummy_module_interface)
+
+        self.assertTrue(self.dao_instance.isModuleRegistered(merge_address))
+        self.assertFalse(self.dao_instance.isModuleRegistered(dummy_module_address))
 
 
     def test_vote_passes_threshold_executes_asc(self):

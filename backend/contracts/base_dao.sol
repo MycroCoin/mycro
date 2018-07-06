@@ -18,6 +18,7 @@ import "./erc20_interface.sol";
 import "./approve_and_call_fallback.sol";
 import "./owned.sol";
 import "./ASC_interface.sol";
+import "./module_interface.sol";
 
 
 // ----------------------------------------------------------------------------
@@ -30,12 +31,13 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     uint8 public decimals;
     uint public totalSupply;
     address[] action_smart_contracts;
-    address[] registeredModules;
     uint public threshold;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     mapping(address => address[]) asc_votes;
+    mapping(uint => address) modulesByCode;
+    mapping(address => uint) modulesByAddress;
 
 
 
@@ -195,13 +197,15 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         asc.execute();
     }
 
-    function registerModule(address module) public {
-        registeredModules.push(module);
+    function registerModule(ModuleInterface module) public {
+        uint code = module.getCode();
+        modulesByAddress[module] = code;
+        modulesByCode[code] = module;
     }
 
 
-    function isModuleRegistered(address module) public view returns (bool) {
-        return indexOf(module, registeredModules) != -1;
+    function isModuleRegistered(ModuleInterface module) public view returns (bool) {
+        return modulesByCode[module.getCode()] != 0;
     }
 
     function indexOf(address needle, address[] haystack) internal pure returns (int) {
