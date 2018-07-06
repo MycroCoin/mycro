@@ -2,16 +2,21 @@ pragma solidity ^0.4.0;
 
 import "./ASC_interface.sol";
 import "./merge_module.sol";
+import "./base_dao.sol";
 
 contract MergeASC is ASC_interface {
-    MergeModule public merge_module;
+    uint public prId;
 
-    constructor(address _merge_module){
-        merge_module = MergeModule(_merge_module);
+    constructor(uint _prId){
+        prId = _prId;
     }
 
     function execute() public {
-        // TODO take PR ID in constructor and pass it here
-        merge_module.merge(1);
+        BaseDao dao = BaseDao(msg.sender);
+
+        address merge_module_address = dao.getModuleByCode(1);
+        MergeModule merge_module = MergeModule(merge_module_address);
+
+        merge_module.merge(prId);
     }
 }

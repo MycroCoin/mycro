@@ -208,6 +208,10 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return modulesByCode[module.getCode()] != 0;
     }
 
+    function getModuleByCode(uint code) public view returns (address){
+        return modulesByCode[code];
+    }
+
     function indexOf(address needle, address[] haystack) internal pure returns (int) {
 
         // TODO make this more efficient
