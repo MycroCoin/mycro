@@ -5,6 +5,7 @@ from graphene import ObjectType
 
 from backend.server.models import Project
 from backend.server.tasks import add
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 
 class ProjectType(DjangoObjectType):
@@ -19,7 +20,12 @@ class Query(ObjectType):
     all_projects = graphene.List(ProjectType)
 
     def resolve_all_projects(self, info):
-        add.delay(1,2)
+        # TODO get rid of this logic because it's just dummy logic
+        # This will cause multiple calls to allProjects to fail because we can't create two PeriodicTasks with the same
+        # name
+        schedule, created = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.SECONDS, )
+        PeriodicTask.objects.create(interval=schedule, name="print 1 constantly",
+                                    task='backend.server.tasks.print_stuff')
         return Project.objects.all()
 
     def resolve_project(self, info, **kwargs):

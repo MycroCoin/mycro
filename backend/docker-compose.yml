@@ -26,8 +26,8 @@ services:
     build:
       context: ..
       dockerfile: backend/server.Dockerfile
-    command: >
-      celery -A backend worker -l debug
+      # TODO run the beat as a separate service instead of embedding in the worker
+    command: celery -A backend worker -l debug -B --scheduler django_celery_beat.schedulers:DatabaseScheduler
   server:
     depends_on:
       - redis

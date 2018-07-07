@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'backend.server',
     'graphene_django',
     'django_celery_results',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [

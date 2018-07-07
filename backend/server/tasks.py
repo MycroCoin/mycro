@@ -4,6 +4,10 @@ from celery import shared_task
 
 
 @shared_task
+def print_stuff():
+    print("1")
+
+@shared_task
 def add(x, y):
     return x + y
 
