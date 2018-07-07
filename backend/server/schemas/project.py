@@ -4,6 +4,7 @@ from graphene_django.types import DjangoObjectType
 from graphene import ObjectType
 
 from backend.server.models import Project
+from backend.server.tasks import add
 
 
 class ProjectType(DjangoObjectType):
@@ -18,6 +19,7 @@ class Query(ObjectType):
     all_projects = graphene.List(ProjectType)
 
     def resolve_all_projects(self, info):
+        add.delay(1,2)
         return Project.objects.all()
 
     def resolve_project(self, info, **kwargs):

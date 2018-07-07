@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
+import dj_database_url
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backend.server',
     'graphene_django',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -75,12 +77,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+DATABASES = {}
+
+DATABASES['default'] = dj_database_url.config(env='DJANGO_DB_URL', default=f'sqlite:///{os.path.join(BASE_DIR, "db.sqlite3")}')
+
 
 
 # Password validation
@@ -126,3 +126,6 @@ GRAPHENE = {
     'SCHEMA': 'backend.schema.schema'
 }
 
+# Celery config
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'

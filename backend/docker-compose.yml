@@ -1,8 +1,44 @@
 version: '2'
 
 services:
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_PASSWORD=loltesting
+      - POSTGRES_USER=user
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis:4
+    ports:
+      - "6379:6379"
+    command: >
+        redis-server --requirepass loltesting
+  worker:
+    environment:
+      # can't use localhost because that always points to the current container. To talk to another container, it's
+      # network name is the service name
+      - CELERY_BROKER_URL=redis://:loltesting@redis:6379/0
+      - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
+    depends_on:
+      - redis
+    build:
+      context: ..
+      dockerfile: backend/server.Dockerfile
+    command: >
+      celery -A backend worker -l debug
   server:
-    build: 
+    depends_on:
+      - redis
+      - worker
+      - db
+    environment:
+      # can't use localhost because that always points to the current container. To talk to another container, it's
+      # network name is the service name
+      - CELERY_BROKER_URL=redis://:loltesting@redis:6379/0
+      - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
+    build:
       context: ..
       dockerfile: backend/server.Dockerfile
     ports:
@@ -10,7 +46,7 @@ services:
     # https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
     command: >
       bash -c "./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
-    volumes: 
+    volumes:
       - '.:/mycro/backend'
   tests:
     build: 
