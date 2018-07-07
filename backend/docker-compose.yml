@@ -1,6 +1,14 @@
 version: '2'
 
 services:
+  ganache:
+    image: trufflesuite/ganache-cli
+    # need -p because cli and gui have different default ports I think
+    # need -h because of how docker networking works. Ganaches decides what host to listen to and docker-compose names
+    # the network 'ganache' instead of 127.0.0.1
+    command: ganache-cli -p 7545 -h ganache
+    ports:
+      - "7545:7545"
   db:
     image: postgres:10
     environment:
@@ -21,8 +29,11 @@ services:
       # network name is the service name
       - CELERY_BROKER_URL=redis://:loltesting@redis:6379/0
       - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
+      - GANACHE_ENDPOINT=http://ganache:7545
     depends_on:
       - redis
+      - db
+      - ganache
     build:
       context: ..
       dockerfile: backend/server.Dockerfile

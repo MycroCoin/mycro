@@ -15,18 +15,28 @@ def get_kaleido_username_password():
 
     return user, password
 
-
-def deploy_to_kaleido(contract_interface):
+def get_kaleido_endpoint():
     user, password = get_kaleido_username_password()
 
-    w3 = Web3(HTTPProvider(f"https://{user}:{password}@u0a9n6r4oc-u0qutwl2df-rpc.us-east-2.kaleido.io"))
+    return os.environ.get("KALEIDO_ENDPOINT", f"https://{user}:{password}@u0a9n6r4oc-u0qutwl2df-rpc.us-east-2.kaleido.io")
+
+
+def get_ganache_endpoint():
+    return os.environ.get("GANACHE_ENDPOINT", "http://127.0.0.1:7545")
+
+
+def deploy_to_kaleido(contract_interface):
+    kaleido_endpoint = get_kaleido_endpoint()
+    w3 = Web3(HTTPProvider(kaleido_endpoint))
     w3.middleware_stack.inject(geth_poa_middleware, layer=0)
 
     return w3, deploy_contract(w3, contract_interface)
 
 
 def deploy_to_ganache(contract_interface):
-    w3 = Web3(HTTPProvider("HTTP://127.0.0.1:7545"))
+    ganache_endpoint = get_ganache_endpoint()
+    logging.info(f"Connecting to {ganache_endpoint}")
+    w3 = Web3(HTTPProvider(ganache_endpoint))
 
     return w3, deploy_contract(w3, contract_interface)
 

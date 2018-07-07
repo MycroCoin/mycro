@@ -23,9 +23,9 @@ class Query(ObjectType):
         # TODO get rid of this logic because it's just dummy logic
         # This will cause multiple calls to allProjects to fail because we can't create two PeriodicTasks with the same
         # name
-        schedule, created = IntervalSchedule.objects.get_or_create(every=1, period=IntervalSchedule.SECONDS, )
+        schedule, created = IntervalSchedule.objects.get_or_create(every=5, period=IntervalSchedule.SECONDS, )
         PeriodicTask.objects.create(interval=schedule, name="print 1 constantly",
-                                    task='backend.server.tasks.print_stuff')
+                                    task='backend.server.tasks.deploy_mycro')
         return Project.objects.all()
 
     def resolve_project(self, info, **kwargs):
