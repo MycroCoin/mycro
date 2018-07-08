@@ -5,25 +5,31 @@ const getProjectForAddress = (address) => {
 };
 
 const ascAddressToJson = (address) => {
-  return {id: address, name: "no name"};
+  return new Promise(resolve => {
+    resolve({id: address, name: "no name"});
+  });
 };
 
 const projectContractToProjectJson = (contract) => {
-  return new Promise( (resolve) => {
-    Promise.all([
-      contract.name(),
-      contract.get_proposals()
-    ]).then( ([name, ascAddresses]) => {
-      const id = contract.address;
-      const githubUrl = "";
-      const ascs = ascAddresses.map(ascAddressToJson);
-      resolve({name, ascs, id, githubUrl});
-    });
+  const projectJson = {};
+  projectJson.id = contract.address;
+  projectJson.githubUrl = "";
+
+  return Promise.all([
+    contract.name(),
+    contract.get_proposals()
+  ]).then( ([name, ascAddresses]) => {
+    projectJson.name = name;
+    return Promise.all(ascAddresses.map(ascAddressToJson))
+  }).then((ascs) => {
+    projectJson.ascs = ascs;
+    return projectJson;
   });
 }
 
 export {
   getProjectForAddress,
-  projectContractToProjectJson
+  projectContractToProjectJson,
+  ascAddressToJson
 }
 

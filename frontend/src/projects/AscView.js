@@ -1,14 +1,34 @@
 import React, { Component } from 'react';
+import {ascAddressToJson, getProjectForAddress} from './ProjectHelpers.js';
 
 class Asc extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      projectContract: null,
       asc: this.getAsc(this.props.match.params.ascId),
       voteState: "NOT_VOTED",
     }
+
+
+    this.loadAsc(this.props.match.params.ascId);
+    getProjectForAddress(this.props.match.params.projectId).then(projectContract => {
+      this.setState(Object.assign(this.state, {projectContract}));
+
+      this.loadVoteState();
+    });
   }
+  loadVoteState(){
+    this.state.projectContract.get_asc_votes(this.state.asc.id, this.state.asc.id).then(votes => {
+      console.log(votes);
+      if(votes.find(address => address === window.web3.eth.defaultAccount)){
+      
+        this.setState(Object.assign(this.state, {voteState: "VOTE_ACCEPT"}));
+      }
+    });
+  }
+
   getAsc(id){
     return {
         id,
@@ -17,8 +37,18 @@ class Asc extends Component {
       }
   }
 
+  loadAsc(id){
+    ascAddressToJson(id).then((asc) => {
+      asc.code = "foo bar baz delete me";
+
+      this.setState(Object.assign(this.state, {asc}));
+    });
+  }
+
   voteAccept(){
-    this.updateVoteState("VOTE_ACCEPT");
+    this.state.projectContract.vote(this.state.asc.id).then(() =>{
+      this.loadVoteState();
+    });
   }
 
   voteReject(){

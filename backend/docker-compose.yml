@@ -67,15 +67,4 @@ services:
       ./manage.py test
     volumes: 
       - '.:/mycro/backend'
-  runserver:
-    build: 
-      context: ..
-      dockerfile: backend/backend.Dockerfile
-    ports:
-      - "8000:8000"
-    command: >
-      ./manage.py runserver
-    volumes: 
-      - '.:/mycro/backend'
-
 

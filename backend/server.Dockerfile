@@ -11,8 +11,5 @@ RUN ln -s $(which python3) /usr/bin/python
 
 COPY backend backend/
 COPY manage.py .
-RUN ./manage.py migrate
 ENV TERM xterm
 
-# This is how tests are run in the django world
-CMD ["./manage.py", "test"]

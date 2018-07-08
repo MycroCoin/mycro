@@ -60,7 +60,7 @@ class Project extends Component {
     }).then(() => {
       console.log("proposed");
       this.loadProject();
-    });;
+    });
   }
 
   render() {

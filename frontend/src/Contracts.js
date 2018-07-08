@@ -3,6 +3,7 @@ import TruffleDeployer from 'truffle-deployer';
 // Import contracts
 import MycroCoinData from './build/contracts/MycroCoin.json';
 import BaseDaoData from './build/contracts/BaseDao.json';
+import MergeAscData from './build/contracts/MergeASC.json';
 
 //TODO have backup providers here
 const provider = window.web3.currentProvider;
@@ -36,6 +37,7 @@ web3.version.getNetwork(function(err, id) {
 const Contracts = {
   MycroCoin: TruffleContract(MycroCoinData),
   BaseDao: TruffleContract(BaseDaoData),
+  MergeAsc: TruffleContract(MergeAscData),
 };
 
 //add providers

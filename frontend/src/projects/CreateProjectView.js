@@ -31,8 +31,9 @@ class CreateProject extends Component {
       this.state.projectName, //name
       1000, //decimals
       1000, //total supply
-      [window.web3.eth.accounts[0]], //initial addresses
-      [1000] //initial balance
+      //TODO (peddle) this is a hack to prevent voted on ascs from executing since merge module hasn't been installed yet
+      [window.web3.eth.defaultAddress, '0x43794a164fb4e0a943e051a859a7cb536fc57c1a'], //initial addresses
+      [1, 999] //initial balance
     ).then(instance => {
       address = instance.address;
       return Contracts.MycroCoin.deployed()
