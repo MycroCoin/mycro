@@ -24,6 +24,7 @@ class TestBaseDao(unittest.TestCase):
         _, _, self.dao_instance = deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY,
                                                   INITIAL_ADDRESSES, INITIAL_BALANCES)
 
+
     def test_can_propose(self):
         asc_address = W3.eth.accounts[1]
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})

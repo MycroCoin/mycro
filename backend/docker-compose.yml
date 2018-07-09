@@ -34,6 +34,7 @@ services:
       - redis
       - db
       - ganache
+      - server
     build:
       context: ..
       dockerfile: backend/server.Dockerfile
@@ -42,13 +43,15 @@ services:
   server:
     depends_on:
       - redis
-      - worker
       - db
+      - ganache
     environment:
       # can't use localhost because that always points to the current container. To talk to another container, it's
       # network name is the service name
       - CELERY_BROKER_URL=redis://:loltesting@redis:6379/0
       - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
+      - DEPLOY_MYCRO_DAO=true
+      - GANACHE_ENDPOINT=http://ganache:7545
     build:
       context: ..
       dockerfile: backend/server.Dockerfile
@@ -60,11 +63,11 @@ services:
     volumes:
       - '.:/mycro/backend'
   tests:
-    build: 
+    build:
       context: ..
       dockerfile: backend/server.Dockerfile
     command: >
       ./manage.py test
-    volumes: 
+    volumes:
       - '.:/mycro/backend'
 
