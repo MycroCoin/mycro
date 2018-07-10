@@ -33,17 +33,19 @@ class CreateProject extends Component {
       1000, //decimals
       1000, //total supply
       //TODO (peddle) this is a hack to prevent voted on ascs from executing since merge module hasn't been installed yet
-      [window.web3.eth.defaultAddress], //initial addresses
+      [window.web3.eth.accounts[0]], //initial addresses
       [1000] //initial balance
     ).then(instance => {
       projectInstance = instance;
+      console.log("Project instance address: " + projectInstance.address);
       return Contracts.MycroCoin.deployed()
     }).then(mycro => {
       return mycro.registerProject(projectInstance.address)
     })
 
     const mergeModulePromise = deployHelper(Contracts.MergeModule).then((instance) => {
-      mergeModuleInstance = instance
+      mergeModuleInstance = instance;
+      console.log("merge module instance address: " + mergeModuleInstance.address);
     });
       
     Promise.all([deployedPromise, mergeModulePromise]).then(() => {

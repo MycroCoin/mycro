@@ -13,13 +13,15 @@ const web3 = window.web3;
 const createTruffleContract = (data) => {
   const contract = TruffleContract(data);
   contract.setProvider(provider);
-  contract.defaults({from: web3.eth.defaultAccount});
+  contract.defaults({from: web3.eth.accounts[9]});
   return contract;
 };
 
 const deployHelper = (contract, ...args) => {
     //TODO use a promise here to avoid race condition
-    return deployer.deploy(contract, ...args);
+    var a = window.web3.eth.accounts[0];
+    a = undefined;
+    return deployer.deploy(contract, ...args, {from: a});
 };
 
 var deployer = null;
@@ -49,10 +51,10 @@ Object.keys(Contracts).forEach((contract) => {
 
 const deployedMycro = () => {
   //TODO don't hardcode and actually grab it with graphql dynamically
-  return Contracts.MycroCoin.at("0x4c6ffC6EA586fCab485C08724d3a911C390D199c");
+  return Contracts.MycroCoin.at("0x96ccE2b02d6DE525Ce73c83c3721f3E6eAF53Cf2");
 }
 // TODO uncomment this once shit is fixed
-// Contracts.MycroCoin.deployed = deployedMycro;
+Contracts.MycroCoin.deployed = deployedMycro;
 
 
 export {

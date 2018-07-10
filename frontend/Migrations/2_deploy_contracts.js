@@ -1,5 +1,5 @@
 var contracts = [
-  ["MergeModule", 1],
+  ["MergeModule"],
   ["MycroCoin"],
 ];
 

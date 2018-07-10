@@ -11,5 +11,6 @@ RUN ln -s $(which python3) /usr/bin/python
 
 COPY backend backend/
 COPY manage.py .
+COPY wait_for_it.sh .
 ENV TERM xterm
 

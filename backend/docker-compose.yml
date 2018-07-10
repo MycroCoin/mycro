@@ -6,7 +6,7 @@ services:
     # need -p because cli and gui have different default ports I think
     # need -h because of how docker networking works. Ganaches decides what host to listen to and docker-compose names
     # the network 'ganache' instead of 127.0.0.1
-    command: ganache-cli -p 7545 -h ganache
+    command: ganache-cli -p 7545 -h ganache -m "nose foot asset wage radar canyon online bread hurry train absent bachelor"
     ports:
       - "7545:7545"
   db:
@@ -39,7 +39,7 @@ services:
       context: ..
       dockerfile: backend/server.Dockerfile
       # TODO run the beat as a separate service instead of embedding in the worker
-    command: celery -A backend worker -l debug -B --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A backend worker -l info -B --scheduler django_celery_beat.schedulers:DatabaseScheduler
   server:
     depends_on:
       - redis
@@ -59,9 +59,9 @@ services:
       - "8001:8000"
     # https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
     command: >
-      bash -c "./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - '.:/mycro/backend'
+      bash -c "./wait_for_it.sh db:5432 && ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
+#    volumes:
+#      - '.:/mycro/backend'
   tests:
     build:
       context: ..
