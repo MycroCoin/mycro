@@ -24,22 +24,33 @@ class CreateProject extends Component {
   }
 
   handleSubmit(){
-    //TODO(peddle) submit here
-    var address = null;
-    deployHelper(Contracts.BaseDao, 
+    var projectInstance = null;
+    var mergeModuleInstance = null;
+
+    const deployedPromise = deployHelper(Contracts.BaseDao, 
       this.state.projectName, //symbol
       this.state.projectName, //name
       1000, //decimals
       1000, //total supply
       //TODO (peddle) this is a hack to prevent voted on ascs from executing since merge module hasn't been installed yet
-      [window.web3.eth.defaultAddress, '0x43794a164fb4e0a943e051a859a7cb536fc57c1a'], //initial addresses
-      [1, 999] //initial balance
+      [window.web3.eth.defaultAddress], //initial addresses
+      [1000] //initial balance
     ).then(instance => {
-      address = instance.address;
+      projectInstance = instance;
       return Contracts.MycroCoin.deployed()
     }).then(mycro => {
-      return mycro.registerProject(address)
-    }).then(() => this.props.history.push('/projects/'+address));
+      return mycro.registerProject(projectInstance.address)
+    })
+
+    const mergeModulePromise = deployHelper(Contracts.MergeModule).then((instance) => {
+      mergeModuleInstance = instance
+    });
+      
+    Promise.all([deployedPromise, mergeModulePromise]).then(() => {
+      return projectInstance.registerModule(mergeModuleInstance.address);
+    }).then(() => {
+      this.props.history.push('/projects/'+projectInstance.address)
+    });
   }
 
   render() {

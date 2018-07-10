@@ -13,6 +13,7 @@ class Project extends Component {
     this.state = {
       projectContract: null,
       project: this.getProject(this.props.match.params.id),
+      prId: 0,
     }
     this.loadProject();
   }
@@ -23,16 +24,6 @@ class Project extends Component {
       id: id,
       githubUrl: "//github.com/peddle/unix-dev-config",
       ascs: [
-        {
-          id: "1",
-          name: "do bar",
-          code: "some code\n contract foo\nbar\nbaz\n"
-        },
-        {
-          id: "2",
-          name: "appoint baz",
-          code: "some code\n contract foo\nbar\nbaz\n"
-        },
       ]
     }
   }
@@ -44,7 +35,8 @@ class Project extends Component {
       projectContract = contract
       return projectContractToProjectJson(contract);
     }).then((project) => {
-      this.setState({project, projectContract});
+      const prId = 0;
+      this.setState({project, projectContract, prId});
     });
   }
 
@@ -54,13 +46,20 @@ class Project extends Component {
     }`;
     client.query({query}).then(({data: {getMergeAscAbi: ascData}}, error) => {
         const asc = createTruffleContract(JSON.parse(ascData));
-        return deployHelper(asc, 1);
+        return deployHelper(asc, this.state.prId);
     }).then((asc) => {
       return this.state.projectContract.propose(asc.address)
     }).then(() => {
       console.log("proposed");
       this.loadProject();
     });
+  }
+
+  handleChange(event){
+    const num = parseInt(event.target.value, 10);
+    if(isNaN(num)) return;
+    this.setState(
+      Object.assign(this.state, {prId: num}));
   }
 
   render() {
@@ -82,6 +81,10 @@ class Project extends Component {
           {ascs}
         </div>
 
+        <input 
+          placeholder="Pull request ID"
+          value={this.state.prId} 
+          onChange={(event) => this.handleChange(event)} />
         <button onClick={() => this.createPullRequest()}>Create Pull Request</button>
       </div>
     );
