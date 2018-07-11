@@ -6,6 +6,9 @@ WORKDIR mycro
 COPY backend/requirements.txt .
 RUN pip3 install -r requirements.txt
 
+# needed for django
+RUN ln -s $(which python3) /usr/bin/python
+
 COPY backend backend/
 COPY manage.py .
 COPY wait_for_it.sh .

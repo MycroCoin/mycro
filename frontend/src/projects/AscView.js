@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {ascAddressToJson, getProjectForAddress} from './ProjectHelpers.js';
+import {getMergeASCForAddress, ascContractToASCJson, getProjectForAddress} from './ProjectHelpers.js';
 
 class Asc extends Component {
   constructor(props) {
@@ -38,11 +38,16 @@ class Asc extends Component {
   }
 
   loadAsc(id){
-    ascAddressToJson(id).then((asc) => {
-      asc.code = "foo bar baz delete me";
-
-      this.setState(Object.assign(this.state, {asc}));
+    getMergeASCForAddress(id).then((contract) => {
+      return ascContractToASCJson(contract);
+    }).then( (json) => {
+        this.setState(Object.assign(this.state, {asc: {id: json.id, prId: json.prId[0]}}));
     });
+    // ascAddressToJson(id).then((asc) => {
+    //   asc.code = "foo bar baz delete me";
+    //
+    //   this.setState(Object.assign(this.state, {asc}));
+    // });
   }
 
   voteAccept(){
@@ -80,6 +85,7 @@ class Asc extends Component {
     return (
       <div className="Page">
         <h1>Asc {asc.id}</h1>
+          <h2> {"Merge PR " + asc.prId} </h2>
         <Footer/>
       </div>
     );

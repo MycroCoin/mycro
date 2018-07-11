@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import client from '../GraphqlClient.js';
-import { createTruffleContract, deployHelper } from '../Contracts.js';
+import { createTruffleContract, deployHelper, Contracts } from '../Contracts.js';
 import gql from 'graphql-tag';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
 
@@ -68,14 +68,14 @@ class Project extends Component {
     const ascs = project.ascs.map( asc => (
       <div key={asc.id}>
         <Link to={"/projects/"+id+"/asc/"+asc.id}>
-          <h3>{asc.name}</h3>
+          <h3>{"Merge Proposal for PR " + asc.prId}</h3>
         </Link>
       </div>));
 
     return (
       <div className="Page">
         <h1> {project.name} ({id})</h1>
-        <a href="http://github.com/mycrocoin/{project.name}">Github Project</a>
+        <a href={"http://github.com/mycrocoin/" + project.name}>Github Project</a>
         <div>
           <h2>Open ASCs</h2>
           {ascs}
@@ -85,7 +85,7 @@ class Project extends Component {
           placeholder="Pull request ID"
           value={this.state.prId} 
           onChange={(event) => this.handleChange(event)} />
-        <button onClick={() => this.createPullRequest()}>Create Pull Request</button>
+        <button onClick={() => this.createPullRequest()}>Create Pull Request Proposal</button>
       </div>
     );
   }

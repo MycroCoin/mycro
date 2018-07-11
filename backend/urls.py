@@ -46,11 +46,11 @@ if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
 
 
     # this access token doesn't have delete permissions
-    # token = "da1f1b18405f9d8af8d878516f2b7883bbfd8451"
-    # github = Github(token)
-    # org = github.get_organization('mycrocoin')
-    # for repo in org.get_repos():
-    #     repo.delete()
+    token = "815c4e96bd6a5a9603d4aa5fc8829cee2697a109"
+    github = Github(token)
+    org = github.get_organization('mycrocoin')
+    for repo in org.get_repos():
+        repo.delete()
 
     compiler = ContractCompiler()
     w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_ganache(

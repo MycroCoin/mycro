@@ -52,7 +52,10 @@ def process_merges():
             org = github.get_organization('mycrocoin')
             repo = org.get_repo(project.repo_name)
             pr = repo.get_pull(pr_id)
-            pr.merge()
+            try:
+                pr.merge()
+            except:
+                pass
 
 
 @shared_task
@@ -92,7 +95,7 @@ def process_registrations():
             github = Github(token)
 
             org = github.get_organization('mycrocoin')
-            org.create_repo(name=repo_name)
+            org.create_repo(name=repo_name, auto_init=True)
             Project.objects.create(repo_name=repo_name, dao_address=registered_project_address)
 
 
