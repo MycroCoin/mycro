@@ -35,13 +35,15 @@ class App extends Component {
             <Link to="/projects/create">New Project</Link>
 
           </header>
-          <Switch>
-            <Route path="/projects/create" component={CreateProjectView}/>
-            <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
-            <Route path="/projects/:id" component={ProjectView}/>
-            <Route path="/projects" component={ProjectListView}/>
-            <Route path="/" component={HomeView}/>
-          </Switch>
+          <div className="App-body">
+            <Switch>
+              <Route path="/projects/create" component={CreateProjectView}/>
+              <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
+              <Route path="/projects/:id" component={ProjectView}/>
+              <Route path="/projects" component={ProjectListView}/>
+              <Route path="/" component={HomeView}/>
+            </Switch>
+          </div>
         </div>
       </BrowserRouter>
     );

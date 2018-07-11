@@ -5,13 +5,19 @@
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
   height: 80px;
+  font-family: 'Lato', sans-serif;
 }
 
 .App-header {
-  background-color: #222;
+  background: linear-gradient(-50deg, #4ff0ff, #0039b5);
   height: 150px;
   padding: 20px;
   color: white;
+}
+
+.App-header a{
+  color: white;
+  padding: 20px;
 }
 
 .App-title {
@@ -22,7 +28,27 @@
   font-size: large;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.App-body {
+  color: #555;
+}
+
+.App-body a {
+  color: #0039b5; 
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.App-body a:hover{
+  text-decoration: underline;
+}
+
+.App-body button{
+  font-size: 20px;
+  font-weight: bold;
+  background-color: white;
+  border-color: #3a1;
+  border-width: 3px;
+  border-radius: 5px;
+  color: #3a1;
+  margin: 20px;
 }

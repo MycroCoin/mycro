@@ -73,17 +73,13 @@ class Asc extends Component {
           return (
             <div>
               <button onClick={() => this.voteAccept()}>Vote Accept</button>
-              <button onClick={() => this.voteReject()}>Vote Reject</button>
             </div>
           )
       }
     }
     return (
       <div className="Page">
-        <h1>Asc {asc.name}</h1>
-        <div>
-          {asc.code}
-        </div>
+        <h1>Asc {asc.id}</h1>
         <Footer/>
       </div>
     );
