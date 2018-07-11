@@ -10,8 +10,8 @@ import os
 
 
 def get_kaleido_username_password():
-    user = os.environ.get("KALEIDO_USER", "u0savgvdua")
-    password = os.environ.get("KALEIDO_PASSWORD")
+    user = os.environ.get("KALEIDO_USER", "u0g9fge43j")
+    password = os.environ.get("KALEIDO_PASSWORD", "LhDEo1KYAuHatVJ2uFaR3i6zK7uIDVBC5Q6RA4UXfHg")
 
     return user, password
 
@@ -24,11 +24,15 @@ def get_kaleido_endpoint():
 def get_ganache_endpoint():
     return os.environ.get("GANACHE_ENDPOINT", "http://127.0.0.1:7545")
 
-
-def deploy_to_kaleido(contract_interface):
+def get_kaleido_w3():
     kaleido_endpoint = get_kaleido_endpoint()
     w3 = Web3(HTTPProvider(kaleido_endpoint))
     w3.middleware_stack.inject(geth_poa_middleware, layer=0)
+
+    return w3
+
+def deploy_to_kaleido(contract_interface):
+    w3 = get_kaleido_w3()
 
     return w3, deploy_contract(w3, contract_interface)
 

@@ -40,7 +40,7 @@ class CreateProject extends Component {
       console.log("Project instance address: " + projectInstance.address);
       return Contracts.MycroCoin.deployed()
     }).then(mycro => {
-      return mycro.registerProject(projectInstance.address)
+      return mycro.registerProject(projectInstance.address, {from: window.web3.eth.accounts[0]})
     })
 
     const mergeModulePromise = deployHelper(Contracts.MergeModule).then((instance) => {
@@ -49,7 +49,8 @@ class CreateProject extends Component {
     });
       
     Promise.all([deployedPromise, mergeModulePromise]).then(() => {
-      return projectInstance.registerModule(mergeModuleInstance.address);
+        console.log("second mm address is " + mergeModuleInstance.address);
+      return projectInstance.registerModule(mergeModuleInstance.address, {from: window.web3.eth.accounts[0]});
     }).then(() => {
       this.props.history.push('/projects/'+projectInstance.address)
     });

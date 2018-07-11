@@ -48,7 +48,7 @@ class Project extends Component {
         const asc = createTruffleContract(JSON.parse(ascData));
         return deployHelper(asc, this.state.prId);
     }).then((asc) => {
-      return this.state.projectContract.propose(asc.address)
+      return this.state.projectContract.propose(asc.address, {from: window.web3.eth.accounts[0]})
     }).then(() => {
       console.log("proposed");
       this.loadProject();

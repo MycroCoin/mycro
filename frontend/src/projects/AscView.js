@@ -22,7 +22,7 @@ class Asc extends Component {
   loadVoteState(){
     this.state.projectContract.get_asc_votes(this.state.asc.id, this.state.asc.id).then(votes => {
       console.log(votes);
-      if(votes.find(address => address === window.web3.eth.defaultAccount)){
+      if(votes.find(address => address === window.web3.eth.accounts[0])){
       
         this.setState(Object.assign(this.state, {voteState: "VOTE_ACCEPT"}));
       }
@@ -46,7 +46,7 @@ class Asc extends Component {
   }
 
   voteAccept(){
-    this.state.projectContract.vote(this.state.asc.id).then(() =>{
+    this.state.projectContract.vote(this.state.asc.id, {from: window.web3.eth.accounts[0]}).then(() =>{
       this.loadVoteState();
     });
   }

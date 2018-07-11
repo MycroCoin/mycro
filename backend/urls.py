@@ -36,7 +36,7 @@ mycro_instance = None
 # a certain env variable is available during the runserver subcommand
 import sys
 if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
-    from backend.server.deploy import deploy_to_ganache
+    from backend.server.deploy import deploy_to_kaleido
     from backend.server.utils.contract_compiler import ContractCompiler
     from django_celery_beat.models import PeriodicTask, IntervalSchedule
     from backend.server.models import Project
@@ -44,7 +44,7 @@ if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
     MERGE_PR_BEAT_NAME = "Detect Merge Events"
 
     compiler = ContractCompiler()
-    w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_ganache(
+    w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_kaleido(
         compiler.get_contract_interface('mycro.sol', 'MycroCoin'))
 
     Project.create_mycro_dao(mycro_address)

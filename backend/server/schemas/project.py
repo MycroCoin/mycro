@@ -64,11 +64,11 @@ class CreateRegisterDao(graphene.Mutation):
         merge_module_interface = compiler.get_contract_interface("merge_module.sol", "MergeModule")
 
         _, dao_address, dao_instance = deploy_contract(w3, dao_interface, 'lol', name, 18, 100,
-                                                       [w3.eth.accounts[7]], [100])
+                                                       [w3.eth.accounts[0]], [100])
         merge_contract, merge_address, merge_instance = deploy_contract(w3, merge_module_interface)
 
-        dao_instance.registerModule(merge_address, transact={'from': w3.eth.accounts[0]})
-        mycro_instance.registerProject(dao_address, transact={'from': w3.eth.accounts[0]})
+        w3.eth.waitForTransactionReceipt(dao_instance.registerModule(merge_address, transact={'from': w3.eth.accounts[0]}))
+        w3.eth.waitForTransactionReceipt(mycro_instance.registerProject(dao_address, transact={'from': w3.eth.accounts[0]}))
 
         return CreateRegisterDao(result=dao_address)
 
@@ -95,10 +95,10 @@ class CreateApproveASC(graphene.Mutation):
                                        ContractFactoryClass=ConciseContract)
         _, asc_address, asc_instance = deploy_contract(w3, asc_interface, pr_id)
 
-        dao_instance.propose(asc_address, transact={'from': w3.eth.accounts[0]})
-        mycro_instance.registerProject(dao_address, transact={'from': w3.eth.accounts[0]})
+        w3.eth.waitForTransactionReceipt(dao_instance.propose(asc_address, transact={'from': w3.eth.accounts[0]}))
+        w3.eth.waitForTransactionReceipt(mycro_instance.registerProject(dao_address, transact={'from': w3.eth.accounts[0]}))
 
-        dao_instance.vote(asc_address, transact={'from': w3.eth.accounts[7]})
+        w3.eth.waitForTransactionReceipt(dao_instance.vote(asc_address, transact={'from': w3.eth.accounts[0]}))
 
         return CreateApproveASC(result=asc_address)
 

@@ -2,7 +2,7 @@
 from github import Github
 from celery import shared_task
 from backend.server.utils.contract_compiler import ContractCompiler
-from backend.server.deploy import get_ganache_endpoint
+from backend.server.deploy import get_kaleido_w3
 from web3 import Web3
 from web3.providers import HTTPProvider
 from backend.server.models import Project
@@ -28,11 +28,15 @@ def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: W
 def process_merges():
     projects = Project.objects.filter()
     compiler = ContractCompiler()
-    w3 = Web3(HTTPProvider(get_ganache_endpoint()))
+    w3 = get_kaleido_w3()
 
     for project in projects:
+        print(f"processing merges for project {project.repo_name}")
         if project.is_mycro_dao:
+            print(f"{project.repo_name} is the mycro doa")
             continue
+
+        print(f"building merge filters for {project.repo_name}")
         merge_filter = build_merge_event_filter(project, compiler, w3)
 
         events = merge_filter.get_all_entries()
@@ -59,7 +63,7 @@ def process_registrations():
 
     # TODO figure out how to cache the compiler, w3, interface, contract and listener
     compiler = ContractCompiler()
-    w3 = Web3(HTTPProvider(get_ganache_endpoint()))
+    w3 = get_kaleido_w3()
 
     contract_interface = compiler.get_contract_interface('mycro.sol', 'MycroCoin')
     mycro_contract = w3.eth.contract(abi=contract_interface['abi'], address=mycro_project.dao_address)
