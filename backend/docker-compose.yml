@@ -2,11 +2,12 @@ version: '2'
 
 services:
   ganache:
-    image: trufflesuite/ganache-cli
+    image: trufflesuite/ganache-cli:v6.1.6
     # need -p because cli and gui have different default ports I think
     # need -h because of how docker networking works. Ganaches decides what host to listen to and docker-compose names
     # the network 'ganache' instead of 127.0.0.1
     command: ganache-cli -p 7545 -h ganache -m "nose foot asset wage radar canyon online bread hurry train absent bachelor"
+#    command: ganache-cli --version
     ports:
       - "7545:7545"
   db:

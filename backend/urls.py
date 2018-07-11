@@ -36,15 +36,24 @@ mycro_instance = None
 # a certain env variable is available during the runserver subcommand
 import sys
 if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
-    from backend.server.deploy import deploy_to_kaleido
+    from backend.server.deploy import deploy_to_kaleido, deploy_to_ganache
     from backend.server.utils.contract_compiler import ContractCompiler
     from django_celery_beat.models import PeriodicTask, IntervalSchedule
     from backend.server.models import Project
+    from github import Github
     PROJECT_REGISTRATION_BEAT_NAME = "Detect Project Registration"
     MERGE_PR_BEAT_NAME = "Detect Merge Events"
 
+
+    # this access token doesn't have delete permissions
+    # token = "da1f1b18405f9d8af8d878516f2b7883bbfd8451"
+    # github = Github(token)
+    # org = github.get_organization('mycrocoin')
+    # for repo in org.get_repos():
+    #     repo.delete()
+
     compiler = ContractCompiler()
-    w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_kaleido(
+    w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_ganache(
         compiler.get_contract_interface('mycro.sol', 'MycroCoin'))
 
     Project.create_mycro_dao(mycro_address)

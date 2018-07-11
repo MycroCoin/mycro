@@ -188,8 +188,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     }
 
     //TODO test this
-    function get_asc_votes(address proposal) 
-        public view returns (address[]) {
+    function get_asc_votes(address proposal) public view returns (address[]) {
       require(indexOf(proposal, action_smart_contracts) != -1);
       
       return asc_votes[proposal];
@@ -205,10 +204,12 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         asc.execute();
     }
 
-    function registerModule(ModuleInterface module) public {
+    function registerModule(address add) public {
+        ModuleInterface module = ModuleInterface(add);
         uint code = module.getCode();
         modulesByAddress[module] = code;
         modulesByCode[code] = module;
+//        modulesByCode[1] = add;
     }
 
 

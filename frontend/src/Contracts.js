@@ -6,6 +6,9 @@ import BaseDaoData from './build/contracts/BaseDao.json';
 import MergeAscData from './build/contracts/MergeASC.json';
 import MergeModuleData from './build/contracts/MergeModule.json';
 
+import client from './GraphqlClient.js';
+import gql from 'graphql-tag';
+
 //TODO have backup providers here
 const provider = window.web3.currentProvider;
 const web3 = window.web3;
@@ -51,7 +54,13 @@ Object.keys(Contracts).forEach((contract) => {
 
 const deployedMycro = () => {
   //TODO don't hardcode and actually grab it with graphql dynamically
-  return Contracts.MycroCoin.at("0x4c6881418589Ec9AB190A1Ca8F3d8Bd9bd8556B1");
+    const query = gql`query{
+  mycroDao 
+}`;
+    return client.query({query}).then(({data: {mycroDao: address}}, error) => {
+        console.log("Mycro dao address is " + address);
+        return Contracts.MycroCoin.at(address);
+    });
 }
 // TODO uncomment this once shit is fixed
 Contracts.MycroCoin.deployed = deployedMycro;

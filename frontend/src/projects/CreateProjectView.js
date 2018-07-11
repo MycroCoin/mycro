@@ -27,7 +27,7 @@ class CreateProject extends Component {
     var projectInstance = null;
     var mergeModuleInstance = null;
 
-    const deployedPromise = deployHelper(Contracts.BaseDao, 
+    const deployedPromise = deployHelper(Contracts.BaseDao,
       this.state.projectName, //symbol
       this.state.projectName, //name
       1000, //decimals
@@ -40,14 +40,15 @@ class CreateProject extends Component {
       console.log("Project instance address: " + projectInstance.address);
       return Contracts.MycroCoin.deployed()
     }).then(mycro => {
-      return mycro.registerProject(projectInstance.address, {from: window.web3.eth.accounts[0]})
-    })
+      var tx = mycro.registerProject(projectInstance.address, {from: window.web3.eth.accounts[0]});
+      return tx
+    });
 
     const mergeModulePromise = deployHelper(Contracts.MergeModule).then((instance) => {
       mergeModuleInstance = instance;
       console.log("merge module instance address: " + mergeModuleInstance.address);
     });
-      
+
     Promise.all([deployedPromise, mergeModulePromise]).then(() => {
         console.log("second mm address is " + mergeModuleInstance.address);
       return projectInstance.registerModule(mergeModuleInstance.address, {from: window.web3.eth.accounts[0]});

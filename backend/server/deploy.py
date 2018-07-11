@@ -24,12 +24,23 @@ def get_kaleido_endpoint():
 def get_ganache_endpoint():
     return os.environ.get("GANACHE_ENDPOINT", "http://127.0.0.1:7545")
 
+def get_ganache_w3():
+    ganache_endpoint = get_ganache_endpoint()
+    logging.info(f"Connecting to {ganache_endpoint}")
+    w3 = Web3(HTTPProvider(ganache_endpoint))
+
+    return w3
+
+
 def get_kaleido_w3():
     kaleido_endpoint = get_kaleido_endpoint()
     w3 = Web3(HTTPProvider(kaleido_endpoint))
     w3.middleware_stack.inject(geth_poa_middleware, layer=0)
 
     return w3
+
+def get_w3():
+    return get_ganache_w3()
 
 def deploy_to_kaleido(contract_interface):
     w3 = get_kaleido_w3()
@@ -38,9 +49,7 @@ def deploy_to_kaleido(contract_interface):
 
 
 def deploy_to_ganache(contract_interface):
-    ganache_endpoint = get_ganache_endpoint()
-    logging.info(f"Connecting to {ganache_endpoint}")
-    w3 = Web3(HTTPProvider(ganache_endpoint))
+    w3 = get_ganache_w3()
 
     return w3, deploy_contract(w3, contract_interface)
 

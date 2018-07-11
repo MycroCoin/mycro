@@ -75,7 +75,7 @@ class Project extends Component {
     return (
       <div className="Page">
         <h1> {project.name} ({id})</h1>
-        <a href={project.githubUrl}>Github Project</a>
+        <a href="http://github.com/mycrocoin/{project.name}">Github Project</a>
         <div>
           <h2>Open ASCs</h2>
           {ascs}
