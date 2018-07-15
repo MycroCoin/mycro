@@ -33,11 +33,11 @@
 
 // ganache
 module.exports = {
-    networks: {
-        development: {
-            host: "localhost",
-            port: 7545,
-            network_id: "*", // Match any network id
-        }
-    }
+   networks: {
+   development: {
+   host: "ganache",
+   port: 7545,
+   network_id: "*" // Match any network id
+  }
+ }
 };

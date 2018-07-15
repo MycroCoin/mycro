@@ -40,8 +40,8 @@ services:
       - ganache
       - server
     build:
-      context: ..
-      dockerfile: backend/server.Dockerfile
+      context: .
+      dockerfile: server.Dockerfile
       # TODO run the beat as a separate service instead of embedding in the worker
     command: celery -A backend worker -l info -B --scheduler django_celery_beat.schedulers:DatabaseScheduler
   server:
@@ -60,8 +60,8 @@ services:
       # TODO figure out why these have to redeclared even though they exist in .env
       - DEPLOY_ENV=${DEPLOY_ENV}
     build:
-      context: ..
-      dockerfile: backend/server.Dockerfile
+      context: .
+      dockerfile: server.Dockerfile
     ports:
       - "8001:8000"
     # https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
@@ -69,12 +69,23 @@ services:
       bash -c "./wait_for_it.sh db:5432 && ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
 #    volumes:
 #      - '.:/mycro/backend'
-  tests:
+  servertests:
     build:
-      context: ..
-      dockerfile: backend/server.Dockerfile
+      context: .
+      dockerfile: server.Dockerfile
     command: >
       ./manage.py test
     volumes:
-      - '.:/mycro/backend'
-
+      - './backend:/mycro/backend'
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    depends_on:
+      - ganache
+    command: >
+      bash -c "./wait_for_it.sh ganache:7545 && truffle migrate && npm start"
+    ports:
+      - "3000:3000"
+    # volumes:
+      # - './frontend:/mycro/'

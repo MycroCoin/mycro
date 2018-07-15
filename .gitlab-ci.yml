@@ -20,6 +20,6 @@ unit_test_backend:
     - IMAGE_WITH_TAG=$TEST_IMAGE:$TAG
 
     - docker pull $IMAGE_WITH_TAG || true
-    - docker build --cache-from $IMAGE_WITH_TAG -t $IMAGE_WITH_TAG -f backend/server.Dockerfile .
+    - docker build --cache-from $IMAGE_WITH_TAG -t $IMAGE_WITH_TAG -f server.Dockerfile .
     - docker push $IMAGE_WITH_TAG
     - docker run $IMAGE_WITH_TAG
