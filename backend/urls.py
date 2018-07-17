@@ -13,11 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.urls import path
-from django.conf.urls import url, include
+from django.conf.urls import url
 from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
 import os
+import sys
 
 from graphene_django.views import GraphQLView
 
@@ -26,29 +26,28 @@ urlpatterns = [
     url(r'^graphql', csrf_exempt(GraphQLView.as_view(graphiql=True))),
 ]
 
-mycro_address = None
-w3 = None
-mycro_instance = None
 
-# TODO figure out how to use app config
+# TODO figure out how to use app config - we can clean all of this up if we get app config working
 # Terrible fucking hack to deploy the Mycro contract and register listeners for it during server startup
 # This file gets executed during all (?) of the manage.py subcommands so use os.environ and sys.argv to guard for when
 # a certain env variable is available during the runserver subcommand
-import sys
 if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
-    from backend.server.deploy import deploy_to_kaleido, deploy_to_ganache
+    from backend.server.utils.deploy import deploy
     from backend.server.utils.contract_compiler import ContractCompiler
     from django_celery_beat.models import PeriodicTask, IntervalSchedule
     from backend.server.models import Project
-    from github import Github
+
     PROJECT_REGISTRATION_BEAT_NAME = "Detect Project Registration"
     MERGE_PR_BEAT_NAME = "Detect Merge Events"
 
+    # TODO remove this when we no longer need to deploy the mycro contract on init
+    # maybe we should hide this behind an env variable because this is useful for testing
     compiler = ContractCompiler()
-    w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_ganache(
+    w3, mycro_contract, mycro_address, mycro_instance = deploy(
         compiler.get_contract_interface('mycro.sol', 'MycroCoin'))
-
     Project.create_mycro_dao(mycro_address)
+
+    # Set up background tasks which monitor blockchain for events
     schedule, created = IntervalSchedule.objects.get_or_create(every=5, period=IntervalSchedule.SECONDS, )
     if not PeriodicTask.objects.filter(name=PROJECT_REGISTRATION_BEAT_NAME):
         PeriodicTask.objects.create(interval=schedule, name=PROJECT_REGISTRATION_BEAT_NAME,

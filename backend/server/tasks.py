@@ -1,6 +1,6 @@
 from celery import shared_task
 from backend.server.utils.contract_compiler import ContractCompiler
-from backend.server.deploy import get_w3
+from backend.server.utils.deploy import get_w3
 from web3 import Web3
 from backend.server.models import Project
 import logging

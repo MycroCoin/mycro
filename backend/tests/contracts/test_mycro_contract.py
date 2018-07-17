@@ -1,7 +1,7 @@
 from web3 import Web3
 from web3.providers.eth_tester import EthereumTesterProvider
 from backend.server.utils.contract_compiler import ContractCompiler
-from backend.server.utils.utils import deploy_contract
+from backend.server.utils.deploy import _deploy_contract
 import unittest
 
 
@@ -14,7 +14,7 @@ class TestMycro(unittest.TestCase):
         self.w3 = Web3(EthereumTesterProvider())
 
         contract_interface = self.compiler.get_contract_interface("mycro.sol", "MycroCoin")
-        self.mycro_contract, _, self.mycro_instance = deploy_contract(self.w3, contract_interface)
+        self.mycro_contract, _, self.mycro_instance = _deploy_contract(self.w3, contract_interface)
 
     def test_give_initial_balance(self):
         balance = self.mycro_instance.balanceOf("0x364ca3F935E88Fbc9e041d2032F996CAc69452e6")

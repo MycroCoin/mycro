@@ -42,3 +42,7 @@ class MycroDjangoTest(TestCase):
         '''
         self.assertNotIn('errors', resp, 'Response had errors')
         self.assertEqual(resp['data'], expected, 'Response has correct data')
+
+    def assertErrorNoResponse(self, resp: dict, msg):
+        self.assertRegex(resp['errors'][0]['message'], msg)
+        lol = 'lol'

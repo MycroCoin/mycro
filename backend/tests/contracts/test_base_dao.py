@@ -1,7 +1,7 @@
 from web3 import Web3
 from web3.providers.eth_tester import EthereumTesterProvider
 from backend.server.utils.contract_compiler import ContractCompiler
-from backend.server.utils.utils import deploy_contract
+from backend.server.utils.deploy import _deploy_contract
 from eth_tester.exceptions import TransactionFailed
 import unittest
 
@@ -21,8 +21,8 @@ class TestBaseDao(unittest.TestCase):
         self.compiler = ContractCompiler()
 
         contract_interface = self.compiler.get_contract_interface("base_dao.sol", "BaseDao")
-        _, _, self.dao_instance = deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY,
-                                                  INITIAL_ADDRESSES, INITIAL_BALANCES)
+        _, _, self.dao_instance = _deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY,
+                                                   INITIAL_ADDRESSES, INITIAL_BALANCES)
 
 
     def test_can_propose(self):
@@ -42,7 +42,7 @@ class TestBaseDao(unittest.TestCase):
     def test_vote_fails_when_voting_second_time(self):
         asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
 
-        _, asc_address, _ = deploy_contract(W3, asc_interface, 1)
+        _, asc_address, _ = _deploy_contract(W3, asc_interface, 1)
 
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
@@ -67,11 +67,11 @@ class TestBaseDao(unittest.TestCase):
     def test_register_module(self):
 
         merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
-        merge_contract, merge_address, merge_instance = deploy_contract(W3, merge_module_interface)
+        merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
         self.dao_instance.registerModule(merge_address, transact={'from': W3.eth.accounts[0]})
 
         dummy_module_interface = self.compiler.get_contract_interface("dummy_module.sol", "DummyModule")
-        _, dummy_module_address, _ = deploy_contract(W3, dummy_module_interface)
+        _, dummy_module_address, _ = _deploy_contract(W3, dummy_module_interface)
 
         self.assertTrue(self.dao_instance.isModuleRegistered(merge_address))
         self.assertFalse(self.dao_instance.isModuleRegistered(dummy_module_address))
@@ -81,8 +81,8 @@ class TestBaseDao(unittest.TestCase):
         asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
         merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
 
-        merge_contract, merge_address, merge_instance = deploy_contract(W3, merge_module_interface)
-        _, asc_address, asc_instance = deploy_contract(W3, asc_interface, 1)
+        merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
+        _, asc_address, asc_instance = _deploy_contract(W3, asc_interface, 1)
 
         event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
                                                                 fromBlock=0)

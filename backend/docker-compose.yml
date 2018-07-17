@@ -31,6 +31,9 @@ services:
       - CELERY_BROKER_URL=redis://:loltesting@redis:6379/0
       - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
       - GANACHE_ENDPOINT=http://ganache:7545
+      # TODO figure out why these have to redeclared even though they exist in .env
+      - DEPLOY_ENV=${DEPLOY_ENV}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
     depends_on:
       - redis
       - db
@@ -53,6 +56,9 @@ services:
       - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
       - DEPLOY_MYCRO_DAO=true
       - GANACHE_ENDPOINT=http://ganache:7545
+
+      # TODO figure out why these have to redeclared even though they exist in .env
+      - DEPLOY_ENV=${DEPLOY_ENV}
     build:
       context: ..
       dockerfile: backend/server.Dockerfile

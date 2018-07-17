@@ -1,6 +1,7 @@
 from backend.tests.mycro_django_test import MycroDjangoTest
 import backend.tests.testing_utilities.constants as constants
-import os
+from backend.server.models import Project
+from graphql.error.located_error import GraphQLLocatedError
 
 
 class TestMycroDaoSchema(MycroDjangoTest):
@@ -8,10 +9,34 @@ class TestMycroDaoSchema(MycroDjangoTest):
     def setUp(self):
         super().setUp()
 
-    def test_return_none_when_not_set(self):
+    def test_return_none_when_not_created(self):
         resp = self.query("""
 query {
   mycroDao
 }
         """)
         self.assertResponseNoErrors(resp, {'mycroDao': None})
+
+    def test_return_proper_address_when_created(self):
+        Project.objects.create(dao_address=constants.DAO_ADDRESS, is_mycro_dao=True)
+
+
+        resp = self.query("""
+query {
+  mycroDao
+}
+        """)
+        self.assertResponseNoErrors(resp, {'mycroDao': constants.DAO_ADDRESS})
+
+    def test_raise_when_two_exist(self):
+        Project.objects.create(dao_address=constants.DAO_ADDRESS, is_mycro_dao=True)
+        Project.objects.create(dao_address='fake address', is_mycro_dao=True)
+
+
+        # this query raises an error in the logs, it's ok
+        resp = self.query("""
+query {
+  mycroDao
+}
+        """)
+        self.assertErrorNoResponse(resp, 'Found 2 instances')
