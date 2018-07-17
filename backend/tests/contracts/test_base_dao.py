@@ -40,9 +40,9 @@ class TestBaseDao(unittest.TestCase):
             self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[0]})
 
     def test_vote_fails_when_voting_second_time(self):
-        asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
 
-        _, asc_address, _ = _deploy_contract(W3, asc_interface, 1)
+        _, asc_address, _ = _deploy_contract(W3, merge_asc_interface, 1)
 
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
@@ -78,11 +78,11 @@ class TestBaseDao(unittest.TestCase):
 
 
     def test_vote_passes_threshold_executes_asc(self):
-        asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
         merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
 
         merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
-        _, asc_address, asc_instance = _deploy_contract(W3, asc_interface, 1)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, 1)
 
         event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
                                                                 fromBlock=0)

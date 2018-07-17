@@ -1,13 +1,13 @@
 pragma solidity ^0.4.0;
 
-import "./ASC_interface.sol";
+import "./base_asc.sol";
 import "./merge_module.sol";
 import "./base_dao.sol";
 
-contract MergeASC is ASC_interface {
+contract MergeASC is BaseASC {
     uint public prId;
 
-    constructor(uint _prId){
+    constructor(uint _prId) BaseASC() {
         prId = _prId;
     }
 

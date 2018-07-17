@@ -47,8 +47,8 @@ class Query(ObjectType):
     def resolve_get_merge_asc_abi(self, info):
         contract_compiler = ContractCompiler()
 
-        asc_interface = contract_compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        return { 'abi': asc_interface['abi'], 'unlinked_binary': asc_interface['bin']}
+        merge_asc_interface = contract_compiler.get_contract_interface("merge_asc.sol", "MergeASC")
+        return { 'abi': merge_asc_interface['abi'], 'unlinked_binary': merge_asc_interface['bin']}
 
 
 class CreateASC(graphene.Mutation):

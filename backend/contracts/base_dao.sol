@@ -17,7 +17,7 @@ import "./safe_math.sol";
 import "./erc20_interface.sol";
 import "./approve_and_call_fallback.sol";
 import "./owned.sol";
-import "./ASC_interface.sol";
+import "./base_asc.sol";
 import "./module_interface.sol";
 
 
@@ -209,7 +209,6 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         uint code = module.getCode();
         modulesByAddress[module] = code;
         modulesByCode[code] = module;
-//        modulesByCode[1] = add;
     }
 
 
