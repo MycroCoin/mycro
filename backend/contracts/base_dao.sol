@@ -60,7 +60,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
             uint currentBalance = _initialBalances[i];
 
             balances[currentAddress] = currentBalance;
-            Transfer(address(0), currentAddress, currentBalance);
+            emit Transfer(address(0), currentAddress, currentBalance);
         }
 
         threshold = totalSupply / 2 + 1;
@@ -91,7 +91,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     function transfer(address to, uint tokens) public returns (bool success) {
         balances[msg.sender] = safeSub(balances[msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
-        Transfer(msg.sender, to, tokens);
+        emit Transfer(msg.sender, to, tokens);
         return true;
     }
 
@@ -124,7 +124,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
         balances[to] = safeAdd(balances[to], tokens);
-        Transfer(from, to, tokens);
+        emit Transfer(from, to, tokens);
         return true;
     }
 
@@ -199,9 +199,13 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     }
 
     function execute_asc(address asc_address) internal returns (uint){
-        ASC_interface asc = ASC_interface(asc_address);
+        BaseASC asc = BaseASC(asc_address);
 
         asc.execute();
+
+        address rewardee = asc.rewardee();
+        balances[rewardee] = safeAdd(balances[rewardee], 10);
+        emit Transfer(address(0), rewardee, 10);
     }
 
     function registerModule(address add) public {

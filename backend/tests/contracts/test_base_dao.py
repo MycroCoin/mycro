@@ -99,3 +99,7 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertEqual(1, len(entries))
         self.assertEqual(1, entries[0]["args"]["pr_id"])
+
+        self.assertEqual(10, self.dao_instance.balanceOf(W3.eth.accounts[0]))
+
+
