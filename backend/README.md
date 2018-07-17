@@ -20,10 +20,11 @@ docker-compose -f backend/docker-compose.yml run tests
 # Docker compose run django server
 ```
 $ cd mycro
-$ docker-compose -f backend/docker-compose.yml up --build server worker ganache
+$ docker-compose -f backend/docker-compose.yml build
+$ docker-compose -f backend/docker-compose.yml down && docker-compose -f backend/docker-compose.yml up
 ```
 
-Then visit `localhost:8000/graphql`. It should work. Run
+Then visit `localhost:8001/graphql`. It should work. Run
 
 
 ```
