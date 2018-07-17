@@ -44,13 +44,6 @@ if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
     PROJECT_REGISTRATION_BEAT_NAME = "Detect Project Registration"
     MERGE_PR_BEAT_NAME = "Detect Merge Events"
 
-
-    token = os.environ['GITHUB_TOKEN']
-    github = Github(token)
-    org = github.get_organization('mycrocoin')
-    for repo in org.get_repos():
-        repo.delete()
-
     compiler = ContractCompiler()
     w3, (mycro_contract, mycro_address, mycro_instance) = deploy_to_ganache(
         compiler.get_contract_interface('mycro.sol', 'MycroCoin'))

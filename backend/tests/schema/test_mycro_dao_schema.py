@@ -1,5 +1,5 @@
 from backend.tests.mycro_django_test import MycroDjangoTest
-import backend.tests.util.constants as constants
+import backend.tests.testing_utilities.constants as constants
 import os
 
 

@@ -1,14 +1,11 @@
-# Create your tasks here
-from github import Github
 from celery import shared_task
 from backend.server.utils.contract_compiler import ContractCompiler
 from backend.server.deploy import get_w3
 from web3 import Web3
-from web3.providers import HTTPProvider
 from backend.server.models import Project
 import logging
 from web3.contract import ConciseContract
-import os
+import backend.server.utils.github as github
 
 
 def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: Web3):
@@ -46,17 +43,14 @@ def process_merges():
             pr_id = int(event['args']['pr_id'])
             logging.info(f"DAO {project.dao_address} with name {project.repo_name} wants to merge {pr_id}")
 
-            # TODO revoke this
-            token = os.environ['GITHUB_TOKEN']
-            github = Github(token)
-
-            org = github.get_organization('mycrocoin')
-            repo = org.get_repo(project.repo_name)
-            pr = repo.get_pull(pr_id)
+            # TODO get rid of this try catch
+            # We can do this when we use get_new_entries but need this for now because we reattempt to merge PRs even
+            # after they've been merged which results in an exception
             try:
-                pr.merge()
-            except:
-                pass
+                github.merge_pr(project.repo_name, pr_id)
+            except Exception as e:
+                logging.warning(f'PR {pr_id} for project {project.repo_name} could not be merged, probably because it already has been')
+                logging.warning(e)
 
 
 @shared_task
@@ -89,14 +83,10 @@ def process_registrations():
             base_dao_interface = compiler.get_contract_interface('base_dao.sol', 'BaseDao')
             base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'], address=registered_project_address,
                                                 ContractFactoryClass=ConciseContract)
+
             repo_name = base_dao_contract.name()
+            github.create_repo(repo_name)
 
-            # TODO revoke this token once we've got some funding
-            token = "da1f1b18405f9d8af8d878516f2b7883bbfd8451"
-            github = Github(token)
-
-            org = github.get_organization('mycrocoin')
-            org.create_repo(name=repo_name, auto_init=True)
             Project.objects.create(repo_name=repo_name, dao_address=registered_project_address)
 
 
