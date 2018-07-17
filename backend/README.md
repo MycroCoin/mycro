@@ -21,8 +21,10 @@ docker-compose -f backend/docker-compose.yml run tests
 ```
 $ cd mycro
 $ docker-compose -f backend/docker-compose.yml build
-$ docker-compose -f backend/docker-compose.yml down && docker-compose -f backend/docker-compose.yml up
+$ docker-compose -f backend/docker-compose.yml down && GITHUB_TOKEN=xxxx docker-compose -f backend/docker-compose.yml up
 ```
+
+NOTE: the github token needs read and delete permissions for now
 
 Then visit `localhost:8001/graphql`. It should work. Run
 

@@ -8,6 +8,7 @@ from web3.providers import HTTPProvider
 from backend.server.models import Project
 import logging
 from web3.contract import ConciseContract
+import os
 
 
 def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: Web3):
@@ -46,7 +47,7 @@ def process_merges():
             logging.info(f"DAO {project.dao_address} with name {project.repo_name} wants to merge {pr_id}")
 
             # TODO revoke this
-            token = "da1f1b18405f9d8af8d878516f2b7883bbfd8451"
+            token = os.environ['GITHUB_TOKEN']
             github = Github(token)
 
             org = github.get_organization('mycrocoin')

@@ -45,8 +45,7 @@ if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
     MERGE_PR_BEAT_NAME = "Detect Merge Events"
 
 
-    # this access token doesn't have delete permissions
-    token = "815c4e96bd6a5a9603d4aa5fc8829cee2697a109"
+    token = os.environ['GITHUB_TOKEN']
     github = Github(token)
     org = github.get_organization('mycrocoin')
     for repo in org.get_repos():
