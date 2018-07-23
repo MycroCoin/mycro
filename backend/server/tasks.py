@@ -1,6 +1,6 @@
 from celery import shared_task
 from backend.server.utils.contract_compiler import ContractCompiler
-from backend.server.utils.deploy import get_w3
+from backend.server.utils.deploy import get_event_filter_w3
 from web3 import Web3
 from backend.server.models import Project
 import logging
@@ -26,7 +26,7 @@ def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: W
 def process_merges():
     projects = Project.objects.filter()
     compiler = ContractCompiler()
-    w3 = get_w3()
+    w3 = get_event_filter_w3()
 
     for project in projects:
         print(f"processing merges for project {project.repo_name}")
@@ -61,11 +61,10 @@ def process_registrations():
 
     # TODO figure out how to cache the compiler, w3, interface, contract and listener
     compiler = ContractCompiler()
-    w3 = get_w3()
+    w3 = get_event_filter_w3()
 
     contract_interface = compiler.get_contract_interface('mycro.sol', 'MycroCoin')
     mycro_contract = w3.eth.contract(abi=contract_interface['abi'], address=mycro_project.dao_address)
-    print(mycro_contract.functions.getProjects().call())
 
     project_registration_listener = mycro_contract.events.RegisterProject.createFilter(fromBlock=0)
 

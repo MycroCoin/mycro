@@ -18,10 +18,12 @@ docker-compose -f backend/docker-compose.yml run tests
 ```
 
 # Docker compose run django server
+First you need to create a `.env` file similar to `.env.sample`. If you want to run
+this on a testnet, you need to download parity and run it with `parity --light --chain ropsten --base-path ~/.local/share/io.parity.ethereum/docker --unsafe-expose`.
+
 ```
 $ cd mycro
-$ docker-compose -f backend/docker-compose.yml build
-$ docker-compose -f backend/docker-compose.yml down && GITHUB_TOKEN=xxxx docker-compose -f backend/docker-compose.yml up
+$ docker-compose down && docker-compose up
 ```
 
 NOTE: the github token needs read and delete permissions for now

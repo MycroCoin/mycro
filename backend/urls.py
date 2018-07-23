@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
 import os
 import sys
+import logging
 
 from graphene_django.views import GraphQLView
 
@@ -32,7 +33,7 @@ urlpatterns = [
 # This file gets executed during all (?) of the manage.py subcommands so use os.environ and sys.argv to guard for when
 # a certain env variable is available during the runserver subcommand
 if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
-    from backend.server.utils.deploy import deploy
+    from backend.server.utils.deploy import deploy, get_private_key
     from backend.server.utils.contract_compiler import ContractCompiler
     from django_celery_beat.models import PeriodicTask, IntervalSchedule
     from backend.server.models import Project
@@ -43,8 +44,9 @@ if "DEPLOY_MYCRO_DAO" in os.environ and 'runserver' in sys.argv:
     # TODO remove this when we no longer need to deploy the mycro contract on init
     # maybe we should hide this behind an env variable because this is useful for testing
     compiler = ContractCompiler()
+    private_key = get_private_key()
     w3, mycro_contract, mycro_address, mycro_instance = deploy(
-        compiler.get_contract_interface('mycro.sol', 'MycroCoin'))
+        compiler.get_contract_interface('mycro.sol', 'MycroCoin'), private_key=private_key, timeout=None)
     Project.create_mycro_dao(mycro_address)
 
     # Set up background tasks which monitor blockchain for events

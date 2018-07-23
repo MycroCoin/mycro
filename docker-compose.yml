@@ -34,6 +34,7 @@ services:
       # TODO figure out why these have to redeclared even though they exist in .env
       - DEPLOY_ENV=${DEPLOY_ENV}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PARITY_ENDPOINT=${PARITY_ENDPOINT}
     depends_on:
       - redis
       - db
@@ -56,9 +57,12 @@ services:
       - DJANGO_DB_URL=postgres://user:loltesting@db:5432/postgres
       - DEPLOY_MYCRO_DAO=true
       - GANACHE_ENDPOINT=http://ganache:7545
+      - PYTHONUNBUFFERED=1
 
       # TODO figure out why these have to redeclared even though they exist in .env
       - DEPLOY_ENV=${DEPLOY_ENV}
+      - INFURA_API_KEY=${INFURA_API_KEY}
+      - ETHEREUM_PRIVATE_KEY=${ETHEREUM_PRIVATE_KEY}
     build:
       context: .
       dockerfile: server.Dockerfile
