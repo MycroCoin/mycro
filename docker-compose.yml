@@ -1,6 +1,17 @@
 version: '2'
 
 services:
+  parity:
+    image: parity/parity:v1.11.7
+    command: --light --chain ropsten --base-path /root/.local/share/io.parity.ethereum --unsafe-expose
+    ports:
+      - "8545:8545"
+      - "8180:8180"
+#      - "8546:8546"
+#      - "30303:30303"
+#      - "30303:30303/udp"
+    volumes:
+      - "~/.local/share/io.parity.ethereum/docker/:/root/.local/share/io.parity.ethereum/"
   ganache:
     image: trufflesuite/ganache-cli:v6.1.6
     # need -p because cli and gui have different default ports I think
@@ -40,6 +51,7 @@ services:
       - db
       - ganache
       - server
+      - parity
     build:
       context: .
       dockerfile: server.Dockerfile
@@ -70,7 +82,7 @@ services:
       - "8001:8000"
     # https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
     command: >
-      bash -c "./wait_for_it.sh db:5432 && ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
+      bash -c "./wait_for_it.sh db:5432  && ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
 #    volumes:
 #      - '.:/mycro/backend'
   servertests:
