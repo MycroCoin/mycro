@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 
 import dj_database_url
 import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,9 +25,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '=*f9))56@c*dzlmm0%t@)v1=)d2*pbom51h+o7l%35xt92ya3t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG') == 'true'
 
-ALLOWED_HOSTS = ['testserver', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = [
+    'testserver',
+    'localhost',
+    '127.0.0.1',
+    '192.168.99.100', # IP of minikube on paymahn's machine
+    '35.230.122.2'  # IP of the server load balancer in GCP
+]
 
 
 # Application definition
@@ -79,10 +86,20 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DJANGO_DB_NAME', 'postgres'),
+        'USER': os.environ.get('DJANGO_DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
+        'HOST': os.environ.get('DJANGO_DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DJANGO_DB_PORT', '5432')
+    }
+}
+# https://stackoverflow.com/questions/6353124/running-django-tests-with-sqlite
+if 'test' in sys.argv or 'test_coverage' in sys.argv: #Covers regular testing and django-coverage
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
-DATABASES = {}
-
-DATABASES['default'] = dj_database_url.config(env='DJANGO_DB_URL', default=f'sqlite:///{os.path.join(BASE_DIR, "db.sqlite3")}')
 
 
 
@@ -135,6 +152,8 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000'
+    '192.168.99.100:30080' # ip of paymahn's minikube
+    '35.197.53.29:3000' # ip of frontend load balancer for production
 )
 
 CORS_ALLOW_METHODS = (
@@ -164,4 +183,20 @@ CSRF_TRUSTED_ORIGINS = (
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Application config
+def deploy_env():
+    return os.environ.get('DEPLOY_ENV', 'parity')
+
+def get_infura_api_key():
+    return os.environ['INFURA_API_KEY']
+
+def ethereum_private_key():
+    return os.environ['ETHEREUM_PRIVATE_KEY']
+
+def parity_endpoint():
+    return os.environ.get('PARITY_ENDPOINT', 'http://localhost:8545')
+
+def github_token():
+    return os.environ['GITHUB_TOKEN']
 

@@ -10,7 +10,7 @@ PR_ID = 1
 class TestGithub(TestCase):
 
     def setUp(self):
-        os_patch = patch('backend.server.utils.github.os')
+        os_patch = patch('backend.settings.os')
         pygithub_patch = patch('backend.server.utils.github.Github')
 
         self.addCleanup(os_patch.stop)

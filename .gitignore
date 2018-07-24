@@ -6,3 +6,7 @@
 backend/coverage/
 .TODO
 .env
+
+
+# gcp service accounts
+mycrocoin-b443c4301ade.json

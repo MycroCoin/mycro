@@ -29,17 +29,13 @@ def process_merges():
     w3 = get_event_filter_w3()
 
     for project in projects:
-        print(f"processing merges for project {project.repo_name}")
         if project.is_mycro_dao:
-            print(f"{project.repo_name} is the mycro doa")
             continue
 
-        print(f"building merge filters for {project.repo_name}")
         merge_filter = build_merge_event_filter(project, compiler, w3)
 
         events = merge_filter.get_all_entries()
         for event in events:
-            print(f"########## merge event: {event}")
             pr_id = int(event['args']['pr_id'])
             logging.info(f"DAO {project.dao_address} with name {project.repo_name} wants to merge {pr_id}")
 
@@ -74,11 +70,9 @@ def process_registrations():
     projects = set([project[0] for project in Project.objects.values_list('dao_address')])
 
     for event in events:
-        print(f"event {event}")
         registered_project_address = event['args']['projectAddress']
 
         if registered_project_address not in projects:
-            print("not previously found")
             base_dao_interface = compiler.get_contract_interface('base_dao.sol', 'BaseDao')
             base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'], address=registered_project_address,
                                                 ContractFactoryClass=ConciseContract)

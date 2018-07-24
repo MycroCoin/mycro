@@ -10,98 +10,21 @@ Below instructions are unnecessary if working purely in docker, which you should
 
 Ok, now whenever you run tests, you'll build the latest image and run them in the docker container, I think.
 
-# Docker Compose Watch tests
-```
-cd mycro
-docker build -t mycro-tests:latest -f backend/tests.Dockerfile .
-docker-compose -f backend/docker-compose.yml run tests
-```
+# Minikube
+1. install minikube. This will be kinda painful becuase you have to get virtualbox or some other hypervisor
+2. `minikube start`
+3. `kubectl create secret generic eth-private-key --from-literal=value=<some eth private key>`
+5. open `parity-dev.json` and add a value to `accounts` with the public address of the private key used in the previous step
+3. `kubectl create secret generic github-token --from-literal=value=<your github access token>`
+4. `eval $(minikube docker-env)`
+5. `docker build -f server.Dockerfile -t mycro-backend .`
+6. `docker build -f parity-dev.Dockerfile -t mycro-parity-dev .`
+7. `docker build -f frontend.Dockerfile -t mycro-frontend `
+4. `kubectl apply -f kubernetes-local.yaml`
+5. run `minikube ip` and record the value
+7. in your browser visit `<minikube ip>:30080`
+6. open metamask and use a new endpoint of the form `http://<minikube ip>:30045`
 
-# Docker compose run django server
-First you need to create a `.env` file similar to `.env.sample`.
-
-```
-$ cd mycro
-$ docker-compose down && docker-compose up
-```
-
-NOTE: the github token needs read and delete permissions for now
-
-Then visit `localhost:8001/graphql`. It should work. Run
-
-
-```
-query {
-  allProjects {
-    name,
-    id
-  }
-}
-```
-
-You should see
-
-```
-{
-  "data": {
-    "allProjects": []
-  }
-}
-```
-
-Create a project with:
-
-```
-mutation create {
-  createProject(repoName: "lol", daoAddress: "wtf") {
-    newProject {
-      repoName
-      id
-      daoAddress
-    }
-  }
-}
-```
-
-You should see:
-
-```
-{
-  "data": {
-    "createProject": {
-      "newProject": {
-        "repoName": "lol",
-        "id": "1",
-        "daoAddress": "wtf"
-      }
-    }
-  }
-}
-```
-
-Now, query all projects like before:
-
-```
-query {
-  allProjects {
-    repoName
-  }
-}
-```
-
-and you should see
-
-```
-{
-  "data": {
-    "allProjects": [
-      {
-        "repoName": "lol"
-      }
-    ]
-  }
-}
-```
 
 # Django backend without docker
 I'm not 100% sure how to get started. I followed http://docs.graphene-python.org/projects/django/en/latest/tutorial-plain/

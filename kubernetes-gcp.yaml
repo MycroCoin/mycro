@@ -1,0 +1,264 @@
+# -------------------------------------
+# Services
+# -------------------------------------
+# parity
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: parity
+  name: parity
+spec:
+  ports:
+  - name: "8545"
+    port: 8545
+    targetPort: 8545
+  selector:
+    service: parity
+
+
+---
+# django server
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: server
+  name: server
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "8001"
+    port: 8001
+    targetPort: 8000
+  selector:
+    service: server
+
+
+---
+# frontend
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: frontend
+  name: frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - name: "3000"
+    port: 3000
+    targetPort: 3000
+  selector:
+    service: frontend
+
+
+# -------------------------------------
+# Deployments
+# -------------------------------------
+
+---
+# parity
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: parity
+  labels:
+    service: parity
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: parity
+    spec:
+      containers:
+      - args:
+        - --light
+        - --chain
+        - ropsten
+        - --base-path
+        - /root/.local/share/io.parity.ethereum
+        - --unsafe-expose # TODO figure out how to only expose what's necessary
+        image: parity/parity:v1.11.7
+        name: parity
+        ports:
+        - containerPort: 8545
+      restartPolicy: Always
+#
+---
+# django server
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+  labels:
+    service: server
+  name: server
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: server
+    spec:
+      containers:
+      - command: ['bash', '-c', './manage.py migrate && ./manage.py runserver 0.0.0.0:8000']
+        env:
+        - name: CELERY_BROKER_URL
+          value: redis://10.0.0.3:6379/0
+        - name: DEPLOY_ENV
+          value: ropsten
+        - name: DJANGO_DB_NAME
+          value: django
+        - name: DJANGO_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: DJANGO_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+        - name: DJANGO_DB_HOST
+          value: 127.0.0.1
+        - name: DJANGO_DB_PORT
+          value: "5432"
+        - name: ETHEREUM_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: eth-private-key
+              key: value
+        - name: INFURA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: infura-api-key
+              key: value
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        image: gcr.io/mycrocoin/mycro-backend:v7
+        imagePullPolicy: IfNotPresent
+        name: server
+        ports:
+        - containerPort: 8000
+        resources: {}
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud_sql_proxy",
+                  "-instances=mycrocoin:us-west1:main=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+
+status: {}
+
+---
+# frontend
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: frontend
+  labels:
+    service: frontend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: frontend
+    spec:
+      containers:
+      - command: ['bash', '-c', ' truffle compile --all && npm start'] # TODO figure out npm build which is meant for prod
+        env:
+        - name: REACT_APP_GRAPHQL_ENDPOINT
+          value: "http://35.230.122.2:8001/graphql"
+        image: gcr.io/mycrocoin/mycro-frontend:v4
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        ports:
+        - containerPort: 3000
+      restartPolicy: Always
+
+---
+# worker
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: worker
+  name: worker
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        service: worker
+    spec:
+      containers:
+      - command: ['celery']
+        args:
+        - -A
+        - backend
+        - worker
+        - -l
+        - info
+        - -B
+        - --scheduler
+        - django_celery_beat.schedulers:DatabaseScheduler
+        env:
+        - name: CELERY_BROKER_URL
+          value: redis://10.0.0.3:6379/0
+        - name: DEPLOY_ENV
+          value: ropsten
+        - name: DJANGO_DB_NAME
+          value: django
+        - name: DJANGO_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: DJANGO_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+        - name: DJANGO_DB_HOST
+          value: 127.0.0.1
+        - name: DJANGO_DB_PORT
+          value: "5432"
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-token
+              key: value
+        - name: PARITY_ENDPOINT
+          value: http://parity:8545
+        image: gcr.io/mycrocoin/mycro-backend:v7
+        imagePullPolicy: IfNotPresent
+        name: worker
+        resources: {}
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud_sql_proxy",
+                  "-instances=mycrocoin:us-west1:main=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+        - name: cloudsql-instance-credentials
+          mountPath: /secrets/cloudsql
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+status: {}
