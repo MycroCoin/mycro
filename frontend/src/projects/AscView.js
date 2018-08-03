@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {getMergeASCForAddress, ascContractToASCJson, getProjectForAddress} from './ProjectHelpers.js';
+import ReactGA from 'react-ga';
 
 class Asc extends Component {
   constructor(props) {
@@ -67,6 +68,8 @@ class Asc extends Component {
   }
 
   render() {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     const asc = this.state.asc;
     const Footer = (props) => {
       switch(this.state.voteState) {

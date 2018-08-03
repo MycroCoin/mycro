@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom'
 import { Contracts, deployHelper } from '../Contracts.js'
 import PropTypes from 'prop-types'
+import ReactGA from 'react-ga';
 
 class CreateProject extends Component {
   static propTypes = {
@@ -58,6 +59,8 @@ class CreateProject extends Component {
   }
 
   render() {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     return (
       <div className="Page">
         <h1>Create Project</h1>

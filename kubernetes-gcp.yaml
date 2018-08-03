@@ -181,7 +181,7 @@ spec:
         env:
         - name: REACT_APP_GRAPHQL_ENDPOINT
           value: "http://35.230.122.2:8001/graphql"
-        image: gcr.io/mycrocoin/mycro-frontend:v4
+        image: gcr.io/mycrocoin/mycro-frontend:v6
         imagePullPolicy: IfNotPresent
         name: frontend
         ports:

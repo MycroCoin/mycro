@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
 
+
 import './App.css';
 import HomeView from './home/HomeView.js';
 import {
@@ -9,18 +10,12 @@ import {
   CreateProjectView,
   AscView} from './projects';
 
-import gql from 'graphql-tag';
-import {graphql} from 'react-apollo';
-const query = gql`query{
-  getMergeAscAbi
-}`;
-const queryHandler = ({ data: {loading, error, getMergeAscAbi }}) => {
-  window.asc = getMergeAscAbi;
-}
-graphql(query)(queryHandler);
+import ReactGA from 'react-ga';
 
 class App extends Component {
   render() {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     return (
       <BrowserRouter>
         <div className="App">

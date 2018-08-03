@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {Contracts} from '../Contracts.js';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
+import ReactGA from 'react-ga';
 
 class Projects extends Component {
   constructor(props) {
@@ -28,6 +29,8 @@ class Projects extends Component {
   }
 
   render() {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     const Project = (props) => (
       <div>
         <p>

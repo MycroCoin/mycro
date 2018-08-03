@@ -4,6 +4,7 @@ import client from '../GraphqlClient.js';
 import { createTruffleContract, deployHelper, Contracts } from '../Contracts.js';
 import gql from 'graphql-tag';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
+import ReactGA from 'react-ga';
 
 
 class Project extends Component {
@@ -63,6 +64,8 @@ class Project extends Component {
   }
 
   render() {
+    ReactGA.pageview(window.location.pathname + window.location.search);
+
     const id = this.state.project.id;
     const project = this.state.project; 
     const ascs = project.ascs.map( asc => (
