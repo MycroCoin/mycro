@@ -60,6 +60,7 @@ class CreateProject extends Component {
 
   render() {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    this.context.mixpanel.track("CreateProjectView", this.state);
 
     return (
       <div className="Page">
@@ -75,5 +76,8 @@ class CreateProject extends Component {
     );
   }
 }
+CreateProject.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};
 
 export default withRouter(CreateProject);

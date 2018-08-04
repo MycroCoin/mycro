@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {getMergeASCForAddress, ascContractToASCJson, getProjectForAddress} from './ProjectHelpers.js';
 import ReactGA from 'react-ga';
+import PropTypes from 'prop-types'
 
 class Asc extends Component {
   constructor(props) {
@@ -69,6 +70,7 @@ class Asc extends Component {
 
   render() {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    this.context.mixpanel.track("ASC View", this.state);
 
     const asc = this.state.asc;
     const Footer = (props) => {
@@ -94,5 +96,9 @@ class Asc extends Component {
     );
   }
 }
+
+Asc.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};
 
 export default Asc;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+import PropTypes from 'prop-types'
 
 
 import './App.css';
@@ -15,6 +16,7 @@ import ReactGA from 'react-ga';
 class App extends Component {
   render() {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    this.context.mixpanel.track("App")
 
     return (
       <BrowserRouter>
@@ -44,5 +46,9 @@ class App extends Component {
     );
   }
 }
+
+App.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};
 
 export default App;

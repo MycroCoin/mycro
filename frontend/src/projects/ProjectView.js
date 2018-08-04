@@ -5,6 +5,8 @@ import { createTruffleContract, deployHelper, Contracts } from '../Contracts.js'
 import gql from 'graphql-tag';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
 import ReactGA from 'react-ga';
+import {ProjectView} from "./index";
+import PropTypes from 'prop-types'
 
 
 class Project extends Component {
@@ -65,6 +67,7 @@ class Project extends Component {
 
   render() {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    this.context.mixpanel.track("ProjectView", this.state);
 
     const id = this.state.project.id;
     const project = this.state.project; 
@@ -93,5 +96,9 @@ class Project extends Component {
     );
   }
 }
+
+Project.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};
 
 export default Project;

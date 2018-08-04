@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import {Contracts} from '../Contracts.js';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
 import ReactGA from 'react-ga';
+import {ProjectListView} from "./index";
+import PropTypes from 'prop-types'
 
 class Projects extends Component {
   constructor(props) {
@@ -30,6 +32,7 @@ class Projects extends Component {
 
   render() {
     ReactGA.pageview(window.location.pathname + window.location.search);
+    this.context.mixpanel.track("ProjectListView", this.state);
 
     const Project = (props) => (
       <div>
@@ -53,6 +56,10 @@ class Projects extends Component {
     );
   }
 }
+
+Projects.contextTypes = {
+    mixpanel: PropTypes.object.isRequired
+};
 
 
 export default Projects;
