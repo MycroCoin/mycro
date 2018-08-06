@@ -30,10 +30,12 @@ class Projects extends Component {
     });
   }
 
-  render() {
+  componentDidMount() {
     ReactGA.pageview(window.location.pathname + window.location.search);
     this.context.mixpanel.track("ProjectListView", this.state);
+  }
 
+  render() {
     const Project = (props) => (
       <div>
         <p>

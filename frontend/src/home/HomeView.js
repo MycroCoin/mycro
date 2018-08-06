@@ -3,10 +3,12 @@ import ReactGA from 'react-ga';
 import PropTypes from 'prop-types'
 
 class Home extends Component {
-  render() {
+  componentDidMount() {
     ReactGA.pageview(window.location.pathname + window.location.search);
     this.context.mixpanel.track("HomeView", this.state);
+  }
 
+  render() {
     return (
       <div className="Page">
         <p>Hello World</p>

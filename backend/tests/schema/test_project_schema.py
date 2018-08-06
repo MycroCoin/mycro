@@ -23,7 +23,6 @@ query {
         self.assertResponseNoErrors(resp, {
             'allProjects': [{'daoAddress': constants.DAO_ADDRESS, 'repoName': constants.PROJECT_NAME}]})
 
-
     def test_create_project(self):
         Project.objects.filter().delete()
         # need to double up on braces because of f-strings
@@ -66,3 +65,30 @@ query {{
             '''
         )
         self.assertResponseNoErrors(resp, {'project': {'id': "1"}})
+
+    def test_is_project_name_available_invalid_github_name(self):
+        resp = self.query(
+            '''
+query {
+    isProjectNameAvailable(proposedProjectName: "invalid name") 
+}
+        '''
+        )
+
+        self.assertResponseNoErrors(resp, {
+            "isProjectNameAvailable": "'invalid name' is invalid. It must match the regex '^[a-zA-Z0-9-_.]+$'"
+        })
+
+    def test_is_project_name_available_project_with_name_already_exists(self):
+
+        resp = self.query(
+            f'''
+query {{
+    isProjectNameAvailable(proposedProjectName: "{constants.PROJECT_NAME}") 
+}}
+        '''
+        )
+
+        self.assertResponseNoErrors(resp, {
+            "isProjectNameAvailable": f"Project with name {constants.PROJECT_NAME} already exists"
+        })

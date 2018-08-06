@@ -1,8 +1,11 @@
 from github import Github
 import backend.settings as settings
+import re
 
 
 def create_repo(repo_name, organization='MycroCoin'):
+    check_repo_name(repo_name)
+
     github = Github(settings.github_token())
 
     org = github.get_organization(organization)
@@ -16,3 +19,10 @@ def merge_pr(repo_name, pr_id, organization='MycroCoin'):
 
     pr = repo.get_pull(pr_id)
     pr.merge()
+
+
+def check_repo_name(repo_name: str):
+    # ^ matches beginning, $ matches end. Everything in between must be inthe character class
+    regex = '^[a-zA-Z0-9-_.]+$'
+    if not re.match(regex, repo_name):
+        raise ValueError(f"'{repo_name}' is invalid. It must match the regex '{regex}'")

@@ -65,10 +65,12 @@ class Project extends Component {
       Object.assign(this.state, {prId: num}));
   }
 
-  render() {
+  componentDidMount() {
     ReactGA.pageview(window.location.pathname + window.location.search);
     this.context.mixpanel.track("ProjectView", this.state);
+  }
 
+  render() {
     const id = this.state.project.id;
     const project = this.state.project; 
     const ascs = project.ascs.map( asc => (

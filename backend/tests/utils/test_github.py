@@ -37,3 +37,24 @@ class TestGithub(TestCase):
         self.pygithub_mock.return_value.get_organization.return_value.get_repo.return_value.get_pull.assert_called_once_with(PR_ID)
         self.pygithub_mock.return_value.get_organization.return_value.get_repo.return_value.get_pull.return_value.merge(REPO)
 
+
+    def test_check_repo_name_happy_case(self):
+
+        # should not throw
+        github.check_repo_name("my-Package_1.1")
+
+    def test_repo_name_contains_space(self):
+        with self.assertRaisesRegex(ValueError, 'is invalid'):
+            github.check_repo_name('contains space')
+
+    def test_repo_name_contains_special_character(self):
+        with self.assertRaisesRegex(ValueError, 'is invalid'):
+            github.check_repo_name('contains-dollar-sign-$$')
+
+    def test_repo_name_cannot_be_empty(self):
+        with self.assertRaisesRegex(ValueError, 'is invalid'):
+            github.check_repo_name('')
+
+    def test_create_repo_validates_name(self):
+        with self.assertRaisesRegex(ValueError, 'is invalid'):
+            github.create_repo('invalid repo name')

@@ -68,10 +68,12 @@ class Asc extends Component {
     this.setState(newState);
   }
 
-  render() {
+  componentDidMount() {
     ReactGA.pageview(window.location.pathname + window.location.search);
     this.context.mixpanel.track("ASC View", this.state);
+  }
 
+  render() {
     const asc = this.state.asc;
     const Footer = (props) => {
       switch(this.state.voteState) {
