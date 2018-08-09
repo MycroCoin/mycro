@@ -10,3 +10,6 @@ backend/coverage/
 
 # gcp service accounts
 mycrocoin-b443c4301ade.json
+
+# paymahn uses a file called scratch.py to mess around with things
+**/scratch.py

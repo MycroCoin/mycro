@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import ReactGA from 'react-ga';
 import client from '../GraphqlClient.js';
 import gql from 'graphql-tag';
+import {toChecksumAddress} from 'web3-utils';
 
 class CreateProject extends Component {
   static propTypes = {
@@ -26,51 +27,19 @@ class CreateProject extends Component {
       Object.assign(this.state, {projectName: event.target.value}));
   }
 
-  handleSubmit(){
+  handleSubmit() {
+    let checksumAddress = toChecksumAddress(window.web3.eth.accounts[0]);
 
-    const isProjectNameAvailable = gql`query {
-      isProjectNameAvailable(proposedProjectName:"${this.state.projectName}")
-    }`;
-
-    client.query({query: isProjectNameAvailable}).then(({data: {isProjectNameAvailable: msg}}) => {
-      // if error is non-empty, don't execute the rest of handleSubmit
-      if (msg) {
-        alert(msg);
-        return
-      }
-
-      let projectInstance = null;
-      let mergeModuleInstance = null;
-
-      const deployedPromise = deployHelper(Contracts.BaseDao,
-        this.state.projectName, //symbol
-        this.state.projectName, //name
-        1000, //decimals
-        1000, //total supply
-        //TODO (peddle) this is a hack to prevent voted on ascs from executing since merge module hasn't been installed yet
-        [window.web3.eth.accounts[0]], //initial addresses
-        [1000] //initial balance
-      ).then(instance => {
-        projectInstance = instance;
-        console.log("Project instance address: " + projectInstance.address);
-        return Contracts.MycroCoin.deployed()
-      }).then(mycro => {
-        let tx = mycro.registerProject(projectInstance.address, {from: window.web3.eth.accounts[0]});
-        return tx
-      });
-
-      const mergeModulePromise = deployHelper(Contracts.MergeModule).then((instance) => {
-        mergeModuleInstance = instance;
-        console.log("merge module instance address: " + mergeModuleInstance.address);
-      });
-
-      Promise.all([deployedPromise, mergeModulePromise]).then(() => {
-        console.log("second mm address is " + mergeModuleInstance.address);
-        return projectInstance.registerModule(mergeModuleInstance.address, {from: window.web3.eth.accounts[0]});
-      }).then(() => {
-        this.props.history.push('/projects/' + projectInstance.address)
-      });
-    });
+    client.mutate({mutation: gql`
+    mutation {
+  createProject(projectName: "${this.state.projectName}", creatorAddress: "${checksumAddress}") {
+    projectAddress
+  }
+}`}).then(({data: { createProject: { projectAddress: address}}}) => {
+      this.props.history.push('/projects/' + address)
+    }).catch((err) => {
+      alert(err);
+    })
   }
 
   componentDidMount() {

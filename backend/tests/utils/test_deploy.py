@@ -5,6 +5,8 @@ from web3.middleware import geth_poa_middleware
 from web3.providers import HTTPProvider
 from web3 import Account
 import backend.settings as settings
+import backend.tests.testing_utilities.constants as constants
+import asyncio
 
 PARITY_ENDPOINT = 'a.b.c'
 INFURA_KEY = 'lol'
@@ -13,6 +15,12 @@ ETHEREUM_PRIAVTE_KEY = '0xlol'
 
 class TestDeploy(unittest.TestCase):
 
+    def setUp(self):
+        self.loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.loop)
+
+    def tearDown(self):
+        self.loop.close()
 
     @patch.dict('backend.settings.os.environ', {'INFURA_API_KEY': INFURA_KEY})
     def test_get_ropsten_w3(self):
@@ -48,18 +56,19 @@ class TestDeploy(unittest.TestCase):
 
         self.assertEqual(settings.parity_endpoint(), w3.providers[0].endpoint_uri)
 
-
     def test_deploy_contract_without_private_key(self):
         w3 = MagicMock()
         contract_interface = MagicMock()
         args = (1,)
 
-        deploy._deploy_contract(w3, contract_interface, *args, private_key=None, timeout=10)
+        contract, address, contract_instance = deploy._deploy_contract(w3, contract_interface, *args, private_key=None,
+                                                                       timeout=10)
 
         contract_interface.__getitem__.assert_has_calls([call('abi'), call('bin'), call('abi')])
 
         w3.eth.contract.return_value.constructor.assert_called_with(*args)
-        w3.eth.contract.return_value.constructor.return_value.transact.assert_called_once_with(transaction={'from': w3.eth.accounts[0]})
+        w3.eth.contract.return_value.constructor.return_value.transact.assert_called_once_with(
+            transaction={'from': w3.eth.accounts[0]})
 
         tx_hash = w3.eth.contract.return_value.constructor.return_value.transact.return_value
         w3.eth.waitForTransactionReceipt.assert_called_once_with(tx_hash, timeout=10)
@@ -81,10 +90,32 @@ class TestDeploy(unittest.TestCase):
         account_mock.privateKeyToAccount.assert_called_once_with(private_key)
 
         txn = w3.eth.contract.return_value.constructor.return_value.buildTransaction
-        txn.assert_called_once_with({'nonce': w3.eth.getTransactionCount.return_value, 'gas': 4000000, 'gasPrice': 21000000000})
+        txn.assert_called_once_with(
+            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 4000000, 'gasPrice': 5000000000})
 
         w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, private_key)
         tx_hash = w3.eth.sendRawTransaction.return_value
 
         w3.eth.waitForTransactionReceipt.assert_called_once_with(tx_hash, timeout=10)
-        
+
+    @patch('backend.server.utils.deploy.get_w3')
+    def test_call_contract_func(self, get_w3_mock):
+        w3 = get_w3_mock.return_value
+
+        private_key = settings.ethereum_private_key()
+        timeout = 1
+        contract = MagicMock()
+
+        receipt = deploy.call_contract_function(contract.functions.registerProject,
+                                                constants.DAO_ADDRESS,
+                                                private_key=private_key, timeout=timeout)
+
+        self.assertEqual(receipt, w3.eth.waitForTransactionReceipt.return_value)
+        w3.eth.waitForTransactionReceipt.assert_called_once_with(w3.eth.sendRawTransaction.return_value,
+                                                                 timeout=timeout)
+
+        deploy.call_contract_function(contract.functions.registerProject, constants.DAO_ADDRESS,
+                                      timeout=timeout)
+
+        # no transaction is made if a private key isn't given
+        self.assertEqual(1, w3.eth.waitForTransactionReceipt.call_count)

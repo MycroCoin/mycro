@@ -184,15 +184,26 @@ CSRF_TRUSTED_ORIGINS = (
 
 CORS_ALLOW_CREDENTIALS = True
 
+ALLOWED_DEPLOY_ENVS = ['parity', 'ropsten', 'mainnet']
+
 # Application config
 def deploy_env():
-    return os.environ.get('DEPLOY_ENV', 'parity')
+    deploy_env = os.environ.get('DEPLOY_ENV', 'parity')
+    if deploy_env not in ALLOWED_DEPLOY_ENVS:
+        raise ValueError(f'DEPLOY_ENV must be one of {ALLOWED_DEPLOY_ENVS} but is {deploy_env}')
+    return deploy_env
 
 def get_infura_api_key():
     return os.environ['INFURA_API_KEY']
 
 def ethereum_private_key():
-    return os.environ['ETHEREUM_PRIVATE_KEY']
+    env_var_name = 'ETHEREUM_PRIVATE_KEY'
+    if deploy_env() == 'mainnet':
+        # on mainnet we will never default to the dev key below
+        return os.environ[env_var_name]
+    else:
+        # ----------- WARNING: DO NOT USE THIS PRIVATE KEY IN ANY PRODUCTION SENSE. NEVER PUT REAL ETH INTO THIS ACCOUNT
+        return os.environ.get('ETHEREUM_PRIVATE_KEY', 'f49e1216edac9a5b0fab36f28037bfe8d5eb104b13f049b59decfac446e56ab3')
 
 def parity_endpoint():
     return os.environ.get('PARITY_ENDPOINT', 'http://localhost:8545')

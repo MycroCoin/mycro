@@ -1,13 +1,14 @@
 from backend.server.models import Project, ASC
 from backend.tests.mycro_django_test import MycroDjangoTest
 import backend.tests.testing_utilities.constants as constants
+from unittest.mock import patch
 
 
 class TestProjectSchema(MycroDjangoTest):
 
     def setUp(self):
         super().setUp()
-        self.project = Project.objects.create(repo_name=constants.PROJECT_NAME, dao_address=constants.DAO_ADDRESS)
+        self.project = Project.objects.create(repo_name=constants.PROJECT_NAME, dao_address=constants.DAO_ADDRESS, is_mycro_dao=True)
 
     def test_get_all_projects(self):
         resp = self.query(
@@ -23,24 +24,58 @@ query {
         self.assertResponseNoErrors(resp, {
             'allProjects': [{'daoAddress': constants.DAO_ADDRESS, 'repoName': constants.PROJECT_NAME}]})
 
-    def test_create_project(self):
-        Project.objects.filter().delete()
+    @patch('backend.server.utils.deploy.get_w3')
+    def test_create_project(self, get_w3_mock):
+        project_name = 'testing'
+        w3 = get_w3_mock.return_value
+        w3.eth.waitForTransactionReceipt.return_value = {'contractAddress': constants.DAO_ADDRESS}
+
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createProject(repoName: "{constants.PROJECT_NAME}", daoAddress: "{constants.DAO_ADDRESS}") {{
-    newProject {{
-      repoName
-    }}
+  createProject(projectName: "{project_name}", creatorAddress: "{constants.DAO_ADDRESS}") {{
+      projectAddress
   }}
 }}
 """)
-        self.assertResponseNoErrors(resp, {'createProject': {'newProject': {'repoName': constants.PROJECT_NAME}}})
+        self.assertResponseNoErrors(resp, {'createProject': {'projectAddress': constants.DAO_ADDRESS}})
 
         all_projects = Project.objects.all()
 
-        self.assertEqual(1, len(all_projects))
+        self.assertEqual(1, len(all_projects)) # the actual project isn't made during this call, just the DAO
         self.assertEqual(constants.PROJECT_NAME, all_projects[0].repo_name)
+
+        # called twice for deployment and twice for registrations
+        self.assertEqual(4, get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
+        self.assertEqual(4, w3.eth.sendRawTransaction.call_count)
+
+    def test_create_project_mycro_dao_doesnt_exist(self):
+        Project.objects.filter().delete()
+        project_name = 'testing'
+
+        # need to double up on braces because of f-strings
+        resp = self.query(f"""
+mutation {{
+  createProject(projectName: "{project_name}", creatorAddress: "{constants.DAO_ADDRESS}") {{
+      projectAddress
+  }}
+}}
+""")
+        self.assertErrorNoResponse(resp, "Could not find mycro dao. Cannot create new project.")
+
+    def test_create_project_with_invalid_name(self):
+        Project.objects.filter().delete()
+        project_name = 'invalid name'
+
+        # need to double up on braces because of f-strings
+        resp = self.query(f"""
+mutation {{
+  createProject(projectName: "{project_name}", creatorAddress: "{constants.DAO_ADDRESS}") {{
+      projectAddress
+  }}
+}}
+""")
+        self.assertErrorNoResponse(resp, "must match the regex")
 
     def test_get_project_by_id(self):
         resp = self.query(
@@ -66,29 +101,3 @@ query {{
         )
         self.assertResponseNoErrors(resp, {'project': {'id': "1"}})
 
-    def test_is_project_name_available_invalid_github_name(self):
-        resp = self.query(
-            '''
-query {
-    isProjectNameAvailable(proposedProjectName: "invalid name") 
-}
-        '''
-        )
-
-        self.assertResponseNoErrors(resp, {
-            "isProjectNameAvailable": "'invalid name' is invalid. It must match the regex '^[a-zA-Z0-9-_.]+$'"
-        })
-
-    def test_is_project_name_available_project_with_name_already_exists(self):
-
-        resp = self.query(
-            f'''
-query {{
-    isProjectNameAvailable(proposedProjectName: "{constants.PROJECT_NAME}") 
-}}
-        '''
-        )
-
-        self.assertResponseNoErrors(resp, {
-            "isProjectNameAvailable": f"Project with name {constants.PROJECT_NAME} already exists"
-        })
