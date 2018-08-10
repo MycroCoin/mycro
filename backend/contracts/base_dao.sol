@@ -236,12 +236,17 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return -1;
     }
 
-    function shouldExecuteAsc(address asc) internal view returns (bool) {
+    function shouldExecuteAsc(address asc_address) internal view returns (bool) {
+        BaseASC asc = BaseASC(asc_address);
+        if (!asc.canExecute()) {
+            return false;
+        }
+
         uint sum = 0;
 
         // TODO make this more efficient
-        for (uint i = 0; i < asc_votes[asc].length; i++) {
-            sum += balances[asc_votes[asc][i]];
+        for (uint i = 0; i < asc_votes[asc_address].length; i++) {
+            sum += balances[asc_votes[asc_address][i]];
         }
 
         if (sum >= threshold) {

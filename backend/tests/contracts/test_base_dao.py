@@ -103,3 +103,30 @@ class TestBaseDao(unittest.TestCase):
         self.assertEqual(10, self.dao_instance.balanceOf(W3.eth.accounts[5]))
 
 
+    def test_vote_for_executed_asc_doesnt_do_raise_new_merge_event(self):
+        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
+
+        merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], 1)
+
+        event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
+                                                                fromBlock=0)
+
+        self.dao_instance.registerModule(merge_address, transact={'from': W3.eth.accounts[0]})
+        self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
+        self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[7]})
+        self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[8]})
+
+        entries = event_filter.get_new_entries()
+
+        self.assertFalse(asc_instance.canExecute())
+        self.assertEqual(1, len(entries))
+        self.assertEqual(1, entries[0]["args"]["pr_id"])
+
+        self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[9]})
+        entries = event_filter.get_new_entries()
+
+        self.assertEqual(0, len(entries))
+
+        self.assertEqual(10, self.dao_instance.balanceOf(W3.eth.accounts[5]))

@@ -12,6 +12,11 @@ contract MergeASC is BaseASC {
     }
 
     function execute() public {
+        if(!canExecute) {
+            return;
+        }
+
+        canExecute = false;
         BaseDao dao = BaseDao(msg.sender);
 
         address merge_module_address = dao.getModuleByCode(1);

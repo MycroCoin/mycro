@@ -134,6 +134,9 @@ def _deploy_contract(w3, contract_interface, *args, private_key=None, timeout=12
 def get_or_create_event_loop():
     try:
         loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
     except RuntimeError as e:
         loop = asyncio.new_event_loop()
 
