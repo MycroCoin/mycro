@@ -27,12 +27,13 @@ SECRET_KEY = '=*f9))56@c*dzlmm0%t@)v1=)d2*pbom51h+o7l%35xt92ya3t'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'true'
 
+# URLs used to talk to the backend
 ALLOWED_HOSTS = [
     'testserver',
     'localhost',
     '127.0.0.1',
     '192.168.99.100', # IP of minikube on paymahn's machine
-    '35.230.122.2'  # IP of the server load balancer in GCP
+    '35.230.122.2',  # IP of the server load balancer in GCP
 ]
 
 
@@ -150,10 +151,12 @@ GRAPHENE = {
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 
+# Who's allowed to talk to the backend
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000'
     '192.168.99.100:30080' # ip of paymahn's minikube
-    '35.197.53.29:3000' # ip of frontend load balancer for production
+    '35.197.53.29:80' # ip of frontend load balancer for production
+    'app.mycrocoin.org:80'
 )
 
 CORS_ALLOW_METHODS = (
