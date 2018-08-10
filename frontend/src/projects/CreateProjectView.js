@@ -32,10 +32,10 @@ class CreateProject extends Component {
 
     client.mutate({mutation: gql`
     mutation {
-  createProject(projectName: "${this.state.projectName}", creatorAddress: "${checksumAddress}") {
-    projectAddress
-  }
-}`}).then(({data: { createProject: { projectAddress: address}}}) => {
+      createProject(projectName: "${this.state.projectName}", creatorAddress: "${checksumAddress}") {
+        projectAddress 
+      }
+    }`}).then(({data: { createProject: { projectAddress: address}}}) => {
       this.props.history.push('/projects/' + address)
     }).catch((err) => {
       alert(err);

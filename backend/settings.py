@@ -97,7 +97,7 @@ DATABASES = {
     }
 }
 # https://stackoverflow.com/questions/6353124/running-django-tests-with-sqlite
-if 'test' in sys.argv or 'test_coverage' in sys.argv: #Covers regular testing and django-coverage
+if 'test' in sys.argv or 'test_coverage' in sys.argv or 'makemigrations' in sys.argv: #Covers regular testing and django-coverage
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 

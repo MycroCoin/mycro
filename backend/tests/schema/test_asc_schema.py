@@ -1,6 +1,7 @@
 from backend.server.models import Project, ASC
 from backend.tests.mycro_django_test import MycroDjangoTest
 import backend.tests.testing_utilities.constants as constants
+from unittest.mock import patch
 
 
 class TestASCSchema(MycroDjangoTest):
@@ -63,25 +64,49 @@ query {{
 
         self.assertResponseNoErrors(resp, {'asc': {'id': "1"}})
 
-    def test_create_asc(self):
-        ASC.objects.filter().delete()
+    def test_create_asc_project_doesnt_exist(self):
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createAsc(address: "{constants.ASC_ADDRESS}", projectId: "1")  {{
-    newAsc {{
-      address
+  createAsc(daoAddress: "invalid dao address", rewardee: "{constants.REWARDEE}", prId: 1)  {{
+    asc {{
+      address 
     }}
   }}
 }}
 """)
-        self.assertResponseNoErrors(resp, {'createAsc': {'newAsc': {'address': constants.ASC_ADDRESS}}})
+
+        self.assertErrorNoResponse(resp, "Project matching query")
+
+    @patch('backend.server.utils.deploy.get_w3')
+    def test_create_asc(self, get_w3_mock):
+        ASC.objects.filter().delete()
+        w3 = get_w3_mock.return_value
+        w3.eth.waitForTransactionReceipt.return_value = {'contractAddress': constants.ASC_ADDRESS}
+
+
+        # need to double up on braces because of f-strings
+        resp = self.query(f"""
+mutation {{
+  createAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", prId: 1)  {{
+    asc {{
+      address 
+    }}
+  }}
+}}
+""")
+        self.assertResponseNoErrors(resp, {'createAsc': {'asc': {'address': constants.ASC_ADDRESS}}})
 
         all_ascs = ASC.objects.all()
 
         self.assertEqual(1, len(all_ascs))
         self.assertEqual(constants.PROJECT_NAME, all_ascs[0].project.repo_name)
         self.assertEqual(constants.ASC_ADDRESS, all_ascs[0].address)
+
+        # called once for deployment and once for registration
+        self.assertEqual(2, get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
+        self.assertEqual(2, w3.eth.sendRawTransaction.call_count)
+
 
     def test_get_merge_asc_abi(self):
         resp = self.query("""

@@ -5,6 +5,8 @@ from graphene import ObjectType
 
 from backend.server.models import ASC, Project
 from backend.server.utils.contract_compiler import ContractCompiler
+import backend.server.utils.deploy as deploy
+import backend.settings as settings
 
 
 class AscType(DjangoObjectType):
@@ -48,22 +50,44 @@ class Query(ObjectType):
         contract_compiler = ContractCompiler()
 
         merge_asc_interface = contract_compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        return { 'abi': merge_asc_interface['abi'], 'unlinked_binary': merge_asc_interface['bin']}
+        return {'abi': merge_asc_interface['abi'], 'unlinked_binary': merge_asc_interface['bin']}
 
 
 class CreateASC(graphene.Mutation):
     class Arguments:
-        address = graphene.String(required=True)
-        project_id = graphene.String(required=True)
+        dao_address = graphene.String(required=True)
+        rewardee = graphene.String(required=True)
+        pr_id = graphene.Int(required=True)
 
-    new_asc = graphene.Field(AscType)
+    asc = graphene.Field(AscType)
 
-    def mutate(self, info, address, project_id):
-        project = Project.objects.get(pk=project_id)
-        asc = ASC(address=address, project=project)
+    def mutate(self, info, dao_address: str, rewardee: str, pr_id: int):
+        # validate that we have a DAO with the given address in our DB
+        # this may be unnecessary
+        project = Project.objects.get(dao_address=dao_address)
+
+        # TODO check that a PR with the given ID exists before executing the rest of this function
+
+        compiler = ContractCompiler()
+
+        w3 = deploy.get_w3()
+        base_dao_interface = compiler.get_contract_interface('base_dao.sol', 'BaseDao')
+        dao_contract = w3.eth.contract(abi=base_dao_interface['abi'], address=dao_address)
+
+        asc_interface = compiler.get_contract_interface('merge_asc.sol', 'MergeASC')
+
+        # we don't use the async method here because we can't parallelize
+        # first the asc has to be deployed to get it's address then the address has to be registered
+        # with the base dao
+        _, _, asc_address, _ = deploy.deploy(asc_interface, rewardee, pr_id, private_key=settings.ethereum_private_key())
+
+        deploy.call_contract_function(dao_contract.functions.propose, asc_address,
+                                      private_key=settings.ethereum_private_key())
+
+        asc = ASC(address=asc_address, project=project, rewardee=rewardee)
         asc.save()
 
-        return CreateASC(new_asc=asc)
+        return CreateASC(asc=asc)
 
 
 class Mutation(graphene.ObjectType):

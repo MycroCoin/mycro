@@ -7,6 +7,7 @@ import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpe
 import ReactGA from 'react-ga';
 import {ProjectView} from "./index";
 import PropTypes from 'prop-types'
+import {toChecksumAddress} from 'web3-utils';
 
 
 class Project extends Component {
@@ -43,19 +44,22 @@ class Project extends Component {
     });
   }
 
-  createPullRequest(){
-    const query = gql`query{
-      getMergeAscAbi
-    }`;
-    client.query({query}).then(({data: {getMergeAscAbi: ascData}}, error) => {
-        const asc = createTruffleContract(JSON.parse(ascData));
-        return deployHelper(asc, this.state.prId);
-    }).then((asc) => {
-      return this.state.projectContract.propose(asc.address, {from: window.web3.eth.accounts[0]})
-    }).then(() => {
-      console.log("proposed");
+  createPullRequest() {
+    let checksumRewardeeAddress = toChecksumAddress(window.web3.eth.accounts[0]);
+    let checksumDaoAddress = toChecksumAddress(this.props.match.params.id);
+
+    client.mutate({mutation: gql`
+    mutation {
+      createAsc(daoAddress: "${checksumDaoAddress}", rewardee: "${checksumRewardeeAddress}", prId: ${this.state.prId}) {
+        asc {
+          address
+        } 
+      }
+    }`}).then((data) => {
       this.loadProject();
-    });
+    }).catch((err) => {
+      alert(err);
+    })
   }
 
   handleChange(event){

@@ -42,7 +42,7 @@ class TestBaseDao(unittest.TestCase):
     def test_vote_fails_when_voting_second_time(self):
         merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
 
-        _, asc_address, _ = _deploy_contract(W3, merge_asc_interface, 1)
+        _, asc_address, _ = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[0], 1)
 
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
@@ -82,7 +82,7 @@ class TestBaseDao(unittest.TestCase):
         merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
 
         merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
-        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, 1)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], 1)
 
         event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
                                                                 fromBlock=0)
@@ -100,6 +100,6 @@ class TestBaseDao(unittest.TestCase):
         self.assertEqual(1, len(entries))
         self.assertEqual(1, entries[0]["args"]["pr_id"])
 
-        self.assertEqual(10, self.dao_instance.balanceOf(W3.eth.accounts[0]))
+        self.assertEqual(10, self.dao_instance.balanceOf(W3.eth.accounts[5]))
 
 

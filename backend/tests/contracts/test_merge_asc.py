@@ -12,9 +12,9 @@ class TestMergeAsc(unittest.TestCase):
         self.compiler = ContractCompiler()
 
         contract_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        _, _, self.merge_asc_instance = _deploy_contract(W3, contract_interface, 1)
+        _, _, self.merge_asc_instance = _deploy_contract(W3, contract_interface, W3.eth.accounts[1], 1)
 
     def test_get_rewardee(self):
 
         # note: depends on the account used by _deploy_contract for the deployment
-        self.assertEqual(W3.eth.accounts[0], self.merge_asc_instance.rewardee())
+        self.assertEqual(W3.eth.accounts[1], self.merge_asc_instance.rewardee())

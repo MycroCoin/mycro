@@ -7,6 +7,7 @@ import logging
 import os
 import backend.settings as settings
 import asyncio
+from contextlib import contextmanager
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +21,9 @@ async def deploy_async(contract_interface, *args, private_key=None, timeout=120)
 
 
 def deploy(contract_interface, *args, private_key=None, timeout=120):
-    return asyncio.get_event_loop().run_until_complete(deploy_async(contract_interface, *args, private_key=private_key, timeout=timeout))
+    with get_or_create_event_loop() as loop:
+        return loop.run_until_complete(
+            deploy_async(contract_interface, *args, private_key=private_key, timeout=timeout))
 
 
 async def call_contract_function_async(contract_func, *args, private_key=None, timeout=120):
@@ -29,8 +32,9 @@ async def call_contract_function_async(contract_func, *args, private_key=None, t
 
 
 def call_contract_function(contract_func, *args, private_key=None, timeout=120):
-    return asyncio.get_event_loop().run_until_complete(
-        call_contract_function_async(contract_func, *args, private_key=private_key, timeout=timeout))
+    with get_or_create_event_loop() as loop:
+        return loop.run_until_complete(
+            call_contract_function_async(contract_func, *args, private_key=private_key, timeout=timeout))
 
 
 def _call_contract_func(w3: Web3, contract_func, *args, private_key=None, timeout=120):
@@ -124,3 +128,16 @@ def _deploy_contract(w3, contract_interface, *args, private_key=None, timeout=12
     contract = w3.eth.contract(address=contract_address, abi=contract_interface['abi'])
 
     return contract, contract_address, contract_instance
+
+
+@contextmanager
+def get_or_create_event_loop():
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError as e:
+        loop = asyncio.new_event_loop()
+
+    try:
+        yield loop
+    finally:
+        loop.close()

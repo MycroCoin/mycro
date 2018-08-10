@@ -7,7 +7,7 @@ import "./base_dao.sol";
 contract MergeASC is BaseASC {
     uint public prId;
 
-    constructor(uint _prId) BaseASC() {
+    constructor(address _rewardee, uint _prId) BaseASC(_rewardee) {
         prId = _prId;
     }
 

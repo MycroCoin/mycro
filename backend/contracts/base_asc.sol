@@ -3,8 +3,8 @@ pragma solidity ^0.4.24;
 contract BaseASC {
     address public rewardee;
 
-    constructor() {
-        rewardee = msg.sender;
+    constructor(address _rewardee) {
+        rewardee = _rewardee;
     }
 
     function execute() public;
