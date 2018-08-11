@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Link, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Link, Switch, Redirect } from 'react-router-dom'
 import PropTypes from 'prop-types'
 
 
 import './App.css';
-import HomeView from './home/HomeView.js';
 import {
   ProjectView,
   ProjectListView,
@@ -27,7 +26,6 @@ class App extends Component {
               The future is open
             </p>
 
-            <Link to="/home">Home</Link>
             <Link to="/projects">Projects</Link>
             <Link to="/projects/create">New Project</Link>
 
@@ -38,7 +36,9 @@ class App extends Component {
               <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
               <Route path="/projects/:id" component={ProjectView}/>
               <Route path="/projects" component={ProjectListView}/>
-              <Route path="/" component={HomeView}/>
+              <Route exact path="/" >
+                <Redirect to="/projects"/>
+              </Route>
             </Switch>
           </div>
         </div>
