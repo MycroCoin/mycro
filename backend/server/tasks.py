@@ -6,6 +6,7 @@ from backend.server.models import Project
 import logging
 from web3.contract import ConciseContract
 import backend.server.utils.github as github
+import backend.settings as settings
 
 
 def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: Web3):
@@ -43,7 +44,7 @@ def process_merges():
             # We can do this when we use get_new_entries but need this for now because we reattempt to merge PRs even
             # after they've been merged which results in an exception
             try:
-                github.merge_pr(project.repo_name, pr_id)
+                github.merge_pr(project.repo_name, pr_id, organization=settings.github_organization())
             except Exception as e:
                 logging.warning(f'PR {pr_id} for project {project.repo_name} could not be merged, probably because it already has been')
                 logging.warning(e)
@@ -78,7 +79,7 @@ def process_registrations():
                                                 ContractFactoryClass=ConciseContract)
 
             repo_name = base_dao_contract.name()
-            github.create_repo(repo_name)
+            github.create_repo(repo_name=repo_name, organization=settings.github_organization())
 
             Project.objects.create(repo_name=repo_name, dao_address=registered_project_address)
 

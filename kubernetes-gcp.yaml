@@ -236,6 +236,8 @@ spec:
           value: 127.0.0.1
         - name: DJANGO_DB_PORT
           value: "5432"
+        - name: GITHUB_ORGANIZATION
+          value: MycroCoin
         - name: GITHUB_TOKEN
           valueFrom:
             secretKeyRef:

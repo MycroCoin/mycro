@@ -57,4 +57,4 @@ class TestGithub(TestCase):
 
     def test_create_repo_validates_name(self):
         with self.assertRaisesRegex(ValueError, 'is invalid'):
-            github.create_repo('invalid repo name')
+            github.create_repo('invalid repo name', ORG)

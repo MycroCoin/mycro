@@ -3,7 +3,7 @@ import backend.settings as settings
 import re
 
 
-def create_repo(repo_name, organization='MycroCoin'):
+def create_repo(repo_name, organization):
     check_repo_name(repo_name)
 
     github = Github(settings.github_token())
@@ -12,7 +12,7 @@ def create_repo(repo_name, organization='MycroCoin'):
     org.create_repo(name=repo_name, auto_init=True)
 
 
-def merge_pr(repo_name, pr_id, organization='MycroCoin'):
+def merge_pr(repo_name, pr_id, organization):
     github = Github(settings.github_token())
     org = github.get_organization(organization)
     repo = org.get_repo(repo_name)

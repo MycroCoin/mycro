@@ -214,3 +214,6 @@ def parity_endpoint():
 def github_token():
     return os.environ['GITHUB_TOKEN']
 
+def github_organization():
+    return os.environ['GITHUB_ORGANIZATION']
+
