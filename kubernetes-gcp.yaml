@@ -80,10 +80,18 @@ spec:
         - --base-path
         - /build
         - --unsafe-expose # TODO figure out how to only expose what's necessary
-        image: gcr.io/mycrocoin/parity:v1
+        image: gcr.io/mycrocoin/parity:v2
         name: parity
         ports:
         - containerPort: 8545
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8545
+          initialDelaySeconds: 90
+          periodSeconds: 10
+          failureThreshold: 5 # allow up to five failures every
+
       restartPolicy: Always
 #
 ---
