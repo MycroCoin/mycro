@@ -16,9 +16,10 @@ import ReactGA from 'react-ga';
 class App extends Component {
 
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.state = {accounts: []}
+    this.state = {accounts: [], network: 'unknown'};
+
 
     window.web3.eth.getAccounts((err, accounts) => {
       if (err != null) {
@@ -26,7 +27,33 @@ class App extends Component {
         return
       }
       this.setState(Object.assign(this.state, {accounts: accounts}));
-    })
+    });
+
+    window.web3.version.getNetwork((err, networkId) => {
+        if (err != null) {
+          console.log("Error when getting network: " + err)
+          return
+        }
+        let networkName = 'unknown';
+        switch (networkId) {
+          case "1":
+            networkName = 'mainnet';
+            break
+          case "2":
+            networkName = 'morden'
+            break
+          case "3":
+            networkName = 'ropsten'
+            break
+          case "4":
+            networkName = 'rinkeby'
+            break
+          default:
+            console.log('This is an unknown network.')
+        }
+        this.setState(Object.assign(this.state, {network: networkName}))
+      }
+    );
   }
 
   componentDidMount() {
@@ -34,36 +61,50 @@ class App extends Component {
     this.context.mixpanel.track("App Mounted")
   }
 
-  render() {
-    return this.state.accounts.length === 0
-      ? (<p>Please log into metamask then refresh the page</p>)
-      : (
-        <BrowserRouter>
-          <div className="App">
-            <header className="App-header">
-              <h1 className="App-title">Mycro</h1>
-              <p className="App-intro">
-                The future is open
-              </p>
+  _renderNoAccounts() {
+    return <p>Please log into metamask then refresh the page</p>
+  }
 
-              <Link to="/projects">Projects</Link>
-              <Link to="/projects/create">New Project</Link>
+  _renderWithAccounts() {
+    return (
+      <BrowserRouter>
+        <div className="App">
+          <header className="App-header">
+            <h1 className="App-title">Mycro</h1>
+            <p className="App-intro">
+              The future is open
+            </p>
 
-            </header>
-            <div className="App-body">
-              <Switch>
-                <Route path="/projects/create" component={CreateProjectView}/>
-                <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
-                <Route path="/projects/:id" component={ProjectView}/>
-                <Route path="/projects" component={ProjectListView}/>
-                <Route exact path="/">
-                  <Redirect to="/projects"/>
-                </Route>
-              </Switch>
-            </div>
+            <Link to="/projects">Projects</Link>
+            <Link to="/projects/create">New Project</Link>
+
+            <p>You're logged into the {this.state.network} network, please make sure you're logged into the Ropsten
+              network</p>
+
+          </header>
+          <div className="App-body">
+            <Switch>
+              <Route path="/projects/create" component={CreateProjectView}/>
+              <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
+              <Route path="/projects/:id" component={ProjectView}/>
+              <Route path="/projects" component={ProjectListView}/>
+              <Route exact path="/">
+                <Redirect to="/projects"/>
+              </Route>
+            </Switch>
           </div>
-        </BrowserRouter>
-      );
+        </div>
+      </BrowserRouter>
+    );
+  }
+
+  render() {
+    if (this.state.accounts.length === 0) {
+      return this._renderNoAccounts()
+    }
+    else {
+      return this._renderWithAccounts()
+    }
   }
 }
 
