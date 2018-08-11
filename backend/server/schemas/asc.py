@@ -57,11 +57,12 @@ class CreateASC(graphene.Mutation):
     class Arguments:
         dao_address = graphene.String(required=True)
         rewardee = graphene.String(required=True)
+        reward = graphene.Int(required=True)
         pr_id = graphene.Int(required=True)
 
     asc = graphene.Field(AscType)
 
-    def mutate(self, info, dao_address: str, rewardee: str, pr_id: int):
+    def mutate(self, info, dao_address: str, rewardee: str, reward: int, pr_id: int):
         # validate that we have a DAO with the given address in our DB
         # this may be unnecessary
         project = Project.objects.get(dao_address=dao_address)
@@ -79,12 +80,12 @@ class CreateASC(graphene.Mutation):
         # we don't use the async method here because we can't parallelize
         # first the asc has to be deployed to get it's address then the address has to be registered
         # with the base dao
-        _, _, asc_address, _ = deploy.deploy(asc_interface, rewardee, pr_id, private_key=settings.ethereum_private_key())
+        _, _, asc_address, _ = deploy.deploy(asc_interface, rewardee, reward, pr_id, private_key=settings.ethereum_private_key())
 
         deploy.call_contract_function(dao_contract.functions.propose, asc_address,
                                       private_key=settings.ethereum_private_key())
 
-        asc = ASC(address=asc_address, project=project, rewardee=rewardee)
+        asc = ASC(address=asc_address, project=project, rewardee=rewardee, reward=reward)
         asc.save()
 
         return CreateASC(asc=asc)

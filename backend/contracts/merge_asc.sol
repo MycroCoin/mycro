@@ -7,21 +7,21 @@ import "./base_dao.sol";
 contract MergeASC is BaseASC {
     uint public prId;
 
-    constructor(address _rewardee, uint _prId) BaseASC(_rewardee) {
+    constructor(address _rewardee, uint _reward, uint _prId) BaseASC(_rewardee, _reward) {
         prId = _prId;
     }
 
     function execute() public {
-        if(!canExecute) {
+        if(hasExecuted) {
             return;
         }
 
-        canExecute = false;
         BaseDao dao = BaseDao(msg.sender);
 
         address merge_module_address = dao.getModuleByCode(1);
         MergeModule merge_module = MergeModule(merge_module_address);
 
         merge_module.merge(prId);
+        hasExecuted = true;
     }
 }

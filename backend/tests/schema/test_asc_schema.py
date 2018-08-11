@@ -9,7 +9,7 @@ class TestASCSchema(MycroDjangoTest):
     def setUp(self):
         super().setUp()
         self.project = Project.objects.create(repo_name=constants.PROJECT_NAME, dao_address=constants.DAO_ADDRESS)
-        self.asc = ASC.objects.create(address=constants.ASC_ADDRESS, project=self.project)
+        self.asc = ASC.objects.create(address=constants.ASC_ADDRESS, project=self.project, reward=constants.REWARD)
 
     def test_get_all_ascs(self):
         resp = self.query(
@@ -68,7 +68,7 @@ query {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createAsc(daoAddress: "invalid dao address", rewardee: "{constants.REWARDEE}", prId: 1)  {{
+  createAsc(daoAddress: "invalid dao address", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD}, prId: 1)  {{
     asc {{
       address 
     }}
@@ -88,7 +88,7 @@ mutation {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", prId: 1)  {{
+  createAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: 1)  {{
     asc {{
       address 
     }}

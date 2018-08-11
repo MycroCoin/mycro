@@ -2,11 +2,13 @@ pragma solidity ^0.4.24;
 
 contract BaseASC {
     address public rewardee;
-    bool public canExecute;
+    bool public hasExecuted;
+    uint public reward;
 
-    constructor(address _rewardee) {
+    constructor(address _rewardee, uint _reward) {
         rewardee = _rewardee;
-        canExecute = true;
+        hasExecuted = false;
+        reward = _reward;
     }
 
     function execute() public;

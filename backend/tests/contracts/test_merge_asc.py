@@ -5,6 +5,7 @@ from backend.server.utils.deploy import _deploy_contract
 import unittest
 
 W3 = Web3(EthereumTesterProvider())
+REWARD = 10
 
 class TestMergeAsc(unittest.TestCase):
 
@@ -12,7 +13,7 @@ class TestMergeAsc(unittest.TestCase):
         self.compiler = ContractCompiler()
 
         contract_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        _, _, self.merge_asc_instance = _deploy_contract(W3, contract_interface, W3.eth.accounts[1], 1)
+        _, _, self.merge_asc_instance = _deploy_contract(W3, contract_interface, W3.eth.accounts[1], REWARD, 1)
 
     def test_get_rewardee(self):
 

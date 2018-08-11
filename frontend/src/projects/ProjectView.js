@@ -18,6 +18,7 @@ class Project extends Component {
       projectContract: null,
       project: this.getProject(this.props.match.params.id),
       prId: 0,
+      reward: 0,
     }
     this.loadProject();
   }
@@ -40,7 +41,8 @@ class Project extends Component {
       return projectContractToProjectJson(contract);
     }).then((project) => {
       const prId = 0;
-      this.setState({project, projectContract, prId});
+      const reward = 0;
+      this.setState({project, projectContract, prId, reward});
     });
   }
 
@@ -50,7 +52,7 @@ class Project extends Component {
 
     client.mutate({mutation: gql`
     mutation {
-      createAsc(daoAddress: "${checksumDaoAddress}", rewardee: "${checksumRewardeeAddress}", prId: ${this.state.prId}) {
+      createAsc(daoAddress: "${checksumDaoAddress}", rewardee: "${checksumRewardeeAddress}", reward: ${this.state.reward}, prId: ${this.state.prId}) {
         asc {
           address
         } 
@@ -62,11 +64,17 @@ class Project extends Component {
     })
   }
 
-  handleChange(event){
+  handlePrIdChange(event){
     const num = parseInt(event.target.value, 10);
     if(isNaN(num)) return;
     this.setState(
       Object.assign(this.state, {prId: num}));
+  }
+  handleRewardChange(event){
+    const num = parseInt(event.target.value, 10);
+    if(isNaN(num)) return;
+    this.setState(
+      Object.assign(this.state, {reward: num}));
   }
 
   componentDidMount() {
@@ -96,7 +104,11 @@ class Project extends Component {
         <input 
           placeholder="Pull request ID"
           value={this.state.prId} 
-          onChange={(event) => this.handleChange(event)} />
+          onChange={(event) => this.handlePrIdChange(event)} />
+        <input
+          placeholder="Reward Value"
+          value={this.state.reward}
+          onChange={(event) => this.handleRewardChange(event)} />
         <button onClick={() => this.createPullRequest()}>Create Pull Request Proposal</button>
       </div>
     );
