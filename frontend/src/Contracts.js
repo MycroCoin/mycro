@@ -13,6 +13,8 @@ import gql from 'graphql-tag';
 const provider = window.web3.currentProvider;
 const web3 = window.web3;
 
+
+
 const createTruffleContract = (data) => {
   const contract = TruffleContract(data);
   contract.setProvider(provider);
@@ -21,24 +23,24 @@ const createTruffleContract = (data) => {
 };
 
 const deployHelper = (contract, ...args) => {
-    //TODO use a promise here to avoid race condition
-    var a = window.web3.eth.accounts[0];
-    // a = undefined;
-    return deployer.deploy(contract, ...args, {from: a});
+  //TODO use a promise here to avoid race condition
+  var a = window.web3.eth.accounts[0];
+  // a = undefined;
+  return deployer.deploy(contract, ...args, {from: a});
 };
 
 var deployer = null;
-web3.version.getNetwork(function(err, id) {
-      const network_id = id;
+web3.version.getNetwork(function (err, id) {
+  const network_id = id;
 
-      deployer = new TruffleDeployer({
-        contracts: [BaseDaoData],
-        network: "test",
-        network_id: network_id,
-        provider: provider
-      });
-      
-      deployer.start();
+  deployer = new TruffleDeployer({
+    contracts: [BaseDaoData],
+    network: "test",
+    network_id: network_id,
+    provider: provider
+  });
+
+  deployer.start();
 });
 const Contracts = {
   MycroCoin: TruffleContract(MycroCoinData),
@@ -54,13 +56,13 @@ Object.keys(Contracts).forEach((contract) => {
 
 const deployedMycro = () => {
   //TODO don't hardcode and actually grab it with graphql dynamically
-    const query = gql`query{
+  const query = gql`query{
   mycroDao 
 }`;
-    return client.query({query}).then(({data: {mycroDao: address}}, error) => {
-        console.log("Mycro dao address is " + address);
-        return Contracts.MycroCoin.at(address);
-    });
+  return client.query({query}).then(({data: {mycroDao: address}}, error) => {
+    console.log("Mycro dao address is " + address);
+    return Contracts.MycroCoin.at(address);
+  });
 }
 // TODO uncomment this once shit is fixed
 Contracts.MycroCoin.deployed = deployedMycro;
