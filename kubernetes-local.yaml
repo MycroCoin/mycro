@@ -258,8 +258,6 @@ spec:
         env:
         - name: REACT_APP_GRAPHQL_ENDPOINT
           value: http://192.168.99.100:30081/graphql
-        - name: NODE_ENV
-          value: wtf
         image: mycro-frontend
         imagePullPolicy: Never
         name: frontend

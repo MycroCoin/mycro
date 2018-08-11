@@ -13,10 +13,17 @@ const ascContractToASCJson = (contract) => {
   ascJson.id = contract.address;
 
   return Promise.all([
-      contract.prId()
-  ]).then((prId) => {
+      contract.prId(),
+    contract.hasExecuted(),
+    contract.reward(),
+    contract.rewardee(),
+  ]).then(([prId, hasExecuted, reward, rewardee]) => {
 
         ascJson.prId = prId;
+    ascJson.hasExecuted = hasExecuted;
+    ascJson.reward = reward;
+    ascJson.rewardee = rewardee;
+
       return ascJson
     })
 }
@@ -41,7 +48,7 @@ const projectContractToProjectJson = (contract) => {
   }).then((asc_contracts) => {
     return Promise.all(asc_contracts.map(ascContractToASCJson))
   }).then((ascs) => {
-    projectJson.ascs = ascs;
+    projectJson.ascs = ascs.filter(asc => !asc.hasExecuted);
     return projectJson;
   });
 }

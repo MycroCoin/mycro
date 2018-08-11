@@ -43,13 +43,8 @@ class Asc extends Component {
     getMergeASCForAddress(id).then((contract) => {
       return ascContractToASCJson(contract);
     }).then( (json) => {
-        this.setState(Object.assign(this.state, {asc: {id: json.id, prId: json.prId[0]}}));
+        this.setState(Object.assign(this.state, {asc: json}));
     });
-    // ascAddressToJson(id).then((asc) => {
-    //   asc.code = "foo bar baz delete me";
-    //
-    //   this.setState(Object.assign(this.state, {asc}));
-    // });
   }
 
   voteAccept(){
