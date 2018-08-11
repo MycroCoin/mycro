@@ -5,7 +5,7 @@ from backend.tests.testing_utilities import constants
 
 REPO = 'blah'
 ORG = 'my_org'
-PR_ID = 1
+PR_ID = 2
 
 class TestGithub(TestCase):
 
@@ -29,13 +29,22 @@ class TestGithub(TestCase):
         self.pygithub_mock.return_value.get_organization.return_value.create_repo.assert_called_once_with(name=REPO, auto_init=True)
 
     def test_merge_pr(self):
+        pr1 = MagicMock()
+        pr2 = MagicMock()
+        pr1.number = 1
+        pr2.number = 2
+
+        self.pygithub_mock.return_value.get_organization.return_value.get_repo.return_value.get_pulls.return_value = [pr1, pr2]
+
         github.merge_pr(REPO, PR_ID, ORG)
 
         self.pygithub_mock.assert_called_once_with(constants.GITHUB_ACCESS_TOKEN)
         self.pygithub_mock.return_value.get_organization.assert_called_once_with(ORG)
         self.pygithub_mock.return_value.get_organization.return_value.get_repo.assert_called_once_with(REPO)
-        self.pygithub_mock.return_value.get_organization.return_value.get_repo.return_value.get_pull.assert_called_once_with(PR_ID)
+        self.pygithub_mock.return_value.get_organization.return_value.get_repo.return_value.get_pulls.assert_called_once_with()
         self.pygithub_mock.return_value.get_organization.return_value.get_repo.return_value.get_pull.return_value.merge(REPO)
+        pr1.merge.assert_not_called()
+        pr2.merge.assert_called_once()
 
 
     def test_check_repo_name_happy_case(self):

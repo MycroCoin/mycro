@@ -17,8 +17,9 @@ def merge_pr(repo_name, pr_id, organization):
     org = github.get_organization(organization)
     repo = org.get_repo(repo_name)
 
-    pr = repo.get_pull(pr_id)
-    pr.merge()
+    for pull_request in repo.get_pulls():
+        if pull_request.number == pr_id:
+            pull_request.merge()
 
 
 def check_repo_name(repo_name: str):

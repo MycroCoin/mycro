@@ -138,7 +138,7 @@ spec:
               key: value
         - name: PYTHONUNBUFFERED
           value: "1"
-        image: gcr.io/mycrocoin/mycro-backend:v12
+        image: gcr.io/mycrocoin/mycro-backend:v14
         imagePullPolicy: IfNotPresent
         name: server
         ports:
@@ -181,7 +181,7 @@ spec:
         env:
         - name: REACT_APP_GRAPHQL_ENDPOINT
           value: "http://35.230.122.2:8001/graphql"
-        image: gcr.io/mycrocoin/mycro-frontend:v10
+        image: gcr.io/mycrocoin/mycro-frontend:v11
         imagePullPolicy: IfNotPresent
         name: frontend
         ports:
@@ -245,7 +245,7 @@ spec:
               key: value
         - name: PARITY_ENDPOINT
           value: http://parity:8545
-        image: gcr.io/mycrocoin/mycro-backend:v12
+        image: gcr.io/mycrocoin/mycro-backend:v14
         imagePullPolicy: IfNotPresent
         name: worker
         resources: {}
