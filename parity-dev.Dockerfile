@@ -1,4 +1,4 @@
-FROM parity/parity:v1.11.7
+FROM parity/parity:v1.11.8
 
 COPY parity-dev.json .
 

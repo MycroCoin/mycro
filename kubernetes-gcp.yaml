@@ -78,9 +78,9 @@ spec:
         - --chain
         - ropsten
         - --base-path
-        - /root/.local/share/io.parity.ethereum
+        - /build
         - --unsafe-expose # TODO figure out how to only expose what's necessary
-        image: parity/parity:v1.11.7
+        image: gcr.io/mycrocoin/parity:v1
         name: parity
         ports:
         - containerPort: 8545
