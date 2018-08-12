@@ -77,22 +77,24 @@ spec:
         - --light
         - --chain
         - ropsten
+        - --reserved-peers
+        - ropstenpeers.txt
         - --base-path
         - /build
         - --unsafe-expose # TODO figure out how to only expose what's necessary
-        image: gcr.io/mycrocoin/parity:v2
+        image: gcr.io/mycrocoin/parity:v3
         name: parity
         ports:
         - containerPort: 8545
         livenessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: 8545
           initialDelaySeconds: 90
           periodSeconds: 10
           failureThreshold: 5 # allow up to five failures every
-
       restartPolicy: Always
+      nodeSelector:
+        cloud.google.com/gke-nodepool: ssd-pool
 #
 ---
 # django server
