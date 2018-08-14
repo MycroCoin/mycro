@@ -4,6 +4,7 @@ from backend.server.utils.contract_compiler import ContractCompiler
 from backend.server.utils.deploy import _deploy_contract
 from eth_tester.exceptions import TransactionFailed
 import unittest
+import backend.tests.testing_utilities.constants as constants
 
 W3 = Web3(EthereumTesterProvider())
 SYMBOL = 'lol'
@@ -18,12 +19,9 @@ INITIAL_BALANCES = [33, 33, 34]
 class TestBaseDao(unittest.TestCase):
 
     def setUp(self):
-        self.compiler = ContractCompiler()
-
-        contract_interface = self.compiler.get_contract_interface("base_dao.sol", "BaseDao")
+        contract_interface = constants.COMPILER.get_contract_interface("base_dao.sol", "BaseDao")
         _, _, self.dao_instance = _deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY,
                                                    INITIAL_ADDRESSES, INITIAL_BALANCES)
-
 
     def test_can_propose(self):
         asc_address = W3.eth.accounts[1]
@@ -40,9 +38,9 @@ class TestBaseDao(unittest.TestCase):
             self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[0]})
 
     def test_vote_fails_when_voting_second_time(self):
-        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_asc_interface = constants.COMPILER.get_contract_interface("merge_asc.sol", "MergeASC")
 
-        _, asc_address, _ = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[0], 15, 1)
+        _, asc_address, _ = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[0], 15, constants.PR_ID)
 
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
@@ -65,26 +63,25 @@ class TestBaseDao(unittest.TestCase):
         self.assertEqual(33, balance)
 
     def test_register_module(self):
-
-        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
+        merge_module_interface = constants.COMPILER.get_contract_interface("merge_module.sol", "MergeModule")
         merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
         self.dao_instance.registerModule(merge_address, transact={'from': W3.eth.accounts[0]})
 
-        dummy_module_interface = self.compiler.get_contract_interface("dummy_module.sol", "DummyModule")
+        dummy_module_interface = constants.COMPILER.get_contract_interface("dummy_module.sol", "DummyModule")
         _, dummy_module_address, _ = _deploy_contract(W3, dummy_module_interface)
 
         self.assertTrue(self.dao_instance.isModuleRegistered(merge_address))
         self.assertFalse(self.dao_instance.isModuleRegistered(dummy_module_address))
 
-
     def test_vote_passes_threshold_executes_asc(self):
         reward = 15
 
-        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
+        merge_asc_interface = constants.COMPILER.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_module_interface = constants.COMPILER.get_contract_interface("merge_module.sol", "MergeModule")
 
         merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
-        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward, 1)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward,
+                                                        constants.PR_ID)
 
         event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
                                                                 fromBlock=0)
@@ -100,20 +97,22 @@ class TestBaseDao(unittest.TestCase):
         entries = event_filter.get_new_entries()
 
         self.assertEqual(1, len(entries))
-        self.assertEqual(1, entries[0]["args"]["pr_id"])
+        self.assertEqual(constants.PR_ID, entries[0]["args"]["pr_id"])
 
         self.assertEqual(reward, self.dao_instance.balanceOf(W3.eth.accounts[5]))
         self.assertEqual(TOTAL_SUPPLY + reward, self.dao_instance.totalSupply())
 
+        self.assertEqual([constants.PR_ID], merge_instance.pullRequestsToMerge())
 
     def test_vote_for_executed_asc_doesnt_do_raise_new_merge_event(self):
         reward = 15
 
-        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
+        merge_asc_interface = constants.COMPILER.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_module_interface = constants.COMPILER.get_contract_interface("merge_module.sol", "MergeModule")
 
         merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
-        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward, 1)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward,
+                                                        constants.PR_ID)
 
         event_filter = merge_contract.events.Merge.createFilter(argument_filters={'filter': {'event': 'Merge'}},
                                                                 fromBlock=0)
@@ -127,7 +126,7 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertTrue(asc_instance.hasExecuted())
         self.assertEqual(1, len(entries))
-        self.assertEqual(1, entries[0]["args"]["pr_id"])
+        self.assertEqual(constants.PR_ID, entries[0]["args"]["pr_id"])
 
         self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[9]})
         entries = event_filter.get_new_entries()
@@ -136,17 +135,17 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertEqual(reward, self.dao_instance.balanceOf(W3.eth.accounts[5]))
 
-
     def test_vote_threshold_updates_after_asc_executes(self):
         reward = 50
 
-        merge_asc_interface = self.compiler.get_contract_interface("merge_asc.sol", "MergeASC")
-        merge_module_interface = self.compiler.get_contract_interface("merge_module.sol", "MergeModule")
+        merge_asc_interface = constants.COMPILER.get_contract_interface("merge_asc.sol", "MergeASC")
+        merge_module_interface = constants.COMPILER.get_contract_interface("merge_module.sol", "MergeModule")
 
         merge_contract, merge_address, merge_instance = _deploy_contract(W3, merge_module_interface)
         self.dao_instance.registerModule(merge_address, transact={'from': W3.eth.accounts[0]})
 
-        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward, 1)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward,
+                                                        constants.PR_ID)
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
         self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[7]})
@@ -155,7 +154,8 @@ class TestBaseDao(unittest.TestCase):
         self.assertEqual(TOTAL_SUPPLY + reward, self.dao_instance.totalSupply())
 
         # deploy new ASC
-        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward, 1)
+        _, asc_address, asc_instance = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[5], reward,
+                                                        constants.PR_ID)
         self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
 
         self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[7]})

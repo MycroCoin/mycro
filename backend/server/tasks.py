@@ -1,6 +1,6 @@
 from celery import shared_task
 from backend.server.utils.contract_compiler import ContractCompiler
-from backend.server.utils.deploy import get_event_filter_w3
+import backend.server.utils.deploy as deploy
 from web3 import Web3
 from backend.server.models import Project
 import logging
@@ -9,7 +9,7 @@ import backend.server.utils.github as github
 import backend.settings as settings
 
 
-def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: Web3):
+def get_merge_module_instance(project: Project, compiler: ContractCompiler, w3: Web3):
     base_dao_interface = compiler.get_contract_interface('base_dao.sol', 'BaseDao')
     base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'], address=project.dao_address)
 
@@ -18,26 +18,24 @@ def build_merge_event_filter(project: Project, compiler: ContractCompiler, w3: W
     merge_module_interface = compiler.get_contract_interface('merge_module.sol', 'MergeModule')
     merge_module_contract = w3.eth.contract(abi=merge_module_interface['abi'], address=merge_address)
 
-    merge_listener = merge_module_contract.events.Merge.createFilter(fromBlock=0)
-
-    return merge_listener
+    return merge_module_contract
 
 
 @shared_task
 def process_merges():
     projects = Project.objects.filter()
     compiler = ContractCompiler()
-    w3 = get_event_filter_w3()
+    w3 = deploy.get_w3()
 
     for project in projects:
         if project.is_mycro_dao:
             continue
+        logging.info(f"Looking for PRs for project {project.dao_address}")
 
-        merge_filter = build_merge_event_filter(project, compiler, w3)
+        merge_contract = get_merge_module_instance(project, compiler, w3)
 
-        events = merge_filter.get_all_entries()
-        for event in events:
-            pr_id = int(event['args']['pr_id'])
+        logging.info(f"Found PRs: {merge_contract.functions.pullRequestsToMerge().call()}")
+        for pr_id in merge_contract.functions.pullRequestsToMerge().call():
             logging.info(f"DAO {project.dao_address} with name {project.repo_name} wants to merge {pr_id}")
 
             # TODO get rid of this try catch
@@ -46,7 +44,8 @@ def process_merges():
             try:
                 github.merge_pr(project.repo_name, pr_id, organization=settings.github_organization())
             except Exception as e:
-                logging.warning(f'PR {pr_id} for project {project.repo_name} could not be merged, probably because it already has been')
+                logging.warning(
+                    f'PR {pr_id} for project {project.repo_name} could not be merged, probably because it already has been')
                 logging.warning(e)
 
 
@@ -58,21 +57,14 @@ def process_registrations():
 
     # TODO figure out how to cache the compiler, w3, interface, contract and listener
     compiler = ContractCompiler()
-    w3 = get_event_filter_w3()
+    w3 = deploy.get_w3()
 
     contract_interface = compiler.get_contract_interface('mycro.sol', 'MycroCoin')
     mycro_contract = w3.eth.contract(abi=contract_interface['abi'], address=mycro_project.dao_address)
 
-    project_registration_listener = mycro_contract.events.RegisterProject.createFilter(fromBlock=0)
-
-    # TODO use get_new_entries instead
-    events = project_registration_listener.get_all_entries()
-
     projects = set([project[0] for project in Project.objects.values_list('dao_address')])
 
-    for event in events:
-        registered_project_address = event['args']['projectAddress']
-
+    for registered_project_address in mycro_contract.functions.getProjects().call():
         if registered_project_address not in projects:
             base_dao_interface = compiler.get_contract_interface('base_dao.sol', 'BaseDao')
             base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'], address=registered_project_address,

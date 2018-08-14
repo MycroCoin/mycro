@@ -44,18 +44,6 @@ class TestDeploy(unittest.TestCase):
 
         self.assertEqual(PARITY_ENDPOINT, w3.providers[0].endpoint_uri)
 
-    @patch.dict('backend.settings.os.environ', {'DEPLOY_ENV': 'ropsten'})
-    def test_event_filter_w3_env_is_ropsten(self):
-        w3 = deploy.get_event_filter_w3()
-
-        self.assertEqual(settings.parity_endpoint(), w3.providers[0].endpoint_uri)
-
-    @patch.dict('backend.settings.os.environ', {'DEPLOY_ENV': 'parity'})
-    def test_event_filter_w3_env_is_not_ropsten(self):
-        w3 = deploy.get_event_filter_w3()
-
-        self.assertEqual(settings.parity_endpoint(), w3.providers[0].endpoint_uri)
-
     def test_deploy_contract_without_private_key(self):
         w3 = MagicMock()
         contract_interface = MagicMock()

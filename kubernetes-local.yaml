@@ -225,6 +225,11 @@ spec:
             secretKeyRef:
               name: eth-private-key
               key: value
+        - name: INFURA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: infura-api-key
+              key: value
         - name: PYTHONUNBUFFERED
           value: "1"
         - name: DEBUG
@@ -282,7 +287,7 @@ spec:
         service: worker
     spec:
       containers:
-      - command: ['bash', '-c', './wait_for_it.sh server:8001 && celery -A backend worker -l info -B --scheduler django_celery_beat.schedulers:DatabaseScheduler']
+      - command: ['bash', '-c', './wait_for_it.sh server:8001 && celery -A backend worker -l debug -B --scheduler django_celery_beat.schedulers:DatabaseScheduler']
         env:
         - name: CELERY_BROKER_URL
           value: redis://:loltesting@redis:6379/0
@@ -309,6 +314,11 @@ spec:
               key: value
         - name: PARITY_ENDPOINT
           value: http://parity:8545
+        - name: INFURA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: infura-api-key
+              key: value
         image: mycro-backend
         imagePullPolicy: Never
         name: worker

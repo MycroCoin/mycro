@@ -66,6 +66,7 @@ def _call_contract_func(w3: Web3, contract_func, *args, private_key=None, timeou
 
 def get_w3():
     deploy_env = settings.deploy_env()
+    logging.debug(f'Deploy env is {deploy_env}')
 
     if deploy_env == 'parity':
         return _get_parity_w3()
@@ -76,18 +77,13 @@ def get_w3():
 
 
 def _get_ropsten_w3():
+    logging.debug('Getting ropsten w3 through infura')
     return Web3(HTTPProvider(f'https://ropsten.infura.io/v3/{settings.get_infura_api_key()}'))
 
 
 def _get_parity_w3():
+    logging.debug('Getting parity w3')
     return Web3(HTTPProvider(settings.parity_endpoint()))
-
-
-def get_event_filter_w3():
-    if settings.deploy_env() == 'ropsten':
-        return _get_parity_w3()
-    else:
-        return get_w3()
 
 
 def _build_transaction_dict(w3, private_key, gas=4000000, gasPrice=5000000000):

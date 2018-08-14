@@ -1,23 +1,6 @@
 # -------------------------------------
 # Services
 # -------------------------------------
-# parity
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    service: parity
-  name: parity
-spec:
-  ports:
-  - name: "8545"
-    port: 8545
-    targetPort: 8545
-  selector:
-    service: parity
-
-
----
 # django server
 apiVersion: v1
 kind: Service
@@ -57,45 +40,6 @@ spec:
 # Deployments
 # -------------------------------------
 
----
-# parity
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: parity
-  labels:
-    service: parity
-spec:
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        service: parity
-    spec:
-      containers:
-      - args:
-        - --light
-        - --chain
-        - ropsten
-        - --reserved-peers
-        - ropstenpeers.txt
-        - --base-path
-        - /build
-        - --unsafe-expose # TODO figure out how to only expose what's necessary
-        image: gcr.io/mycrocoin/parity:v3
-        name: parity
-        ports:
-        - containerPort: 8545
-        livenessProbe:
-          tcpSocket:
-            port: 8545
-          initialDelaySeconds: 90
-          periodSeconds: 10
-          failureThreshold: 5 # allow up to five failures every
-      restartPolicy: Always
-      nodeSelector:
-        cloud.google.com/gke-nodepool: ssd-pool
-#
 ---
 # django server
 apiVersion: extensions/v1beta1
@@ -148,7 +92,7 @@ spec:
               key: value
         - name: PYTHONUNBUFFERED
           value: "1"
-        image: gcr.io/mycrocoin/mycro-backend:v14
+        image: gcr.io/mycrocoin/mycro-backend:v15
         imagePullPolicy: IfNotPresent
         name: server
         ports:
@@ -191,7 +135,7 @@ spec:
         env:
         - name: REACT_APP_GRAPHQL_ENDPOINT
           value: "http://35.230.122.2:8001/graphql"
-        image: gcr.io/mycrocoin/mycro-frontend:v11
+        image: gcr.io/mycrocoin/mycro-frontend:v12
         imagePullPolicy: IfNotPresent
         name: frontend
         ports:
@@ -253,9 +197,12 @@ spec:
             secretKeyRef:
               name: github-token
               key: value
-        - name: PARITY_ENDPOINT
-          value: http://parity:8545
-        image: gcr.io/mycrocoin/mycro-backend:v14
+        - name: INFURA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: infura-api-key
+              key: value
+        image: gcr.io/mycrocoin/mycro-backend:v15
         imagePullPolicy: IfNotPresent
         name: worker
         resources: {}
