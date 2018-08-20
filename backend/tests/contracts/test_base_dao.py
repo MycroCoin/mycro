@@ -20,8 +20,9 @@ class TestBaseDao(unittest.TestCase):
 
     def setUp(self):
         contract_interface = constants.COMPILER.get_contract_interface("base_dao.sol", "BaseDao")
-        _, _, self.dao_instance = _deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS, TOTAL_SUPPLY,
-                                                   INITIAL_ADDRESSES, INITIAL_BALANCES)
+        self.dao_contract, _, self.dao_instance = _deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS,
+                                                                   TOTAL_SUPPLY,
+                                                                   INITIAL_ADDRESSES, INITIAL_BALANCES)
 
     def test_can_propose(self):
         asc_address = W3.eth.accounts[1]
@@ -166,3 +167,55 @@ class TestBaseDao(unittest.TestCase):
         self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[9]})
 
         self.assertTrue(asc_instance.hasExecuted())
+
+    def test_constructor_adds_to_transactors(self):
+        self.assertEqual(INITIAL_ADDRESSES, self.dao_instance.getTransactors())
+
+    def test_transfer_event_emitted_during_construction(self):
+        event_filter = self.dao_contract.events.Transfer.createFilter(
+            argument_filters={'filter': {'event': 'Transfer'}},
+            fromBlock=0)
+
+        events = event_filter.get_new_entries()
+
+        self.assertEqual(3, len(events))
+
+    def test_transfer_adds_to_transactors(self):
+        event_filter = self.dao_contract.events.Transfer.createFilter(
+            argument_filters={'filter': {'event': 'Transfer'}},
+            fromBlock=0)
+        # consume events emitted during construction
+        event_filter.get_new_entries()
+
+        # transfer 10 tokens to accounts[6] from accounts[7]
+        self.dao_instance.transfer(W3.eth.accounts[6], 10, transact={'from': W3.eth.accounts[7]})
+
+        self.assertEqual(10, self.dao_instance.balanceOf(W3.eth.accounts[6]))
+        self.assertEqual(INITIAL_ADDRESSES + [W3.eth.accounts[6]], self.dao_instance.getTransactors())
+        self.assertEqual(23, self.dao_instance.balanceOf(W3.eth.accounts[7]))
+        self.assertEqual(1, len(event_filter.get_new_entries()))
+
+    def test_transfer_from_adds_to_transactors(self):
+        event_filter = self.dao_contract.events.Transfer.createFilter(
+            argument_filters={'filter': {'event': 'Transfer'}},
+            fromBlock=0)
+        # consume events emitted during construction
+        event_filter.get_new_entries()
+
+        # approve accounts[6]
+        num_tokens = 10
+        self.dao_instance.approve(W3.eth.accounts[6], num_tokens, transact={'from': W3.eth.accounts[7]})
+
+        self.dao_instance.transferFrom(W3.eth.accounts[7], W3.eth.accounts[6], num_tokens,
+                                       transact={'from': W3.eth.accounts[6]})
+
+        self.assertEqual(num_tokens, self.dao_instance.balanceOf(W3.eth.accounts[6]))
+        self.assertEqual(INITIAL_ADDRESSES + [W3.eth.accounts[6]], self.dao_instance.getTransactors())
+        self.assertEqual(23, self.dao_instance.balanceOf(W3.eth.accounts[7]))
+        self.assertEqual(1, len(event_filter.get_new_entries()))
+
+    def test_duplicate_account_in_transactors_when_balance_emptied_then_filled(self):
+        self.dao_instance.transfer(W3.eth.accounts[8], 33, transact={'from': W3.eth.accounts[7]})
+        self.dao_instance.transfer(W3.eth.accounts[7], 33, transact={'from': W3.eth.accounts[8]})
+
+        self.assertEqual(INITIAL_ADDRESSES + [W3.eth.accounts[7]], self.dao_instance.getTransactors())

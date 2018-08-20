@@ -32,6 +32,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     uint public totalSupply;
     address[] action_smart_contracts;
     uint public threshold;
+    address[] public transactors;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
@@ -59,8 +60,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
             address currentAddress = _initialAddresses[i];
             uint currentBalance = _initialBalances[i];
 
-            balances[currentAddress] = currentBalance;
-            emit Transfer(address(0), currentAddress, currentBalance);
+            performTransfer(address(0), currentAddress, currentBalance);
         }
         calculateThreshold();
     }
@@ -88,9 +88,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transfer(address to, uint tokens) public returns (bool success) {
-        balances[msg.sender] = safeSub(balances[msg.sender], tokens);
-        balances[to] = safeAdd(balances[to], tokens);
-        emit Transfer(msg.sender, to, tokens);
+        performTransfer(msg.sender, to, tokens);
         return true;
     }
 
@@ -120,10 +118,8 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     // - 0 value transfers are allowed
     // ------------------------------------------------------------------------
     function transferFrom(address from, address to, uint tokens) public returns (bool success) {
-        balances[from] = safeSub(balances[from], tokens);
         allowed[from][msg.sender] = safeSub(allowed[from][msg.sender], tokens);
-        balances[to] = safeAdd(balances[to], tokens);
-        emit Transfer(from, to, tokens);
+        performTransfer(from, to, tokens);
         return true;
     }
 
@@ -204,8 +200,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
 
         address rewardee = asc.rewardee();
         uint reward = asc.reward();
-        balances[rewardee] = safeAdd(balances[rewardee], reward);
-        emit Transfer(address(0), rewardee, reward);
+        performTransfer(address(0), rewardee, reward);
         totalSupply += reward;
         calculateThreshold();
     }
@@ -260,6 +255,29 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
 
     function calculateThreshold() internal {
         threshold = totalSupply / 2 + 1;
+    }
+
+    function getTransactors() public returns (address[]) {
+        return transactors;
+    }
+
+    function performTransfer(address from, address to, uint tokens) internal {
+        // add addresses to list of transactors if they have a balance of 0
+        // note: this will double count addresses who's balance goes from x -> 0 -> y
+        // this happens because 0 is a valid balance and also how map values are initialized.
+        if(from != address(0) && balances[from] == 0) {
+            transactors.push(from);
+        }
+        if(to != address(0) && balances[to] == 0) {
+            transactors.push(to);
+        }
+
+        // perform the transfer
+        if(from != address(0)) {
+            balances[from] = safeSub(balances[from], tokens);
+        }
+        balances[to] = safeAdd(balances[to], tokens);
+        emit Transfer(from, to, tokens);
     }
 
 }
