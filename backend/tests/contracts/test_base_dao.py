@@ -19,10 +19,11 @@ INITIAL_BALANCES = [33, 33, 34]
 class TestBaseDao(unittest.TestCase):
 
     def setUp(self):
-        contract_interface = constants.COMPILER.get_contract_interface("base_dao.sol", "BaseDao")
-        self.dao_contract, _, self.dao_instance = _deploy_contract(W3, contract_interface, SYMBOL, NAME, DECIMALS,
-                                                                   TOTAL_SUPPLY,
-                                                                   INITIAL_ADDRESSES, INITIAL_BALANCES)
+        self.base_dao_interface = constants.COMPILER.get_contract_interface("base_dao.sol", "BaseDao")
+        self.dao_contract, self.dao_address, self.dao_instance = _deploy_contract(W3, self.base_dao_interface, SYMBOL,
+                                                                                  NAME, DECIMALS,
+                                                                                  TOTAL_SUPPLY,
+                                                                                  INITIAL_ADDRESSES, INITIAL_BALANCES)
 
     def test_can_propose(self):
         asc_address = W3.eth.accounts[1]
@@ -219,3 +220,59 @@ class TestBaseDao(unittest.TestCase):
         self.dao_instance.transfer(W3.eth.accounts[7], 33, transact={'from': W3.eth.accounts[8]})
 
         self.assertEqual(INITIAL_ADDRESSES + [W3.eth.accounts[7]], self.dao_instance.getTransactors())
+
+    def test_upgrade_symbol_not_the_same(self):
+        __, __, new_dao_instance = _deploy_contract(W3, self.base_dao_interface, 'dif', NAME, DECIMALS,
+                                                    TOTAL_SUPPLY,
+                                                    INITIAL_ADDRESSES, INITIAL_BALANCES)
+
+        # expected to not throw for now
+        new_dao_instance.upgradeFrom(self.dao_address)
+
+    def test_upgrade_name_not_the_same(self):
+        __, __, new_dao_instance = _deploy_contract(W3, self.base_dao_interface, SYMBOL, 'dif', DECIMALS,
+                                                    TOTAL_SUPPLY,
+                                                    INITIAL_ADDRESSES, INITIAL_BALANCES)
+
+        # expected to not throw for now
+        new_dao_instance.upgradeFrom(self.dao_address)
+
+    def test_upgrade_decimals_not_the_same(self):
+        __, __, new_dao_instance = _deploy_contract(W3, self.base_dao_interface, SYMBOL, NAME, 1,
+                                                    TOTAL_SUPPLY,
+                                                    INITIAL_ADDRESSES, INITIAL_BALANCES)
+
+        with self.assertRaises(TransactionFailed):
+            new_dao_instance.upgradeFrom(self.dao_address)
+
+    def test_upgrade_works_as_expected(self):
+        # create, propose and vote for an ASC
+        merge_asc_interface = constants.COMPILER.get_contract_interface("merge_asc.sol", "MergeASC")
+        _, asc_address, _ = _deploy_contract(W3, merge_asc_interface, W3.eth.accounts[0], 15, constants.PR_ID)
+        self.dao_instance.propose(asc_address, transact={'from': W3.eth.accounts[0]})
+        self.dao_instance.vote(asc_address, transact={'from': W3.eth.accounts[0]})
+
+        # create and register a module
+        merge_module_interface = constants.COMPILER.get_contract_interface("merge_module.sol", "MergeModule")
+        __, merge_address, __ = _deploy_contract(W3, merge_module_interface)
+        self.dao_instance.registerModule(merge_address, transact={'from': W3.eth.accounts[0]})
+
+        __, __, new_dao_instance = _deploy_contract(W3, self.base_dao_interface, SYMBOL, NAME, DECIMALS,
+                                                    1,
+                                                    [], [])
+        new_dao_instance.upgradeFrom(self.dao_address, transact={'from': W3.eth.accounts[0]})
+
+        self.assertEqual(new_dao_instance.name(), self.dao_instance.name())
+        self.assertEqual(new_dao_instance.symbol(), self.dao_instance.symbol())
+        self.assertEqual(new_dao_instance.decimals(), self.dao_instance.decimals())
+        self.assertEqual(new_dao_instance.totalSupply(), self.dao_instance.totalSupply())
+        self.assertEqual(new_dao_instance.threshold(), self.dao_instance.threshold())
+        self.assertEqual(new_dao_instance.get_proposals(), self.dao_instance.get_proposals())
+        self.assertEqual(new_dao_instance.getTransactors(), self.dao_instance.getTransactors())
+        for transactor in self.dao_instance.getTransactors():
+            self.assertEqual(new_dao_instance.balanceOf(transactor), self.dao_instance.balanceOf(transactor))
+
+        for asc in self.dao_instance.get_proposals():
+            self.assertEqual(new_dao_instance.get_asc_votes(asc), self.dao_instance.get_asc_votes(asc))
+
+        self.assertNotEqual(new_dao_instance.getModuleByCode(1), self.dao_instance.getModuleByCode(1))

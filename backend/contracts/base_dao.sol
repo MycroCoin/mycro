@@ -30,7 +30,7 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public totalSupply;
-    address[] action_smart_contracts;
+    address[] public action_smart_contracts;
     uint public threshold;
     address[] public transactors;
 
@@ -171,6 +171,10 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return action_smart_contracts;
     }
 
+    function getNumberOfProposals() public view returns (uint) {
+        return action_smart_contracts.length;
+    }
+
     function vote(address proposal) {
         require(indexOf(proposal, action_smart_contracts) != -1);
         require(indexOf(msg.sender, asc_votes[proposal]) == -1);
@@ -191,6 +195,10 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
 
     function get_num_votes(address asc_address) public view returns (uint256) {
         return asc_votes[asc_address].length;
+    }
+
+    function getAscVoter(address ascAddress, uint index) public view returns (address) {
+        return asc_votes[ascAddress][index];
     }
 
     function execute_asc(address asc_address) internal returns (uint){
@@ -261,6 +269,10 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return transactors;
     }
 
+    function getNumberOfTransactors() public returns (uint) {
+        return transactors.length;
+    }
+
     function performTransfer(address from, address to, uint tokens) internal {
         // add addresses to list of transactors if they have a balance of 0
         // note: this will double count addresses who's balance goes from x -> 0 -> y
@@ -278,6 +290,43 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         }
         balances[to] = safeAdd(balances[to], tokens);
         emit Transfer(from, to, tokens);
+    }
+
+    function upgradeFrom(address previousDaoAddress) public {
+        // NOTE: this specifically does not copy over allowed, or modulesByCode or modulesByAddress
+        BaseDao previousDao = BaseDao(previousDaoAddress);
+
+        // unfortunately, it seems that strings can't be passed between contracts yet, at least I couldn't figure it out
+        // on my backend, maybe it's possible on mainnet. Upon further investigation this isn't yet possible with a local
+        // evm version of 0.4.22+ and pyethereum because certain opcodes aren't yet implemented in pyethereum:
+        // https://github.com/ethereum/web3.py/issues/926
+        //
+        // require(keccak256(symbol) == keccak256(previousDao.symbol()));
+        // require(keccak256(name) == keccak256(previousDao.name()));
+        require(decimals == previousDao.decimals());
+
+        totalSupply = previousDao.totalSupply();
+        threshold = previousDao.threshold();
+
+        // copy the ASCs
+        uint numProposals = previousDao.getNumberOfProposals();
+        for(uint i = 0; i < numProposals; i++) {
+            address asc = previousDao.action_smart_contracts(i);
+            action_smart_contracts.push(asc);
+
+            // copy the votes of each ASC
+            for(uint j = 0; j < previousDao.get_num_votes(asc); j++) {
+                asc_votes[asc].push(previousDao.getAscVoter(asc, j));
+            }
+        }
+
+        // copy balances of coin holders. Copy the transactors too
+        uint numTransactors = previousDao.getNumberOfTransactors();
+        for(i = 0; i < numTransactors; i++) {
+            address transactor = previousDao.transactors(i);
+            transactors.push(transactor);
+            balances[transactor] = previousDao.balanceOf(transactor);
+        }
     }
 
 }
