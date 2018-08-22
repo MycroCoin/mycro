@@ -1,14 +1,29 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import client from '../GraphqlClient.js';
-import { createTruffleContract, deployHelper, Contracts } from '../Contracts.js';
 import gql from 'graphql-tag';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
+import Spinner from '../shared/Spinner.js';
 import ReactGA from 'react-ga';
-import {ProjectView} from "./index";
 import PropTypes from 'prop-types'
 import {toChecksumAddress} from 'web3-utils';
 
+
+const createAscQuery = (checksumDaoAddress, 
+                                checksumRewardeeAddress, 
+                                reward,
+                                prId) => gql`
+    mutation {
+      createAsc(
+        daoAddress: "${checksumDaoAddress}",
+        rewardee: "${checksumRewardeeAddress}", 
+        reward: ${reward}, 
+        prId: ${prId}) {
+          asc {
+            address
+          } 
+        }
+    }`
 
 class Project extends Component {
   constructor(props) {
@@ -16,21 +31,13 @@ class Project extends Component {
 
     this.state = {
       projectContract: null,
-      project: this.getProject(this.props.match.params.id),
+      project: {},
+      loaded: false,
       prId: 0,
       reward: 0,
+      hasPendingAscCreation: false,
     }
     this.loadProject();
-  }
-
-  getProject(id){
-    return {
-      name: "foo",
-      id: id,
-      githubUrl: "//github.com/peddle/unix-dev-config",
-      ascs: [
-      ]
-    }
   }
 
   loadProject(){
@@ -42,7 +49,9 @@ class Project extends Component {
     }).then((project) => {
       const prId = 0;
       const reward = 0;
-      this.setState({project, projectContract, prId, reward});
+      this.setState(
+        Object.assign(this.state,
+          {project, projectContract, prId, reward, loaded: true,}));
     });
   }
 
@@ -50,17 +59,24 @@ class Project extends Component {
     let checksumRewardeeAddress = toChecksumAddress(window.web3.eth.accounts[0]);
     let checksumDaoAddress = toChecksumAddress(this.props.match.params.id);
 
-    client.mutate({mutation: gql`
-    mutation {
-      createMergeAsc(daoAddress: "${checksumDaoAddress}", rewardee: "${checksumRewardeeAddress}", reward: ${this.state.reward}, prId: ${this.state.prId}) {
-        asc {
-          address
-        } 
-      }
-    }`}).then((data) => {
+    const query = createAscQuery(
+      checksumDaoAddress,
+      checksumRewardeeAddress,
+      this.state.reward,
+      this.state.prId,
+    );
+
+    this.setState(
+      Object.assign(this.state,
+        {hasPendingAscCreation: true}));
+
+    client.mutate({mutation: query}).then((data) => {
       this.loadProject();
+      this.setState(
+        Object.assign(this.state,
+          {hasPendingAscCreation: false}));
     }).catch((err) => {
-      alert(err);
+      console.error(err);
     })
   }
 
@@ -82,7 +98,7 @@ class Project extends Component {
     this.context.mixpanel.track("ProjectView", this.state);
   }
 
-  render() {
+  renderProject(){
     const id = this.state.project.id;
     const project = this.state.project; 
     const ascs = project.ascs.map( asc => (
@@ -91,6 +107,34 @@ class Project extends Component {
           <h3>{"Merge Proposal for PR " + asc.prId}</h3>
         </Link>
       </div>));
+
+    const createPullRequestForm = (<div>
+        <input 
+          placeholder="Pull request ID"
+          value={this.state.prId} 
+          onChange={(event) => this.handlePrIdChange(event)} />
+        <input
+          placeholder="Reward Value"
+          value={this.state.reward}
+          onChange={(event) => this.handleRewardChange(event)} />
+        <button 
+            onClick={() => this.createPullRequest()}
+            disabled={this.state.hasPendingAscCreation}>
+          Create Pull Request Proposal
+        </button>
+      </div>);
+    const pendingAscMessage = (<div>
+      <Spinner />
+      <h1>Creating ASC</h1>
+      <p>This could take a few minutes while your ASC is posted to 
+      the Ethereum blockchain. Now might be a good time to get a coffee &nbsp;
+        <span role="img" aria-label="coffee">
+          ☕
+        </span>
+        </p>
+      </div>);
+    const pullRequestFormContainer = this.state.hasPendingAscCreation ? 
+      pendingAscMessage : createPullRequestForm;
 
     return (
       <div className="Page">
@@ -101,19 +145,15 @@ class Project extends Component {
           {ascs}
         </div>
 
-        <input 
-          placeholder="Pull request ID"
-          value={this.state.prId} 
-          onChange={(event) => this.handlePrIdChange(event)} />
-        <input
-          placeholder="Reward Value"
-          value={this.state.reward}
-          onChange={(event) => this.handleRewardChange(event)} />
-        <button onClick={() => this.createPullRequest()}>Create Pull Request Proposal</button>
+        {pullRequestFormContainer}
       </div>
     );
   }
-}
+
+  render() {
+    return this.state.loaded ? this.renderProject() : <Spinner />;
+  }
+};
 
 Project.contextTypes = {
     mixpanel: PropTypes.object.isRequired

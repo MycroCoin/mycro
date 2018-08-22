@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom'
-import { Contracts, deployHelper } from '../Contracts.js'
 import PropTypes from 'prop-types'
+import Spinner from '../shared/Spinner.js';
 import ReactGA from 'react-ga';
 import client from '../GraphqlClient.js';
 import gql from 'graphql-tag';
@@ -19,6 +19,7 @@ class CreateProject extends Component {
 
     this.state = {
       projectName: "",
+      submitting: false,
     }
   }
 
@@ -30,6 +31,7 @@ class CreateProject extends Component {
   handleSubmit() {
     let checksumAddress = toChecksumAddress(window.web3.eth.accounts[0]);
 
+    this.setState(Object.assign(this.state, {submitting: true}));
     client.mutate({mutation: gql`
     mutation {
       createProject(projectName: "${this.state.projectName}", creatorAddress: "${checksumAddress}") {
@@ -48,8 +50,8 @@ class CreateProject extends Component {
   }
 
   render() {
-    return (
-      <div className="Page">
+    const unsubmitted = (
+      <div>
         <h1>Create Project</h1>
         <input 
           placeholder="project name"
@@ -57,9 +59,24 @@ class CreateProject extends Component {
           onChange={(event) => this.handleChange(event)} />
         
         <button onClick={() => this.handleSubmit()}>Create</button>
-        
       </div>
     );
+    const submitting = (
+      <div>
+        <h1>Creating project <em>{this.state.projectName}</em></h1>
+        <p>This could take a few minutes while your project DAO is added to 
+        the Ethereum blockchain. Now might be a good time to get a coffee &nbsp;
+          <span role="img" aria-label="coffee">
+            ☕
+          </span>
+        </p>
+        <Spinner />
+      </div>
+    )
+
+    return <div className="Page">{this.state.submitting ? submitting : unsubmitted}</div>
+
+
   }
 }
 CreateProject.contextTypes = {

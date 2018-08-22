@@ -64,7 +64,6 @@ const deployedMycro = () => {
     return Contracts.MycroCoin.at(address);
   });
 }
-// TODO uncomment this once shit is fixed
 Contracts.MycroCoin.deployed = deployedMycro;
 
 

@@ -19,7 +19,7 @@ Ok, now whenever you run tests, you'll build the latest image and run them in th
 4. `eval $(minikube docker-env)`
 5. `docker build -f server.Dockerfile -t mycro-backend .`
 6. `docker build -f parity-dev.Dockerfile -t mycro-parity-dev .`
-7. `docker build -f frontend.Dockerfile -t mycro-frontend `
+7. `docker build -f frontend.Dockerfile -t mycro-frontend .`
 4. `kubectl apply -f kubernetes-local.yaml`
 5. run `minikube ip` and record the value
 7. in your browser visit `<minikube ip>:30080`

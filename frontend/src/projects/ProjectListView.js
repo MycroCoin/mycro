@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import {Contracts} from '../Contracts.js';
+import Spinner from '../shared/Spinner.js';
 import {getProjectForAddress, projectContractToProjectJson} from './ProjectHelpers.js';
 import ReactGA from 'react-ga';
-import {ProjectListView} from "./index";
 import PropTypes from 'prop-types'
 
 class Projects extends Component {
@@ -12,7 +12,8 @@ class Projects extends Component {
 
     //TODO do some cute ajax spinner here for when projects aren't filled
     this.state = {
-      projects: []
+      projects: [],
+      loaded: false
     }
 
     this.loadProjects()
@@ -26,7 +27,7 @@ class Projects extends Component {
     }).then(projectContracts => {
       return Promise.all(projectContracts.map(projectContractToProjectJson));
     }).then(projects => {
-      return this.setState({projects});
+      return this.setState({projects, loaded: true});
     });
   }
 
@@ -46,8 +47,10 @@ class Projects extends Component {
       </div>
     );
       
-    const projects = 
-      this.state.projects.map(project => (<Project key={project.id} project={project}/>));
+    const projects = this.state.loaded ? 
+        this.state.projects.map(
+            project => (<Project key={project.id} project={project}/>)) : 
+        <Spinner />; 
     return (
       <div className="Page">
         <h1>Projects</h1>
