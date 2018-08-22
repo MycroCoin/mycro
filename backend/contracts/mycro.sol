@@ -22,7 +22,7 @@ contract MycroCoin is BaseDao{
     uint[] initialBalances;
     bool initialized = false;
 
-    address[] registeredProjects;
+    address[] public registeredProjects;
 
     event RegisterProject(address projectAddress);
 
@@ -59,5 +59,18 @@ contract MycroCoin is BaseDao{
 
     function getProjects() public view returns (address[]) {
         return registeredProjects;
+    }
+
+    function getNumberOfProjects() public view returns (uint) {
+        return registeredProjects.length;
+    }
+
+    function upgradeFrom(address previousMycroAddress) public {
+        MycroCoin mycroDao = MycroCoin(previousMycroAddress);
+        super.upgradeFrom(previousMycroAddress);
+
+        for(uint i = 0; i < mycroDao.getNumberOfProjects(); i++) {
+            registerProject(mycroDao.registeredProjects(i));
+        }
     }
 }
