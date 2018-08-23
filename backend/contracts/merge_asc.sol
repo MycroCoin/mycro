@@ -24,4 +24,12 @@ contract MergeASC is BaseASC {
         merge_module.merge(prId);
         hasExecuted = true;
     }
+
+    function upgradeFrom(address previousMergeAscAddress) public {
+        super.upgradeFrom(previousMergeAscAddress);
+
+        MergeASC previousMergeASC = MergeASC(previousMergeAscAddress);
+
+        prId = previousMergeASC.prId();
+    }
 }

@@ -13,4 +13,14 @@ contract BaseASC {
 
     function execute() public;
 
+    function upgradeFrom(address previousAscAddress) public {
+        BaseASC previousASC = BaseASC(previousAscAddress);
+
+        require(!previousASC.hasExecuted());
+        require(!hasExecuted);
+
+        reward = previousASC.reward();
+        rewardee = previousASC.rewardee();
+    }
+
 }
