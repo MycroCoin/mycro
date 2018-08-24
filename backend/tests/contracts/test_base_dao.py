@@ -86,7 +86,7 @@ class TestBaseDao(unittest.TestCase):
         entries = event_filter.get_new_entries()
 
         self.assertEqual(1, len(entries))
-        self.assertEqual(constants.PR_ID, entries[0]["args"]["pr_id"])
+        self.assertEqual(constants.PR_ID, entries[0]["args"]["prId"])
 
         self.assertEqual(constants.REWARD, self.dao_instance.balanceOf(
             constants.REWARDEE))
@@ -114,7 +114,7 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertTrue(asc_instance.hasExecuted())
         self.assertEqual(1, len(entries))
-        self.assertEqual(constants.PR_ID, entries[0]["args"]["pr_id"])
+        self.assertEqual(constants.PR_ID, entries[0]["args"]["prId"])
 
         self.dao_instance.vote(asc_address,
                                transact={'from': constants.W3.eth.accounts[9]})

@@ -3,16 +3,16 @@ import "./module_interface.sol";
 
 contract MergeModule {
 
-    event Merge(uint pr_id);
+    event Merge(uint prId);
     uint[] public pullRequestsToMerge;
 
     constructor(){
     }
 
-    function merge(uint pr_id) public {
+    function merge(uint prId) public {
         // TODO validate that this module is allowed to execute
-        emit Merge(pr_id);
-        pullRequestsToMerge.push(pr_id);
+        emit Merge(prId);
+        pullRequestsToMerge.push(prId);
     }
 
     function getCode() public returns (uint) {
