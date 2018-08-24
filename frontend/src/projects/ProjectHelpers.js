@@ -41,7 +41,7 @@ const projectContractToProjectJson = (contract) => {
 
   return Promise.all([
     contract.name(),
-    contract.get_proposals()
+    contract.getProposals()
   ]).then( ([name, ascAddresses]) => {
     projectJson.name = name;
     return Promise.all(ascAddresses.map(getMergeASCForAddress))

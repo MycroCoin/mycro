@@ -30,13 +30,13 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     string public  name;
     uint8 public decimals;
     uint public totalSupply;
-    address[] public action_smart_contracts;
+    address[] public ascs;
     uint public threshold;
     address[] public transactors;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
-    mapping(address => address[]) asc_votes;
+    mapping(address => address[]) ascVotes;
     mapping(uint => address) modulesByCode;
     mapping(address => uint) modulesByAddress;
 
@@ -161,48 +161,48 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return ERC20Interface(tokenAddress).transfer(owner, tokens);
     }
 
-    function propose(address asc_address) public {
-        require(indexOf(asc_address, action_smart_contracts) == -1);
+    function propose(address ascAddress) public {
+        require(indexOf(ascAddress, ascs) == -1);
 
-        action_smart_contracts.push(asc_address);
+        ascs.push(ascAddress);
     }
 
-    function get_proposals() public view returns (address[]) {
-        return action_smart_contracts;
+    function getProposals() public view returns (address[]) {
+        return ascs;
     }
 
     function getNumberOfProposals() public view returns (uint) {
-        return action_smart_contracts.length;
+        return ascs.length;
     }
 
     function vote(address proposal) {
-        require(indexOf(proposal, action_smart_contracts) != -1);
-        require(indexOf(msg.sender, asc_votes[proposal]) == -1);
+        require(indexOf(proposal, ascs) != -1);
+        require(indexOf(msg.sender, ascVotes[proposal]) == -1);
 
-        asc_votes[proposal].push(msg.sender);
+        ascVotes[proposal].push(msg.sender);
 
         if (shouldExecuteAsc(proposal)) {
-            execute_asc(proposal);
+            executeAsc(proposal);
         }
     }
 
     //TODO test this
-    function get_asc_votes(address proposal) public view returns (address[]) {
-      require(indexOf(proposal, action_smart_contracts) != -1);
+    function getAscVotes(address proposal) public view returns (address[]) {
+      require(indexOf(proposal, ascs) != -1);
       
-      return asc_votes[proposal];
+      return ascVotes[proposal];
     }
 
-    function get_num_votes(address asc_address) public view returns (uint256) {
-        return asc_votes[asc_address].length;
+    function getNumVotes(address ascAddress) public view returns (uint256) {
+        return ascVotes[ascAddress].length;
     }
 
     function getAscVoter(address ascAddress, uint index) public view returns (address) {
-        return asc_votes[ascAddress][index];
+        return ascVotes[ascAddress][index];
     }
 
-    function execute_asc(address asc_address) internal returns (uint){
-        BaseASC asc = BaseASC(asc_address);
+    function executeAsc(address ascAddress) internal returns (uint){
+        BaseASC asc = BaseASC(ascAddress);
 
         asc.execute();
 
@@ -241,8 +241,8 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         return -1;
     }
 
-    function shouldExecuteAsc(address asc_address) internal view returns (bool) {
-        BaseASC asc = BaseASC(asc_address);
+    function shouldExecuteAsc(address ascAddress) internal view returns (bool) {
+        BaseASC asc = BaseASC(ascAddress);
         if (asc.hasExecuted()) {
             return false;
         }
@@ -250,8 +250,8 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         uint sum = 0;
 
         // TODO make this more efficient
-        for (uint i = 0; i < asc_votes[asc_address].length; i++) {
-            sum += balances[asc_votes[asc_address][i]];
+        for (uint i = 0; i < ascVotes[ascAddress].length; i++) {
+            sum += balances[ascVotes[ascAddress][i]];
         }
 
         if (sum >= threshold) {
@@ -311,12 +311,12 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         // copy the ASCs
         uint numProposals = previousDao.getNumberOfProposals();
         for(uint i = 0; i < numProposals; i++) {
-            address asc = previousDao.action_smart_contracts(i);
-            action_smart_contracts.push(asc);
+            address asc = previousDao.ascs(i);
+            ascs.push(asc);
 
             // copy the votes of each ASC
-            for(uint j = 0; j < previousDao.get_num_votes(asc); j++) {
-                asc_votes[asc].push(previousDao.getAscVoter(asc, j));
+            for(uint j = 0; j < previousDao.getNumVotes(asc); j++) {
+                ascVotes[asc].push(previousDao.getAscVoter(asc, j));
             }
         }
 

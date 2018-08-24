@@ -16,7 +16,7 @@ class TestBaseDao(unittest.TestCase):
         asc_address = constants.W3.eth.accounts[1]
         self.dao_instance.propose(asc_address, transact={
             'from': constants.W3.eth.accounts[0]})
-        proposals = self.dao_instance.get_proposals()
+        proposals = self.dao_instance.getProposals()
 
         self.assertEqual(1, len(proposals))
         self.assertEqual(str(asc_address), proposals[0])
@@ -273,17 +273,17 @@ class TestBaseDao(unittest.TestCase):
                          self.dao_instance.totalSupply())
         self.assertEqual(new_dao_instance.threshold(),
                          self.dao_instance.threshold())
-        self.assertEqual(new_dao_instance.get_proposals(),
-                         self.dao_instance.get_proposals())
+        self.assertEqual(new_dao_instance.getProposals(),
+                         self.dao_instance.getProposals())
         self.assertEqual(new_dao_instance.getTransactors(),
                          self.dao_instance.getTransactors())
         for transactor in self.dao_instance.getTransactors():
             self.assertEqual(new_dao_instance.balanceOf(transactor),
                              self.dao_instance.balanceOf(transactor))
 
-        for asc in self.dao_instance.get_proposals():
-            self.assertEqual(new_dao_instance.get_asc_votes(asc),
-                             self.dao_instance.get_asc_votes(asc))
+        for asc in self.dao_instance.getProposals():
+            self.assertEqual(new_dao_instance.getAscVotes(asc),
+                             self.dao_instance.getAscVotes(asc))
 
         self.assertNotEqual(new_dao_instance.getModuleByCode(1),
                             self.dao_instance.getModuleByCode(1))

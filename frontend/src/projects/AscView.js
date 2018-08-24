@@ -22,7 +22,7 @@ class Asc extends Component {
     });
   }
   loadVoteState(){
-    this.state.projectContract.get_asc_votes(this.state.asc.id).then(votes => {
+    this.state.projectContract.getAscVotes(this.state.asc.id).then(votes => {
       console.log(votes);
       if(votes.find(address => address === window.web3.eth.accounts[0])){
       

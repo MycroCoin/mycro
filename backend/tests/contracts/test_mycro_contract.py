@@ -65,8 +65,8 @@ class TestMycro(unittest.TestCase):
             'from': constants.W3.eth.accounts[0]})
 
         # want to make sure that BaseDao state is upgraded along the mycro specific state
-        self.assertEqual(new_mycro_instance.get_proposals(),
-                         self.mycro_instance.get_proposals())
+        self.assertEqual(new_mycro_instance.getProposals(),
+                         self.mycro_instance.getProposals())
         self.assertEqual(new_mycro_instance.getProjects(),
                          self.mycro_instance.getProjects())
 
