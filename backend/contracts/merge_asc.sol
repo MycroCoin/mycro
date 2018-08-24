@@ -18,10 +18,10 @@ contract MergeASC is BaseASC {
 
         BaseDao dao = BaseDao(msg.sender);
 
-        address merge_module_address = dao.getModuleByCode(1);
-        MergeModule merge_module = MergeModule(merge_module_address);
+        address mergeModuleAddress = dao.getModuleByCode(1);
+        MergeModule mergeModule = MergeModule(mergeModuleAddress);
 
-        merge_module.merge(prId);
+        mergeModule.merge(prId);
         hasExecuted = true;
     }
 
