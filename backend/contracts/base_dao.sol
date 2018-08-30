@@ -26,6 +26,9 @@ import "./module_interface.sol";
 // token transfers
 // ----------------------------------------------------------------------------
 contract BaseDao is ERC20Interface, Owned, SafeMath {
+    // Increment this any time the storage of this contract changes
+    uint private constant VERSION = 1;
+
     string public symbol;
     string public  name;
     uint8 public decimals;
@@ -39,7 +42,6 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     mapping(address => address[]) ascVotes;
     mapping(uint => address) modulesByCode;
     mapping(address => uint) modulesByAddress;
-
 
 
 
@@ -290,6 +292,10 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         }
         balances[to] = safeAdd(balances[to], tokens);
         emit Transfer(from, to, tokens);
+    }
+
+    function getVersion() public constant returns (uint) {
+        return VERSION;
     }
 
     function upgradeFrom(address previousDaoAddress) public {

@@ -17,6 +17,8 @@ import "./base_dao.sol";
 
 
 contract MycroCoin is BaseDao{
+    // Increment this any time the storage of this contract changes
+    uint private constant VERSION = 1;
 
     address[] initialAddresses;
     uint[] initialBalances;
@@ -63,6 +65,10 @@ contract MycroCoin is BaseDao{
 
     function getNumberOfProjects() public view returns (uint) {
         return registeredProjects.length;
+    }
+
+    function getVersion() public constant returns (uint) {
+        return VERSION;
     }
 
     function upgradeFrom(address previousMycroAddress) public {

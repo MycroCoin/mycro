@@ -5,6 +5,9 @@ import "./merge_module.sol";
 import "./base_dao.sol";
 
 contract MergeASC is BaseASC {
+    // Increment this any time the storage of this contract changes
+    uint private constant VERSION = 1;
+
     uint public prId;
 
     constructor(address _rewardee, uint _reward, uint _prId) BaseASC(_rewardee, _reward) {
@@ -23,6 +26,10 @@ contract MergeASC is BaseASC {
 
         mergeModule.merge(prId);
         hasExecuted = true;
+    }
+
+    function getVersion() public constant returns (uint) {
+        return VERSION;
     }
 
     function upgradeFrom(address previousMergeAscAddress) public {
