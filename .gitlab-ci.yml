@@ -22,4 +22,4 @@ unit_test_backend:
     - docker pull $IMAGE_WITH_TAG || true
     - docker build --cache-from $IMAGE_WITH_TAG -t $IMAGE_WITH_TAG -f server.Dockerfile .
     - docker push $IMAGE_WITH_TAG
-    - docker run $IMAGE_WITH_TAG
+    - docker run $IMAGE_WITH_TAG python manage.py test -v 2
