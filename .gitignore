@@ -13,3 +13,6 @@ mycrocoin-b443c4301ade.json
 
 # paymahn uses a file called scratch.py to mess around with things
 **/scratch.py
+
+# sqlite3 db thats created when makemigrations is called
+postgres

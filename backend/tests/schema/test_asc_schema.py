@@ -23,16 +23,16 @@ query {
         )
         self.assertResponseNoErrors(resp, {'allAscs': [{'address': constants.ASC_ADDRESS}]})
 
-    def test_get_asc_by_project_id(self):
+    def test_get_asc_by_project_address(self):
         resp = self.query(
-            '''
-query {
-  ascForProject(projectId: "1") {
-    project {
+            f'''
+query {{
+  ascForProject(projectAddress: "{constants.DAO_ADDRESS}") {{
+    project {{
         repoName
-    }
-  }
-}
+    }}
+  }}
+}}
             '''
         )
 
@@ -68,7 +68,7 @@ query {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createAsc(daoAddress: "invalid dao address", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD}, prId: 1)  {{
+  createMergeAsc(daoAddress: "invalid dao address", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD}, prId: 1)  {{
     asc {{
       address 
     }}
@@ -88,14 +88,14 @@ mutation {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: 1)  {{
+  createMergeAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: 1)  {{
     asc {{
       address 
     }}
   }}
 }}
 """)
-        self.assertResponseNoErrors(resp, {'createAsc': {'asc': {'address': constants.ASC_ADDRESS}}})
+        self.assertResponseNoErrors(resp, {'createMergeAsc': {'asc': {'address': constants.ASC_ADDRESS}}})
 
         all_ascs = ASC.objects.all()
 

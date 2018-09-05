@@ -34,4 +34,5 @@ class ASC(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     rewardee = models.CharField(max_length=42)
     reward = models.IntegerField()
+    pr_id = models.IntegerField(null=True, blank=True)
 

@@ -52,7 +52,7 @@ class Project extends Component {
 
     client.mutate({mutation: gql`
     mutation {
-      createAsc(daoAddress: "${checksumDaoAddress}", rewardee: "${checksumRewardeeAddress}", reward: ${this.state.reward}, prId: ${this.state.prId}) {
+      createMergeAsc(daoAddress: "${checksumDaoAddress}", rewardee: "${checksumRewardeeAddress}", reward: ${this.state.reward}, prId: ${this.state.prId}) {
         asc {
           address
         } 

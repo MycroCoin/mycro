@@ -20,7 +20,7 @@ class Query(ObjectType):
                          address=graphene.String(),
                          project_id=graphene.String())
     asc_for_project = graphene.List(AscType,
-                                    project_id=graphene.String())
+                                    project_address=graphene.String())
     all_ASCs = graphene.List(AscType)
 
     get_merge_asc_abi = graphene.JSONString()
@@ -42,8 +42,8 @@ class Query(ObjectType):
         raise Exception("Uhoh, something went horribly wrong. This should never be raised. Graphql won't allow neither "
                         "of these parameters to exist.")
 
-    def resolve_asc_for_project(self, info, project_id):
-        ascs = ASC.objects.filter(project__pk=project_id)
+    def resolve_asc_for_project(self, info, project_address):
+        ascs = ASC.objects.filter(project__dao_address=project_address)
         return ascs
 
     def resolve_get_merge_asc_abi(self, info):
@@ -53,7 +53,7 @@ class Query(ObjectType):
         return {'abi': merge_asc_interface['abi'], 'unlinked_binary': merge_asc_interface['bin']}
 
 
-class CreateASC(graphene.Mutation):
+class CreateMergeASC(graphene.Mutation):
     class Arguments:
         dao_address = graphene.String(required=True)
         rewardee = graphene.String(required=True)
@@ -85,11 +85,11 @@ class CreateASC(graphene.Mutation):
         deploy.call_contract_function(dao_contract.functions.propose, asc_address,
                                       private_key=settings.ethereum_private_key())
 
-        asc = ASC(address=asc_address, project=project, rewardee=rewardee, reward=reward)
+        asc = ASC(address=asc_address, project=project, rewardee=rewardee, reward=reward, pr_id=pr_id)
         asc.save()
 
-        return CreateASC(asc=asc)
+        return CreateMergeASC(asc=asc)
 
 
 class Mutation(graphene.ObjectType):
-    create_asc = CreateASC.Field()
+    create_merge_asc = CreateMergeASC.Field()
