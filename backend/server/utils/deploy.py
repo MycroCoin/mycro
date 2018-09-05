@@ -86,7 +86,7 @@ def _get_parity_w3():
     return Web3(HTTPProvider(settings.parity_endpoint()))
 
 
-def _build_transaction_dict(w3, private_key, gas=4000000, gasPrice=5000000000):
+def _build_transaction_dict(w3, private_key, gas=6000000, gasPrice=5000000000):
     acc = Account.privateKeyToAccount(private_key)
     nonce = w3.eth.getTransactionCount(acc.address)
     latest_block = w3.eth.getBlock('latest')

@@ -267,11 +267,11 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
         threshold = totalSupply / 2 + 1;
     }
 
-    function getTransactors() public returns (address[]) {
+    function getTransactors() public view returns (address[]) {
         return transactors;
     }
 
-    function getNumberOfTransactors() public returns (uint) {
+    function getNumberOfTransactors() public view returns (uint) {
         return transactors.length;
     }
 

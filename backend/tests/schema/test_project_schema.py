@@ -2,6 +2,7 @@ from backend.server.models import Project, ASC
 from backend.tests.mycro_django_test import MycroDjangoTest
 import backend.tests.testing_utilities.constants as constants
 from unittest.mock import patch
+from backend.tests.testing_utilities.utils import deploy_base_dao
 
 
 class TestProjectSchema(MycroDjangoTest):
@@ -100,4 +101,28 @@ query {{
             '''
         )
         self.assertResponseNoErrors(resp, {'project': {'id': "1"}})
+
+
+    @patch('backend.server.utils.deploy.get_w3')
+    def test_get_balances(self, get_w3_mock):
+        w3 = constants.W3
+        get_w3_mock.return_value = w3
+
+        dao_contract, dao_address, dao_instance = deploy_base_dao()
+
+        resp = self.query(
+            f'''
+            query {{
+                balances(address: "{dao_address}") {{
+                    address,
+                    balance
+                }}
+            }}'''
+        )
+
+        balances = resp['data']['balances']
+        balances = {balance['address']: balance['balance'] for balance in balances}
+
+        for expected_address, expected_balance in zip(constants.INITIAL_ADDRESSES, constants.INITIAL_BALANCES):
+            self.assertEqual(expected_balance, balances[expected_address])
 
