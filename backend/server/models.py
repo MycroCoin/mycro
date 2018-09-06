@@ -7,6 +7,8 @@ class Project(models.Model):
     merge_module_address = models.CharField(max_length=42)
     last_merge_event_block = models.PositiveIntegerField(default=0)
     is_mycro_dao = models.BooleanField(default=False)
+    symbol = models.CharField(max_length=10, default=None, blank=False, null=True)
+    decimals = models.IntegerField(default=-1)
 
     # TODO use django managers
     @staticmethod
