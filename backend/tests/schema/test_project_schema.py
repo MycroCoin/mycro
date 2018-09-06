@@ -9,7 +9,9 @@ class TestProjectSchema(MycroDjangoTest):
 
     def setUp(self):
         super().setUp()
-        self.project = Project.objects.create(repo_name=constants.PROJECT_NAME, dao_address=constants.DAO_ADDRESS, is_mycro_dao=True)
+        self.project = Project.objects.create(repo_name=constants.PROJECT_NAME,
+                                              dao_address=constants.DAO_ADDRESS,
+                                              is_mycro_dao=True)
 
     def test_get_all_projects(self):
         resp = self.query(
@@ -23,13 +25,18 @@ query {
             '''
         )
         self.assertResponseNoErrors(resp, {
-            'allProjects': [{'daoAddress': constants.DAO_ADDRESS, 'repoName': constants.PROJECT_NAME}]})
+            'allProjects': [{'daoAddress': constants.DAO_ADDRESS,
+                             'repoName': constants.PROJECT_NAME}]})
 
     @patch('backend.server.utils.deploy.get_w3')
-    def test_create_project(self, get_w3_mock):
+    @patch('backend.server.utils.github.create_repo')
+    @patch('backend.settings.github_organization')
+    def test_create_project(self, github_organization_mock, create_repo_mock, get_w3_mock):
         project_name = 'testing'
+        dao_address = '0x1111111111111111111111111111111111111118'
         w3 = get_w3_mock.return_value
-        w3.eth.waitForTransactionReceipt.return_value = {'contractAddress': constants.DAO_ADDRESS}
+        w3.eth.waitForTransactionReceipt.return_value = {
+            'contractAddress': dao_address}
 
         # need to double up on braces because of f-strings
         resp = self.query(f"""
@@ -39,16 +46,22 @@ mutation {{
   }}
 }}
 """)
-        self.assertResponseNoErrors(resp, {'createProject': {'projectAddress': constants.DAO_ADDRESS}})
+        self.assertResponseNoErrors(resp, {
+            'createProject': {'projectAddress': dao_address}})
 
         all_projects = Project.objects.all()
 
-        self.assertEqual(1, len(all_projects)) # the actual project isn't made during this call, just the DAO
+        self.assertEqual(2, len(
+            all_projects))
         self.assertEqual(constants.PROJECT_NAME, all_projects[0].repo_name)
+        self.assertEqual(project_name, all_projects[1].repo_name)
 
         # called twice for deployment and twice for registrations
-        self.assertEqual(4, get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
+        self.assertEqual(4,
+                         get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
         self.assertEqual(4, w3.eth.sendRawTransaction.call_count)
+
+        create_repo_mock.assert_called_once_with(repo_name=project_name, organization=github_organization_mock.return_value)
 
     def test_create_project_mycro_dao_doesnt_exist(self):
         Project.objects.filter().delete()
@@ -62,7 +75,8 @@ mutation {{
   }}
 }}
 """)
-        self.assertErrorNoResponse(resp, "Could not find mycro dao. Cannot create new project.")
+        self.assertErrorNoResponse(resp,
+                                   "Could not find mycro dao. Cannot create new project.")
 
     def test_create_project_with_invalid_name(self):
         Project.objects.filter().delete()
@@ -88,7 +102,8 @@ query {
 }
             '''
         )
-        self.assertResponseNoErrors(resp, {'project': {'repoName': constants.PROJECT_NAME}})
+        self.assertResponseNoErrors(resp, {
+            'project': {'repoName': constants.PROJECT_NAME}})
 
     def test_get_project_by_name(self):
         resp = self.query(
@@ -101,7 +116,6 @@ query {{
             '''
         )
         self.assertResponseNoErrors(resp, {'project': {'id': "1"}})
-
 
     @patch('backend.server.utils.deploy.get_w3')
     def test_get_balances(self, get_w3_mock):
@@ -121,8 +135,9 @@ query {{
         )
 
         balances = resp['data']['balances']
-        balances = {balance['address']: balance['balance'] for balance in balances}
+        balances = {balance['address']: balance['balance'] for balance in
+                    balances}
 
-        for expected_address, expected_balance in zip(constants.INITIAL_ADDRESSES, constants.INITIAL_BALANCES):
+        for expected_address, expected_balance in zip(
+                constants.INITIAL_ADDRESSES, constants.INITIAL_BALANCES):
             self.assertEqual(expected_balance, balances[expected_address])
-

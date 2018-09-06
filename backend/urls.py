@@ -39,7 +39,6 @@ if 'runserver' in sys.argv:
     from django_celery_beat.models import PeriodicTask, IntervalSchedule
     from backend.server.models import Project
 
-    PROJECT_REGISTRATION_BEAT_NAME = "Detect Project Registration"
     MERGE_PR_BEAT_NAME = "Detect Merge Events"
 
     # TODO remove this when we no longer need to deploy the mycro contract on init
@@ -56,9 +55,6 @@ if 'runserver' in sys.argv:
 
     # Set up background tasks which monitor blockchain for events
     schedule, created = IntervalSchedule.objects.get_or_create(every=5, period=IntervalSchedule.SECONDS, )
-    if not PeriodicTask.objects.filter(name=PROJECT_REGISTRATION_BEAT_NAME):
-        PeriodicTask.objects.create(interval=schedule, name=PROJECT_REGISTRATION_BEAT_NAME,
-                                    task='backend.server.tasks.process_registrations')
     if not PeriodicTask.objects.filter(name=MERGE_PR_BEAT_NAME):
         PeriodicTask.objects.create(interval=schedule, name=MERGE_PR_BEAT_NAME,
                                     task='backend.server.tasks.process_merges')

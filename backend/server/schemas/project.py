@@ -110,14 +110,17 @@ class CreateProject(graphene.Mutation):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
+        symbol = project_name[:3]
+        decimals = 18 # todo acccept this as a parameter
+        total_supply = 1000 # todo accept this as a parameter
         deploy_dao_task: asyncio.Task = asyncio.ensure_future(
             deploy.deploy_async(base_dao_interface,
-                                project_name[:3],  # symbol
-                                project_name,  # name
-                                18,  # decimals
-                                1000,  # total supply
+                                symbol,
+                                project_name,
+                                decimals,
+                                total_supply,
                                 [creator_address],  # inital addresses
-                                [1000],  # initial balance
+                                [total_supply],  # initial balance
                                 private_key=settings.ethereum_private_key()))
 
         deploy_merge_module_task: asyncio.Task = asyncio.ensure_future(
@@ -146,6 +149,17 @@ class CreateProject(graphene.Mutation):
             asyncio.gather(register_module_task, register_dao_task))
 
         loop.close()
+
+        # create a row in the a db and a repository in github
+        Project.objects.create(
+            repo_name=project_name,
+            dao_address=dao_address,
+            merge_module_address=merge_module_address,
+            last_merge_event_block=0,
+            is_mycro_dao=False,
+            symbol=symbol,
+            decimals=decimals)
+        github.create_repo(repo_name=project_name, organization=settings.github_organization())
 
         return CreateProject(project_address=dao_address)
 

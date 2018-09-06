@@ -49,35 +49,3 @@ def process_merges():
                 logging.warning(e)
 
 
-@shared_task
-def process_registrations():
-    mycro_project = Project.get_mycro_dao()
-    if mycro_project is None:
-        return
-
-    # TODO figure out how to cache the compiler, w3, interface, contract and listener
-    compiler = ContractCompiler()
-    w3 = deploy.get_w3()
-
-    contract_interface = compiler.get_contract_interface('mycro.sol', 'MycroCoin')
-    mycro_contract = w3.eth.contract(abi=contract_interface['abi'], address=mycro_project.dao_address)
-
-    projects = set([project[0] for project in Project.objects.values_list('dao_address')])
-
-    for registered_project_address in mycro_contract.functions.getProjects().call():
-        if registered_project_address not in projects:
-            base_dao_interface = compiler.get_contract_interface('base_dao.sol', 'BaseDao')
-            base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'], address=registered_project_address,
-                                                ContractFactoryClass=ConciseContract)
-
-            repo_name = base_dao_contract.name()
-            github.create_repo(repo_name=repo_name, organization=settings.github_organization())
-
-            Project.objects.create(repo_name=repo_name, dao_address=registered_project_address)
-
-
-@shared_task
-def print_stuff():
-    # NB: this isn't used for anything meaningful but is helpful to keep around for playing around with celery
-    # we should get rid of this once we're comfortable with how celery works
-    print("1")
