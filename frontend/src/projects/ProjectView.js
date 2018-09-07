@@ -14,7 +14,7 @@ const createAscQuery = (checksumDaoAddress,
                                 reward,
                                 prId) => gql`
     mutation {
-      createAsc(
+      createMergeAsc(
         daoAddress: "${checksumDaoAddress}",
         rewardee: "${checksumRewardeeAddress}", 
         reward: ${reward}, 
@@ -77,6 +77,11 @@ class Project extends Component {
           {hasPendingAscCreation: false}));
     }).catch((err) => {
       console.error(err);
+
+      // if we don't do this, the spinner spins forever when there's an error
+      this.setState(
+        Object.assign(this.state,
+          {hasPendingAscCreation: false}));
     })
   }
 
