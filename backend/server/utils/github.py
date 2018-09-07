@@ -26,4 +26,12 @@ def check_repo_name(repo_name: str):
     # ^ matches beginning, $ matches end. Everything in between must be inthe character class
     regex = '^[a-zA-Z0-9-_.]+$'
     if not re.match(regex, repo_name):
-        raise ValueError(f"'{repo_name}' is invalid. It must match the regex '{regex}'")
+        raise ValueError(
+            f"'{repo_name}' is invalid. It must match the regex '{regex}'")
+
+
+def list_repos(organization_name: str, github_token: str):
+    github = Github(github_token)
+    org = github.get_organization(organization_name)
+
+    return org.get_repos()
