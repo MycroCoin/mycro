@@ -16,3 +16,6 @@ mycrocoin-b443c4301ade.json
 
 # sqlite3 db thats created when makemigrations is called
 postgres
+
+# redis performs snapshotting if you run it locally
+dump.rdb

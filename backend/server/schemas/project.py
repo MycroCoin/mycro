@@ -9,10 +9,25 @@ import backend.settings as settings
 import asyncio
 from backend.server.utils.contract_compiler import ContractCompiler
 import backend.server.utils.deploy as deploy
+from backend.server.schemas.asc import AscType
+from backend.server.models import ASC
+from typing import List
 
 
 class ProjectException(Exception):
     """Exception for Project related problems"""
+
+
+def _get_dao_contract(dao_address):
+    compiler = ContractCompiler()
+    w3 = deploy.get_w3()
+
+    base_dao_interface = compiler.get_contract_interface('base_dao.sol',
+                                                         'BaseDao')
+    base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'],
+                                        address=dao_address)
+
+    return base_dao_contract
 
 
 class BalanceType(graphene.ObjectType):
@@ -24,6 +39,41 @@ class ProjectType(DjangoObjectType):
     class Meta:
         model = Project
 
+    ascs = graphene.List(AscType)
+    threshold = graphene.Int()
+    balances = graphene.List(BalanceType)
+
+    def resolve_ascs(self: Project, info) -> List or None:
+        if self is None:
+            return None
+
+        return ASC.objects.filter(project__dao_address=self.dao_address)
+
+    def resolve_threshold(self: Project, info) -> int or None:
+        if self is None:
+            return None
+
+        base_dao_contract = _get_dao_contract(self.dao_address)
+
+        return base_dao_contract.functions.threshold().call()
+
+    def resolve_balances(self: Project, info) -> List[BalanceType] or None:
+        if self is None:
+            return None
+
+        balances = {}
+
+        base_dao_contract = _get_dao_contract(self.dao_address)
+
+        transactors = base_dao_contract.functions.getTransactors().call()
+
+        for transactor in transactors:
+            balances[transactor] = base_dao_contract.functions.balanceOf(
+                transactor).call()
+
+        return [BalanceType(address=transactor, balance=balance) for
+                transactor, balance in balances.items()]
+
 
 class Query(ObjectType):
     project = graphene.Field(ProjectType,
@@ -32,7 +82,6 @@ class Query(ObjectType):
     all_projects = graphene.List(ProjectType)
     is_project_name_available = graphene.String(
         proposed_project_name=graphene.String())
-    balances = graphene.List(BalanceType, address=graphene.String())
 
     def resolve_all_projects(self, info):
         return Project.objects.all()
@@ -48,26 +97,6 @@ class Query(ObjectType):
             return Project.objects.get(repo_name=repo_name)
 
         return None
-
-    def resolve_balances(self, info, address):
-        balances = {}
-
-        compiler = ContractCompiler()
-        w3 = deploy.get_w3()
-
-        base_dao_interface = compiler.get_contract_interface('base_dao.sol',
-                                                             'BaseDao')
-        base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'],
-                                            address=address)
-
-        transactors = base_dao_contract.functions.getTransactors().call()
-
-        for transactor in transactors:
-            balances[transactor] = base_dao_contract.functions.balanceOf(
-                transactor).call()
-
-        return [BalanceType(address=transactor, balance=balance) for
-                transactor, balance in balances.items()]
 
 
 class CreateProject(graphene.Mutation):
@@ -111,8 +140,8 @@ class CreateProject(graphene.Mutation):
         asyncio.set_event_loop(loop)
 
         symbol = project_name[:3]
-        decimals = 18 # todo acccept this as a parameter
-        total_supply = 1000 # todo accept this as a parameter
+        decimals = 18  # todo acccept this as a parameter
+        total_supply = 1000  # todo accept this as a parameter
         deploy_dao_task: asyncio.Task = asyncio.ensure_future(
             deploy.deploy_async(base_dao_interface,
                                 symbol,
@@ -159,7 +188,8 @@ class CreateProject(graphene.Mutation):
             is_mycro_dao=False,
             symbol=symbol,
             decimals=decimals)
-        github.create_repo(repo_name=project_name, organization=settings.github_organization())
+        github.create_repo(repo_name=project_name,
+                           organization=settings.github_organization())
 
         return CreateProject(project_address=dao_address)
 
