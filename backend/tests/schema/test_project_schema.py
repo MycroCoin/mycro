@@ -94,28 +94,17 @@ mutation {{
 
     def test_get_project_by_id(self):
         resp = self.query(
-            '''
-query {
-  project(id: "1") {
-    repoName
-  }
-}
+            f'''
+            query {{
+                project(daoAddress: "{constants.DAO_ADDRESS}") {{
+                    repoName
+                }}
+            }}
             '''
         )
         self.assertResponseNoErrors(resp, {
             'project': {'repoName': constants.PROJECT_NAME}})
 
-    def test_get_project_by_name(self):
-        resp = self.query(
-            f'''
-query {{
-  project(repoName: "{constants.PROJECT_NAME}") {{
-    id
-  }}
-}}
-            '''
-        )
-        self.assertResponseNoErrors(resp, {'project': {'id': "1"}})
 
     @patch('backend.server.utils.deploy.get_w3')
     def test_get_balances(self, get_w3_mock):
@@ -127,15 +116,15 @@ query {{
         self.project.save()
 
         resp = self.query(
-            '''
-            query {
-                project(id: "1") {
-                    balances {
+            f'''
+            query {{
+                project(daoAddress: "{dao_address}") {{
+                    balances {{
                         address,
                         balance
-                    }
-                }
-            }'''
+                    }}
+                }}
+            }}'''
         )
 
         balances = resp['data']['project']['balances']
@@ -156,12 +145,12 @@ query {{
         self.project.save()
 
         resp = self.query(
-            '''
-            query {
-                project(id: "1") {
+            f'''
+            query {{
+                project(daoAddress: "{dao_address}") {{
                     threshold
-                }
-            }'''
+                }}
+            }}'''
         )
 
         self.assertResponseNoErrors(resp, {'project': {'threshold': 51}})
@@ -174,12 +163,12 @@ query {{
         dao_instance.vote(asc_address, transact={'from': constants.INITIAL_ADDRESSES[1]})
 
         resp = self.query(
-            '''
-            query {
-                project(id: "1") {
+            f'''
+            query {{
+                project(daoAddress: "{dao_address}") {{
                     threshold
-                }
-            }'''
+                }}
+            }}'''
         )
 
         self.assertResponseNoErrors(resp, {'project': {'threshold': (100 + constants.REWARD) // 2 + 1}})
@@ -194,14 +183,14 @@ query {{
             rewardee=constants.REWARDEE)
 
         resp = self.query(
-            '''
-            query {
-                project(id: "1") {
-                    ascs {
+            f'''
+            query {{
+                project(daoAddress: "{constants.DAO_ADDRESS}") {{
+                    ascs {{
                         address
-                    }
-                }
-            }
+                    }}
+                }}
+            }}
             '''
         )
 

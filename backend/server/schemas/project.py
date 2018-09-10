@@ -77,8 +77,7 @@ class ProjectType(DjangoObjectType):
 
 class Query(ObjectType):
     project = graphene.Field(ProjectType,
-                             id=graphene.String(),
-                             repo_name=graphene.String())
+                             dao_address=graphene.String())
     all_projects = graphene.List(ProjectType)
     is_project_name_available = graphene.String(
         proposed_project_name=graphene.String())
@@ -86,17 +85,9 @@ class Query(ObjectType):
     def resolve_all_projects(self, info):
         return Project.objects.all()
 
-    def resolve_project(self, info, **kwargs):
-        repo_name = kwargs.get('repo_name')
-        id = kwargs.get('id')
+    def resolve_project(self, info, dao_address):
+        return Project.objects.get(dao_address=dao_address)
 
-        if id is not None:
-            return Project.objects.get(pk=id)
-
-        if repo_name is not None:
-            return Project.objects.get(repo_name=repo_name)
-
-        return None
 
 
 class CreateProject(graphene.Mutation):
