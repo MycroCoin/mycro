@@ -1,4 +1,5 @@
-from github import Github
+import github
+import github.PaginatedList
 import backend.settings as settings
 import re
 
@@ -6,18 +7,33 @@ import re
 def create_repo(repo_name, organization):
     check_repo_name(repo_name)
 
-    github = Github(settings.github_token())
+    gh = github.Github(settings.github_token())
 
-    org = github.get_organization(organization)
+    org = gh.get_organization(organization)
     org.create_repo(name=repo_name, auto_init=True)
 
 
-def merge_pr(repo_name, pr_id, organization):
-    github = Github(settings.github_token())
-    org = github.get_organization(organization)
+def get_pull_requests(repo_name: str, organization: str, token: str,
+                      **kwargs) -> github.PaginatedList:
+    """
+    Gets the pull requests of a repository
+    :param repo_name: the name of the repo
+    :param organization: the organization that the repository belongs to
+    :param token: the token used to authenticate with github
+    :param kwargs: passed directly to the get repo call: https://bit.ly/2Mlyklc
+    :return: list of pull requests
+    """
+    gh = github.Github(token)
+    org = gh.get_organization(organization)
     repo = org.get_repo(repo_name)
 
-    for pull_request in repo.get_pulls():
+    return repo.get_pulls(**kwargs)
+
+
+def merge_pr(repo_name: str, pr_id: int, organization: str):
+    for pull_request in get_pull_requests(repo_name=repo_name,
+                                          organization=organization,
+                                          token=settings.github_token()):
         if pull_request.number == pr_id:
             pull_request.merge()
 
@@ -31,7 +47,7 @@ def check_repo_name(repo_name: str):
 
 
 def list_repos(organization_name: str, github_token: str):
-    github = Github(github_token)
-    org = github.get_organization(organization_name)
+    gh = github.Github(github_token)
+    org = gh.get_organization(organization_name)
 
     return org.get_repos()

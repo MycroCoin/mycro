@@ -35,6 +35,45 @@ class BalanceType(graphene.ObjectType):
     balance = graphene.Int()
 
 
+class PullRequestType(graphene.ObjectType):
+    additions = graphene.Int()
+    # assignee = github.NamedUser
+    # assignees = List[github.NamedUser]
+    # base = github.PullRequestPart
+    body = graphene.String()
+    changed_files = graphene.Int()
+    closed_at = graphene.DateTime()
+    comments = graphene.Int()
+    comments_url = graphene.String()
+    commits = graphene.Int()
+    commits_url = graphene.String()
+    created_at = graphene.DateTime()
+    deletions = graphene.Int()
+    diff_url = graphene.String()
+    # head = List[github.PullRequestPart]
+    html_url = graphene.String()
+    id = graphene.Int()
+    issue_url = graphene.String()
+    # labels = List[github.Label]
+    merge_commit_sha = graphene.String()
+    mergeable = graphene.Boolean()
+    mergeable_state = graphene.String()
+    merged = graphene.Boolean()
+    merged_at = graphene.DateTime()
+    # merged_by = github.NamedUser
+    # milestone = github.Milestone
+    number = graphene.Int()
+    patch_url = graphene.String()
+    review_comment_url = graphene.String()
+    review_comments = graphene.String()
+    review_comments_url = graphene.String()
+    state = graphene.String()
+    title = graphene.String()
+    updated_at = graphene.String()
+    url = graphene.String()
+    # user = github.NamedUser
+
+
 class ProjectType(DjangoObjectType):
     class Meta:
         model = Project
@@ -42,6 +81,7 @@ class ProjectType(DjangoObjectType):
     ascs = graphene.List(AscType)
     threshold = graphene.Int()
     balances = graphene.List(BalanceType)
+    pull_requests = graphene.List(PullRequestType)
 
     def resolve_ascs(self: Project, info) -> List or None:
         if self is None:
@@ -74,6 +114,50 @@ class ProjectType(DjangoObjectType):
         return [BalanceType(address=transactor, balance=balance) for
                 transactor, balance in balances.items()]
 
+    def resolve_pull_requests(self: Project, info) -> List[
+                                                          PullRequestType] or None:
+        if self is None:
+            return None
+
+        pull_requests = []
+        for pull_request in github.get_pull_requests(self.repo_name,
+                                                     settings.github_organization(),
+                                                     settings.github_token()):
+            pull_requests.append(
+                PullRequestType(
+                    additions=pull_request.additions,
+                    body=pull_request.body,
+                    changed_files=pull_request.changed_files,
+                    closed_at=pull_request.closed_at,
+                    comments=pull_request.comments,
+                    comments_url=pull_request.comments_url,
+                    commits=pull_request.commits,
+                    commits_url=pull_request.commits_url,
+                    created_at=pull_request.created_at,
+                    deletions=pull_request.deletions,
+                    diff_url=pull_request.diff_url,
+                    html_url=pull_request.html_url,
+                    id=pull_request.id,
+                    issue_url=pull_request.issue_url,
+                    merge_commit_sha=pull_request.merge_commit_sha,
+                    mergeable=pull_request.mergeable,
+                    mergeable_state=pull_request.mergeable_state,
+                    merged=pull_request.merged,
+                    merged_at=pull_request.merged_at,
+                    number=pull_request.number,
+                    patch_url=pull_request.patch_url,
+                    review_comment_url=pull_request.review_comment_url,
+                    review_comments=pull_request.review_comments,
+                    review_comments_url=pull_request.review_comments_url,
+                    state=pull_request.state,
+                    title=pull_request.title,
+                    updated_at=pull_request.updated_at,
+                    url=pull_request.url
+                )
+            )
+
+        return pull_requests
+
 
 class Query(ObjectType):
     project = graphene.Field(ProjectType,
@@ -87,7 +171,6 @@ class Query(ObjectType):
 
     def resolve_project(self, info, dao_address):
         return Project.objects.get(dao_address=dao_address)
-
 
 
 class CreateProject(graphene.Mutation):

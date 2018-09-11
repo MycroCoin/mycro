@@ -11,7 +11,7 @@ class TestGithub(TestCase):
 
     def setUp(self):
         os_patch = patch('backend.settings.os')
-        pygithub_patch = patch('backend.server.utils.github.Github')
+        pygithub_patch = patch('backend.server.utils.github.github.Github')
 
         self.addCleanup(os_patch.stop)
         self.addCleanup(pygithub_patch.stop)
