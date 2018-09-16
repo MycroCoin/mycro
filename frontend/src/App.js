@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
 import {BrowserRouter, Route, Link, Switch, Redirect} from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { ApolloProvider } from "react-apollo";
+import client from './GraphqlClient.js';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 import './App.css';
@@ -20,7 +24,6 @@ class App extends Component {
 
     this.state = {accounts: [], network: 'unknown'};
 
-
     window.web3.eth.getAccounts((err, accounts) => {
       if (err != null) {
         console.error("An error occurred: " + err);
@@ -37,19 +40,27 @@ class App extends Component {
         let networkName = 'unknown';
         switch (networkId) {
           case "1":
-            networkName = 'mainnet';
+            networkName = 'MainNet';
             break
           case "2":
-            networkName = 'morden'
+            networkName = 'Morden'
             break
           case "3":
-            networkName = 'ropsten'
+            networkName = 'Ropsten'
             break
           case "4":
-            networkName = 'rinkeby'
+            networkName = 'Rinkeby'
             break
           default:
             console.log('This is an unknown network.')
+        }
+        if(this.state.network !== "Ropsten"){
+            toast.error("You're logged into the "+this.state.network+" network " +
+                "please make sure you're logged into the Ropsten network",
+              {
+                autoClose: false,
+                position: toast.POSITION.BOTTOM_CENTER
+              });
         }
         this.setState(Object.assign(this.state, {network: networkName}))
       }
@@ -61,49 +72,49 @@ class App extends Component {
     this.context.mixpanel.track("App Mounted")
   }
 
-  _renderNoAccounts() {
+
+
+  renderNoAccounts() {
     return <p>Please log into metamask then refresh the page</p>
   }
 
-  _renderWithAccounts() {
+  renderWithAccounts() {
+
     return (
-      <BrowserRouter>
-        <div className="App">
-          <header className="App-header">
-            <h1 className="App-title">Mycro</h1>
-            <p className="App-intro">
-              The future is open
-            </p>
+  <ApolloProvider client={client}>
+        <BrowserRouter>
+          <div className="App">
+            <header className="App-header">
+              <h1 className="App-title"><Link to= "/projects">Mycro</Link></h1>
+              <p className="App-intro">
+                - The future is open
+              </p>
 
-            <Link to="/projects">Projects</Link>
-            <Link to="/projects/create">New Project</Link>
-
-            <p>You're logged into the {this.state.network} network, please make sure you're logged into the Ropsten
-              network</p>
-
-          </header>
-          <div className="App-body">
-            <Switch>
-              <Route path="/projects/create" component={CreateProjectView}/>
-              <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
-              <Route path="/projects/:id" component={ProjectView}/>
-              <Route path="/projects" component={ProjectListView}/>
-              <Route exact path="/">
-                <Redirect to="/projects"/>
-              </Route>
-            </Switch>
+            </header>
+            <div className="App-body">
+              <Switch>
+                <Route path="/projects/create" component={CreateProjectView}/>
+                <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
+                <Route path="/projects/:id" component={ProjectView}/>
+                <Route path="/projects" component={ProjectListView}/>
+                <Route exact path="/">
+                  <Redirect to="/projects"/>
+                </Route>
+              </Switch>
+            </div>
+            <ToastContainer />
           </div>
-        </div>
-      </BrowserRouter>
+        </BrowserRouter>
+      </ApolloProvider>
     );
   }
 
   render() {
     if (this.state.accounts.length === 0) {
-      return this._renderNoAccounts()
+      return this.renderNoAccounts()
     }
     else {
-      return this._renderWithAccounts()
+      return this.renderWithAccounts()
     }
   }
 }

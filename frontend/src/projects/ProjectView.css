@@ -1,0 +1,31 @@
+.Page{
+  padding: 0 60px;
+}
+.InfoBlock{
+  width: 400px;
+  border-style: solid;
+  border-radius: 3px;
+  border-width: 1px;
+  border-color: #aaa;
+  padding: 10px;
+  font-size: 13px
+}
+
+.InfoLine .Descriptor{
+  font-weight: bold;
+  display: inline-block;
+  text-align: right;
+}
+.InfoLine .Descriptor:after{
+  content: ':';
+  padding-right: 5px;
+}
+
+.InfoLine .Value {
+  font-size: 14px;
+}
+
+.InfoBlock a{
+  margin-top: 30px;
+  text-align: center;
+}

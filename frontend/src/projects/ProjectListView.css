@@ -1,0 +1,45 @@
+.ProjectList {
+  text-align: center;
+}
+.ProjectListItem {
+  border-width: 1px;
+  border-color: #aaa;
+  border-style: solid;
+  border-radius: 3px;
+  padding: 5px 10px;
+  text-align: left;
+  width: 500px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.Symbol:before{
+  content: "Symbol";
+  font-weight: 100;
+  padding-right: 5px;
+  font-size: 12px;
+  color: #999;
+}
+.Symbol {
+  font-weight: bold;
+}
+
+.GithubLink {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
+.GithubLink a{
+  color: #999;
+}
+
+.Title {
+  font-size: 18px;
+}
+
+.ProjectListItem p {
+  margin: 0;
+}
+
+
+

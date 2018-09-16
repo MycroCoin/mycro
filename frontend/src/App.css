@@ -1,18 +1,13 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
-  font-family: 'Lato', sans-serif;
 }
 
 .App-header {
   background: linear-gradient(-50deg, #4ff0ff, #0039b5);
-  height: 150px;
-  padding: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  height: 30px;
+  padding: 20px 60px;
   color: white;
+  display: flex;
 }
 
 .App-header a{
@@ -22,10 +17,20 @@
 
 .App-title {
   font-size: 1.5em;
+  margin: 0;
+  padding-right: 10px;
+}
+
+.App-title a {
+  padding: 0;
+  text-decoration: none;
 }
 
 .App-intro {
   font-size: large;
+  margin: 0;
+  color: rgba(255,255,255,0.85);
+  padding-top: 5px;
 }
 
 .App-body {
@@ -33,8 +38,8 @@
 }
 
 .App-body a {
-  color: #0039b5; 
-  font-weight: bold;
+  color: #4ac;
+  font-weight: normal;
   text-decoration: none;
 }
 
@@ -51,4 +56,38 @@
   border-radius: 5px;
   color: #3a1;
   margin: 20px;
+  cursor: pointer;
+}
+
+.App-body .button{
+  font-size: 20px;
+  font-weight: bold;
+  border-color: #3a1;
+  border-width: 3px;
+  border-radius: 5px;
+  border-style: solid;
+  color: #3a1;
+  margin: 20px;
+  padding: 1px 7px 2px 7px;
+}
+
+.App-body button:hover{
+  color: #69dc49;
+  border-color: #69dc49;
+  text-decoration: none;
+}
+.App-body .button:hover{
+  color: #69dc49;
+  border-color: #69dc49;
+  text-decoration: none;
+}
+
+.GitHubLogo{
+  content: " ";
+  background-image: url('./github_logo.png');
+  background-size: contain;
+  display: inline-block;
+  margin-left: 10px;
+  width: 20px;
+  height: 20px;
 }

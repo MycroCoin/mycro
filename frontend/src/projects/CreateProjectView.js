@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import Spinner from '../shared/Spinner.js';
+import Api from '../services/Api.js';
 import ReactGA from 'react-ga';
-import client from '../GraphqlClient.js';
-import gql from 'graphql-tag';
 import {toChecksumAddress} from 'web3-utils';
 
 class CreateProject extends Component {
@@ -32,15 +31,11 @@ class CreateProject extends Component {
     let checksumAddress = toChecksumAddress(window.web3.eth.accounts[0]);
 
     this.setState(Object.assign(this.state, {submitting: true}));
-    client.mutate({mutation: gql`
-    mutation {
-      createProject(projectName: "${this.state.projectName}", creatorAddress: "${checksumAddress}") {
-        projectAddress 
-      }
-    }`}).then(({data: { createProject: { projectAddress: address}}}) => {
+    Api.createProject(this.state.projectName, checksumAddress).then(
+      ({data: { createProject: { projectAddress: address}}}) => {
       this.props.history.push('/projects/' + address)
     }).catch((err) => {
-      alert(err);
+      console.log(err);
     })
   }
 
