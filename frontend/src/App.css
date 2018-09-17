@@ -35,6 +35,7 @@
 
 .App-body {
   color: #555;
+  padding: 0 60px;
 }
 
 .App-body a {
@@ -90,4 +91,14 @@
   margin-left: 10px;
   width: 20px;
   height: 20px;
+  vertical-align: bottom;
+}
+
+.NoWeb3 {
+  text-align: center;
+}
+
+em {
+  font-style: normal;
+  font-weight: bold;
 }

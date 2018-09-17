@@ -144,7 +144,7 @@ class Project extends Component {
             <span className="Descriptor">total supply</span>
             <span className="Value">TODO</span>
           </div>
-          <a href={"http://github.com/mycrocoin/" + project.repoName}>
+          <a href={"http://github.com/mycrocoin/" + project.repoName} target="blank_">
             View Github Project <span className="GitHubLogo"></span></a>
         </div>
         <div className="Ascs">

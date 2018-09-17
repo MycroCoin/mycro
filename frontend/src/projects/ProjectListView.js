@@ -26,7 +26,7 @@ class Projects extends Component {
           {props.project.symbol}
         </p>
         <div className="GithubLink">
-          <a href={"http://github.com/mycroin/"+props.project.repoName}>
+          <a href={"http://github.com/mycroin/"+props.project.repoName} target="blank_">
             [view on GitHub]<span className="GitHubLogo"></span></a>
         </div>
       </div>

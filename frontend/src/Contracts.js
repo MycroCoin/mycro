@@ -9,62 +9,64 @@ import MergeModuleData from './build/contracts/MergeModule.json';
 import client from './GraphqlClient.js';
 import gql from 'graphql-tag';
 
-//TODO have backup providers here
-const provider = window.web3.currentProvider;
-const web3 = window.web3;
+let Contracts, deployHelper, createTruffleContract;
 
+if(window.web3){
+  //TODO have backup providers here
+  const provider = window.web3.currentProvider;
+  const web3 = window.web3;
 
+  createTruffleContract = (data) => {
+    const contract = TruffleContract(data);
+    contract.setProvider(provider);
+    contract.defaults({from: web3.eth.accounts[0]});
+    return contract;
+  };
 
-const createTruffleContract = (data) => {
-  const contract = TruffleContract(data);
-  contract.setProvider(provider);
-  contract.defaults({from: web3.eth.accounts[0]});
-  return contract;
-};
+  deployHelper = (contract, ...args) => {
+    //TODO use a promise here to avoid race condition
+    var a = window.web3.eth.accounts[0];
+    // a = undefined;
+    return deployer.deploy(contract, ...args, {from: a});
+  };
 
-const deployHelper = (contract, ...args) => {
-  //TODO use a promise here to avoid race condition
-  var a = window.web3.eth.accounts[0];
-  // a = undefined;
-  return deployer.deploy(contract, ...args, {from: a});
-};
+  var deployer = null;
+  web3.version.getNetwork(function (err, id) {
+    const network_id = id;
 
-var deployer = null;
-web3.version.getNetwork(function (err, id) {
-  const network_id = id;
+    deployer = new TruffleDeployer({
+      contracts: [BaseDaoData],
+      network: "test",
+      network_id: network_id,
+      provider: provider
+    });
 
-  deployer = new TruffleDeployer({
-    contracts: [BaseDaoData],
-    network: "test",
-    network_id: network_id,
-    provider: provider
+    deployer.start();
+  });
+  Contracts = {
+    MycroCoin: TruffleContract(MycroCoinData),
+    BaseDao: TruffleContract(BaseDaoData),
+    MergeAsc: TruffleContract(MergeAscData),
+    MergeModule: TruffleContract(MergeModuleData),
+  };
+
+  //add providers
+  Object.keys(Contracts).forEach((contract) => {
+    Contracts[contract] = createTruffleContract(Contracts[contract]);
   });
 
-  deployer.start();
-});
-const Contracts = {
-  MycroCoin: TruffleContract(MycroCoinData),
-  BaseDao: TruffleContract(BaseDaoData),
-  MergeAsc: TruffleContract(MergeAscData),
-  MergeModule: TruffleContract(MergeModuleData),
-};
-
-//add providers
-Object.keys(Contracts).forEach((contract) => {
-  Contracts[contract] = createTruffleContract(Contracts[contract]);
-});
-
-const deployedMycro = () => {
-  //TODO don't hardcode and actually grab it with graphql dynamically
-  const query = gql`query{
-  mycroDao 
-}`;
-  return client.query({query}).then(({data: {mycroDao: address}}, error) => {
-    console.log("Mycro dao address is " + address);
-    return Contracts.MycroCoin.at(address);
-  });
+  const deployedMycro = () => {
+    //TODO don't hardcode and actually grab it with graphql dynamically
+    const query = gql`query{
+    mycroDao 
+  }`;
+    return client.query({query}).then(({data: {mycroDao: address}}, error) => {
+      console.log("Mycro dao address is " + address);
+      return Contracts.MycroCoin.at(address);
+    });
+  }
+  Contracts.MycroCoin.deployed = deployedMycro;
 }
-Contracts.MycroCoin.deployed = deployedMycro;
 
 
 export {

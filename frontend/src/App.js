@@ -24,47 +24,49 @@ class App extends Component {
 
     this.state = {accounts: [], network: 'unknown'};
 
-    window.web3.eth.getAccounts((err, accounts) => {
-      if (err != null) {
-        console.error("An error occurred: " + err);
-        return
-      }
-      this.setState(Object.assign(this.state, {accounts: accounts}));
-    });
-
-    window.web3.version.getNetwork((err, networkId) => {
+    if(window.web3) {
+      window.web3.eth.getAccounts((err, accounts) => {
         if (err != null) {
-          console.log("Error when getting network: " + err)
+          console.error("An error occurred: " + err);
           return
         }
-        let networkName = 'unknown';
-        switch (networkId) {
-          case "1":
-            networkName = 'MainNet';
-            break
-          case "2":
-            networkName = 'Morden'
-            break
-          case "3":
-            networkName = 'Ropsten'
-            break
-          case "4":
-            networkName = 'Rinkeby'
-            break
-          default:
-            console.log('This is an unknown network.')
+        this.setState(Object.assign(this.state, {accounts: accounts}));
+      });
+
+      window.web3.version.getNetwork((err, networkId) => {
+          if (err != null) {
+            console.log("Error when getting network: " + err)
+            return
+          }
+          let networkName = 'unknown';
+          switch (networkId) {
+            case "1":
+              networkName = 'MainNet';
+              break
+            case "2":
+              networkName = 'Morden'
+              break
+            case "3":
+              networkName = 'Ropsten'
+              break
+            case "4":
+              networkName = 'Rinkeby'
+              break
+            default:
+              console.log('This is an unknown network.')
+          }
+          if(this.state.network !== "Ropsten"){
+              toast.error("You're logged into the "+this.state.network+" network " +
+                  "please make sure you're logged into the Ropsten network",
+                {
+                  autoClose: false,
+                  position: toast.POSITION.BOTTOM_CENTER
+                });
+          }
+          this.setState(Object.assign(this.state, {network: networkName}))
         }
-        if(this.state.network !== "Ropsten"){
-            toast.error("You're logged into the "+this.state.network+" network " +
-                "please make sure you're logged into the Ropsten network",
-              {
-                autoClose: false,
-                position: toast.POSITION.BOTTOM_CENTER
-              });
-        }
-        this.setState(Object.assign(this.state, {network: networkName}))
-      }
-    );
+      );
+    }
   }
 
   componentDidMount() {
@@ -75,47 +77,49 @@ class App extends Component {
 
 
   renderNoAccounts() {
-    return <p>Please log into metamask then refresh the page</p>
+    return <div className="NoWeb3">
+      <p>Please login to <em>MetaMask</em> then refresh the page</p>
+      <a href="https://metamask.io/" target="blank_">Get MetaMask</a>
+    </div>
   }
 
   renderWithAccounts() {
 
     return (
-  <ApolloProvider client={client}>
-        <BrowserRouter>
-          <div className="App">
-            <header className="App-header">
-              <h1 className="App-title"><Link to= "/projects">Mycro</Link></h1>
-              <p className="App-intro">
-                - The future is open
-              </p>
-
-            </header>
-            <div className="App-body">
-              <Switch>
-                <Route path="/projects/create" component={CreateProjectView}/>
-                <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
-                <Route path="/projects/:id" component={ProjectView}/>
-                <Route path="/projects" component={ProjectListView}/>
-                <Route exact path="/">
-                  <Redirect to="/projects"/>
-                </Route>
-              </Switch>
-            </div>
-            <ToastContainer />
-          </div>
-        </BrowserRouter>
-      </ApolloProvider>
+      <Switch>
+        <Route path="/projects/create" component={CreateProjectView}/>
+        <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
+        <Route path="/projects/:id" component={ProjectView}/>
+        <Route path="/projects" component={ProjectListView}/>
+        <Route exact path="/">
+          <Redirect to="/projects"/>
+        </Route>
+      </Switch>
     );
   }
 
   render() {
-    if (this.state.accounts.length === 0) {
-      return this.renderNoAccounts()
-    }
-    else {
-      return this.renderWithAccounts()
-    }
+    const content = this.state.accounts.length === 0 ? 
+      this.renderNoAccounts() :
+      this.renderWithAccounts()
+
+    return <ApolloProvider client={client}>
+      <BrowserRouter>
+        <div className="App">
+          <header className="App-header">
+            <h1 className="App-title"><Link to= "/projects">Mycro</Link></h1>
+            <p className="App-intro">
+              - The future is open
+            </p>
+
+          </header>
+          <div className="App-body">
+            {content}
+          </div>
+          <ToastContainer />
+        </div>
+      </BrowserRouter>
+    </ApolloProvider>
   }
 }
 
