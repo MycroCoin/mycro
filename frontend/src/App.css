@@ -102,3 +102,8 @@ em {
   font-style: normal;
   font-weight: bold;
 }
+
+h2 {
+  font-weight: 400;
+  color: #666;
+}

@@ -51,7 +51,8 @@ const getProjectQuery = (address) => {
       ascs{
         id,
         reward,
-        prId
+        prId,
+        address,
       },
       balances {
         address

@@ -18,6 +18,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "1.1.4",
     "react-spinners": "^0.4.4",
+    "react-table": "^6.8.6",
     "react-toastify": "^4.3.1",
     "truffle": "^4.1.13",
     "truffle-contract": "^3.0.6",

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
 import { Pie } from 'react-chartjs';
 import Spinner from '../shared/Spinner.js';
+import AscList from './AscList.js';
 import { Query } from "react-apollo";
 import Api from '../services/Api.js';
 import ReactGA from 'react-ga';
@@ -104,7 +104,6 @@ class Project extends Component {
   }
 
   renderBalancesChart(balances){
-    let total = 0;
     const pieData = balances.map((account, index) => {
       return {
         value: account.balance,
@@ -114,47 +113,49 @@ class Project extends Component {
       }
     });
 
-    return <Pie data={pieData} />;
+    return <div>
+      <h2>Token Stakeholders</h2>
+      <Pie data={pieData} />
+    </div>;
   }
 
   renderProject(project){
-    const id = project.daoAddress;
-    const ascs = project.ascs.map( asc => (
-      <div key={asc.id}>
-        <Link to={"/projects/"+id+"/asc/"+asc.id}>
-          <h3>{"Merge Proposal for PR " + asc.prId}</h3>
-        </Link>
-      </div>));
-
     const pullRequestFormContainer = this.renderPullRequestForm();
 
     return (
       <div className="Page">
         <h1>{project.repoName}</h1>
-        <div className="InfoBlock">
-          <div className="InfoLine">
-            <span className="Descriptor">symbol</span>
-            <span className="Value">{project.symbol}</span>
-          </div>
-          <div className="InfoLine">
-            <span className="Descriptor">address</span>
-            <span className="Value">{project.daoAddress}</span>
-          </div>
-          <div className="InfoLine">
-            <span className="Descriptor">total supply</span>
-            <span className="Value">TODO</span>
-          </div>
-          <a href={"http://github.com/mycrocoin/" + project.repoName} target="blank_">
-            View Github Project <span className="GitHubLogo"></span></a>
-        </div>
-        <div className="Ascs">
-          <h2>Open ASCs</h2>
-          {ascs}
-        </div>
+        <div className="PanelContainer">
+          <div className="LeftPanel">
+            <div className="InfoBlock">
+              <div className="InfoLine">
+                <span className="Descriptor">symbol</span>
+                <span className="Value">{project.symbol}</span>
+              </div>
+              <div className="InfoLine">
+                <span className="Descriptor">address</span>
+                <span className="Value">{project.daoAddress}</span>
+              </div>
+              <div className="InfoLine">
+                <span className="Descriptor">total supply</span>
+                <span className="Value">TODO</span>
+              </div>
+              <a href={"http://github.com/mycrocoin/" + project.repoName} target="blank_">
+                View Github Project <span className="GitHubLogo"></span></a>
+            </div>
 
-        {this.renderBalancesChart(project.balances)}
+            {this.renderBalancesChart(project.balances)}
+          </div>
+          <div className="RightPanel">
+            <div className="Ascs">
+              <h2>Open ASCs</h2>
+              <AscList ascs={project.ascs} daoAddress={project.daoAddress}
+                  gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/>
+            </div>
 
-        {pullRequestFormContainer}
+            {pullRequestFormContainer}
+          </div>
+        </div>
       </div>
     );
   }
