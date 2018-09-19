@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {toChecksumAddress} from 'web3-utils';
 import Api from '../services/Api.js';
-import './CreatePullRequestAsc.css';
 
 class CreatePullRequestAsc extends Component {
   constructor(props){
@@ -55,7 +54,7 @@ class CreatePullRequestAsc extends Component {
   }
 
   render() {
-    return <div className="AscModal">
+    return <div className="Modal">
       <div className="Header">
         <h2>Create Pull Request ASC</h2>
       </div>

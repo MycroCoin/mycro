@@ -11,7 +11,6 @@ import './App.css';
 import {
   ProjectView,
   ProjectListView,
-  CreateProjectView,
   AscView
 } from './projects';
 
@@ -87,7 +86,6 @@ class App extends Component {
 
     return (
       <Switch>
-        <Route path="/projects/create" component={CreateProjectView}/>
         <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
         <Route path="/projects/:id" component={ProjectView}/>
         <Route path="/projects" component={ProjectListView}/>

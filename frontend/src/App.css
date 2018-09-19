@@ -107,3 +107,39 @@ h2 {
   font-weight: 400;
   color: #666;
 }
+
+.Modal{
+  padding: 0px;
+}
+.Modal .Body{
+  margin: 20px;
+}
+.Modal input{
+  font-size: 20px;
+  width: 100%;
+}
+
+.Modal .Header{
+  background-color: #2a94e0;
+  margin: -5px -20px 0 -20px;
+  padding: 20px 20px 10px 20px;
+  text-align: center;
+}
+.Modal .Header h2{
+  color: white;
+  margin: 0;
+}
+
+button:disabled, button:disabled:hover{
+  color: #999;
+  border-color: #999;
+  cursor: initial;
+}
+
+.Modal button{
+  margin-left: 0px;
+}
+
+.Modal h3{
+  font-weight: 300;
+}
