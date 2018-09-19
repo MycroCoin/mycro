@@ -36,6 +36,9 @@
 .LeftPanel {
   margin-right: 20px;
 }
+.RightPanel {
+  flex-grow: 1;
+}
 .RightPanel h2{
   margin-top: 0;
 }

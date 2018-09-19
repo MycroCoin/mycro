@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
+import Modal, {closeStyle} from 'simple-react-modal';
 import { Pie } from 'react-chartjs';
 import Spinner from '../shared/Spinner.js';
 import AscList from './AscList.js';
+import CreatePullRequestAsc from './CreatePullRequestAsc.js';
 import { Query } from "react-apollo";
 import Api from '../services/Api.js';
 import ReactGA from 'react-ga';
 import PropTypes from 'prop-types'
-import {toChecksumAddress} from 'web3-utils';
 import './ProjectView.css';
 
 const colors = [
@@ -23,50 +24,16 @@ class Project extends Component {
     super(props);
 
     this.state = {
-      prId: 0,
-      reward: 0,
       hasPendingAscCreation: false,
     }
   }
 
-  createPullRequest() {
-    let checksumRewardeeAddress = toChecksumAddress(window.web3.eth.accounts[0]);
-    let checksumDaoAddress = toChecksumAddress(this.props.match.params.id);
-
-    this.setState(
-      Object.assign(this.state,
-        {hasPendingAscCreation: true}));
-
-    Api.createAsc(
-      checksumDaoAddress,
-      checksumRewardeeAddress,
-      this.state.reward,
-      this.state.prId,
-    ).then((data) => {
-      this.setState(
-        Object.assign(this.state,
-          {hasPendingAscCreation: false}));
-    }).catch((err) => {
-      console.error(err);
-
-      // if we don't do this, the spinner spins forever when there's an error
-      this.setState(
-        Object.assign(this.state,
-          {hasPendingAscCreation: false}));
-    })
+  showAscModal() {
+    this.setState(Object.assign(this.state, { showAscModal: true }));
   }
 
-  handlePrIdChange(event){
-    const num = parseInt(event.target.value, 10);
-    if(isNaN(num)) return;
-    this.setState(
-      Object.assign(this.state, {prId: num}));
-  }
-  handleRewardChange(event){
-    const num = parseInt(event.target.value, 10);
-    if(isNaN(num)) return;
-    this.setState(
-      Object.assign(this.state, {reward: num}));
+  closeAscModal(){
+    this.setState(Object.assign(this.state, {showAscModal: false}));
   }
 
   componentDidMount() {
@@ -87,16 +54,8 @@ class Project extends Component {
           </p>
         </div>
     return <div>
-        <input 
-          placeholder="Pull request ID"
-          value={this.state.prId} 
-          onChange={(event) => this.handlePrIdChange(event)} />
-        <input
-          placeholder="Reward Value"
-          value={this.state.reward}
-          onChange={(event) => this.handleRewardChange(event)} />
         <button 
-            onClick={() => this.createPullRequest()}
+            onClick={() => this.showAscModal()}
             disabled={this.state.hasPendingAscCreation}>
           Create Pull Request Proposal
         </button>
@@ -153,6 +112,16 @@ class Project extends Component {
                   gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/>
             </div>
 
+            <Modal
+              show={this.state.showAscModal}
+              onClose={this.closeAscModal.bind(this)}
+            >
+              <a style={closeStyle} onClick={this.closeAscModal.bind(this)}>X</a>
+              <CreatePullRequestAsc 
+                symbol={project.symbol}
+                daoAddress={project.daoAddress}
+              />
+            </Modal>
             {pullRequestFormContainer}
           </div>
         </div>
