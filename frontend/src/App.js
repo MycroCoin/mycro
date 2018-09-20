@@ -58,7 +58,6 @@ class App extends Component {
               toast.error("You're logged into the "+this.state.network+" network " +
                   "please make sure you're logged into the Ropsten network",
                 {
-                  autoClose: false,
                   position: toast.POSITION.BOTTOM_CENTER
                 });
           }
@@ -114,7 +113,9 @@ class App extends Component {
           <div className="App-body">
             {content}
           </div>
-          <ToastContainer />
+          <ToastContainer 
+            autoClose={false} 
+            position={ toast.POSITION.BOTTOM_RIGHT }/>
         </div>
       </BrowserRouter>
     </ApolloProvider>

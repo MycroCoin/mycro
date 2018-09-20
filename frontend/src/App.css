@@ -143,3 +143,11 @@ button:disabled, button:disabled:hover{
 .Modal h3{
   font-weight: 300;
 }
+
+.animated{
+  transition: transform 0.6s ease 0s, opacity 0.2s ease 0s;
+}
+
+.rotateY{
+  transform: rotateY(360deg);
+}
