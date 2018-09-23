@@ -57,15 +57,16 @@ class CreateProject extends Component {
 
     }).catch((err) => {
       console.log(err);
-      setTimeout(() => {
       toast.update(toastId, {
         render: <div>
             <p>Failed to create project <em>{name}</em></p>
           </div>,
         type: toast.TYPE.ERROR,
         className: 'rotateY animated'
-      }); }, 2000);
+      });
     })
+
+    this.props.onProjectCreateRequest();
   }
 
   componentDidMount() {

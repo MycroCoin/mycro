@@ -78,6 +78,18 @@ class Project extends Component {
     </div>;
   }
 
+  renderAscs(project){
+    const content = project.ascs.length ? <div>
+        <h2>Open ASCs</h2>
+        <AscList ascs={project.ascs} daoAddress={project.daoAddress}
+            gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/> 
+      </div> :
+        <h2> No ASCs open </h2>
+    return <div className="Ascs">
+      {content}
+    </div>
+  }
+
   renderProject(project){
     const pullRequestFormContainer = this.renderPullRequestForm();
 
@@ -106,11 +118,7 @@ class Project extends Component {
             {this.renderBalancesChart(project.balances)}
           </div>
           <div className="RightPanel">
-            <div className="Ascs">
-              <h2>Open ASCs</h2>
-              <AscList ascs={project.ascs} daoAddress={project.daoAddress}
-                  gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/>
-            </div>
+            {this.renderAscs(project)}
 
             <Modal
               show={this.state.showAscModal}
@@ -120,6 +128,7 @@ class Project extends Component {
               <CreatePullRequestAsc 
                 symbol={project.symbol}
                 daoAddress={project.daoAddress}
+                onAscCreateRequest={this.closeAscModal.bind(this)}
               />
             </Modal>
             {pullRequestFormContainer}
@@ -131,9 +140,10 @@ class Project extends Component {
 
   render() {
     return <Query
+      pollInterval={1000}
       query={Api.getProjectQuery(this.props.match.params.id)}>
       {({ loading, error, data}) => {
-        if(loading) return <Spinner />
+        if(loading && (!data || !data.project)) return <Spinner />
         if(error) return <p>
           Something went wrong. Please contact support@mycrocoin.org</p>
         return this.renderProject(data.project);

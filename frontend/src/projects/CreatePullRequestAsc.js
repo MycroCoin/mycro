@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {toChecksumAddress} from 'web3-utils';
 import Api from '../services/Api.js';
+import { toast } from 'react-toastify';
 
 class CreatePullRequestAsc extends Component {
   constructor(props){
@@ -9,7 +10,6 @@ class CreatePullRequestAsc extends Component {
     this.state = {
       prId: null,
       reward: null,
-      hasPendingAscCreation: false,
     }
   }
 
@@ -17,9 +17,18 @@ class CreatePullRequestAsc extends Component {
     let checksumRewardeeAddress = toChecksumAddress(window.web3.eth.accounts[0]);
     let checksumDaoAddress = toChecksumAddress(this.props.daoAddress);
 
-    this.setState(
-      Object.assign(this.state,
-        {hasPendingAscCreation: true}));
+
+    const toastId = toast.info(<div>
+        <h3>Creating ASC</h3>
+        <p>This could take a few minutes while your ASC is added to 
+        the Ethereum blockchain. Now might be a good time to get a coffee &nbsp;
+          <span role="img" aria-label="coffee">
+            ☕
+          </span>
+        </p>
+      </div>, {
+        className: "animated",
+      });
 
     Api.createAsc(
       checksumDaoAddress,
@@ -27,17 +36,25 @@ class CreatePullRequestAsc extends Component {
       this.state.reward,
       this.state.prId,
     ).then((data) => {
-      this.setState(
-        Object.assign(this.state,
-          {hasPendingAscCreation: false}));
+      toast.update(toastId, {
+        render: <div>
+            <p>ASC created.</p>
+          </div>,
+        type: toast.TYPE.SUCCESS,
+        className: 'rotateY animated'
+      });
     }).catch((err) => {
       console.error(err);
+      toast.update(toastId, {
+        render: <div>
+            <p>Failed to create ASC</p>
+          </div>,
+        type: toast.TYPE.ERROR,
+        className: 'rotateY animated'
+      });
+    });
 
-      // if we don't do this, the spinner spins forever when there's an error
-      this.setState(
-        Object.assign(this.state,
-          {hasPendingAscCreation: false}));
-    })
+    this.props.onAscCreateRequest();
   }
 
   handlePrIdChange(event){

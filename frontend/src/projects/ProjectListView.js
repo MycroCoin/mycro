@@ -50,6 +50,7 @@ class Projects extends Component {
     );
 
     return <Query
+      pollInterval={1000}
       query={Api.listProjectsQuery()}>
       {({ loading, error, data}) => {
         if(loading) return <Spinner />
@@ -74,7 +75,8 @@ class Projects extends Component {
                 <h2>Create Project</h2>
               </div>
               <div className="Body">
-              <CreateProjectForm />
+              <CreateProjectForm 
+                onProjectCreateRequest={this.closeCreateModal.bind(this)}/>
               </div>
             </div>
           </Modal>
