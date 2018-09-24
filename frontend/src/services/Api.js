@@ -39,6 +39,9 @@ const listProjectsQuery = () => {
         repoName,
         daoAddress,
         symbol,
+        ascs{
+          id
+        },
       }
     }
   `;

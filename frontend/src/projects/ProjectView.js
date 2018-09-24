@@ -68,7 +68,9 @@ class Project extends Component {
       return <div key={account.address}>
         <span className="BalanceColor"
             style={{backgroundColor: colors[index%colors.length].lowlight}}></span>
-        <AddressShortener address={account.address} />
+        <span className="BalanceAddress">
+          <AddressShortener address={account.address} />
+        </span>
         <span>{account.balance}</span>
       </div>
     });
@@ -79,7 +81,7 @@ class Project extends Component {
       </div>
       <div className="InfoBody BalanceBlockBody">
         <div className="BalanceChartWrapper">
-          <Pie data={pieData} width={200} height={200}/>
+          <Pie data={pieData} width={180} height={180}/>
         </div>
         <div className="BalanceListWrapper">
           {balancesList}

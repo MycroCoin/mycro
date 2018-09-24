@@ -32,22 +32,36 @@ class Projects extends Component {
   }
 
   render() {
-    const Project = (props) => (
-      <div className="ProjectListItem">
-        <p className="Title">
-          <Link to={"/projects/" + props.project.daoAddress}>
-            {props.project.repoName}
-          </Link>
-        </p>
-        <p className="Symbol">
-          {props.project.symbol}
-        </p>
-        <div className="GithubLink">
-          <a href={"http://github.com/mycroin/"+props.project.repoName} target="blank_">
-            [view on GitHub]<span className="GitHubLogo"></span></a>
+    const Project = (props) => {
+      const ascMessage = props.project.ascs.length === 0 ? 
+        <span>No ASCs are open</span> :
+        props.project.ascs.length === 1 ?
+        <span><span className="NumberTag">1</span>ASC open for review</span> :
+        <span><span className="NumberTag">{props.project.ascs.length}</span>ASCs open for review</span>
+
+      return <div className="ProjectListItem">
+        <Link to={"/projects/" + props.project.daoAddress}>
+          <div className="Header">
+            {props.project.symbol}
+          </div>
+        </Link>
+        <div className="Body">
+          <p className="Title">
+            <Link to={"/projects/" + props.project.daoAddress}>
+              {props.project.repoName}
+            </Link>
+          </p>
+          <p className="Subtitle">
+            {ascMessage}
+          </p>
+          <div className="GithubLink">
+            <a href={"http://github.com/mycroin/"+props.project.repoName}
+                target="blank_">
+              [view on GitHub]<span className="GitHubLogo"></span></a>
+          </div>
         </div>
       </div>
-    );
+    };
 
     return <Query
       pollInterval={1000}

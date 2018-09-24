@@ -73,3 +73,7 @@
 .BalanceBlockBody {
   display: flex;
 }
+.BalanceBlockBody .BalanceAddress {
+  min-width: 95px;
+  display: inline-block;
+}
