@@ -1,29 +1,64 @@
 import React, {Component} from 'react';
-import {BrowserRouter, Route, Link, Switch, Redirect} from 'react-router-dom'
+import {BrowserRouter, Link, Redirect, Route, Switch} from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { ApolloProvider } from "react-apollo";
+import {ApolloProvider} from "react-apollo";
 import client from './GraphqlClient.js';
-import { ToastContainer, toast } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import Api from './services/Api.js'
+import * as jwtAuth from './services/Jwt.js'
 import './App.css';
-import {
-  ProjectView,
-  ProjectListView,
-  AscView
-} from './projects';
-
+import {AscView, ProjectListView, ProjectView} from './projects';
 import ReactGA from 'react-ga';
+import {auth, firebase} from "./firebase";
+
 
 class App extends Component {
+
+  // Configure FirebaseUI.
+  uiConfig = {
+    // Popup signin flow rather than redirect flow.
+    signInFlow: 'redirect',
+    // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
+    // TODO make this a callback which dynamically returns the current URL
+    signInSuccessUrl: '/',
+    signInOptions: [
+      firebase.auth.GithubAuthProvider.PROVIDER_ID,
+    ],
+    callbacks: {
+      signInSuccessWithAuthResult: this.signInSuccessWithAuthResult,
+      signInFailure: this.signInFailure
+    }
+  };
+
+  signInSuccessWithAuthResult(authResult, redirectUrl) {
+    console.log("Successfully signed in User");
+
+    return Api.loginUser('github', authResult.credential.accessToken).then(({data}) => {
+      jwtAuth.setJwt(data.socialAuth.token);
+      return true;
+    }).catch((error) => {
+      console.error('There was a problem authenticating the user with the backend')
+      console.log(error);
+      return false;
+    })
+
+  }
+
+  signInFailure(error) {
+    alert("We couldn't sign you in. Please try again.");
+    console.log(error);
+  }
 
   constructor(props) {
     super(props);
 
-    this.state = {accounts: [], network: 'unknown'};
 
-    if(window.web3) {
+    // TODO the jwt and firebase auth may be out sync and should probably be normalized here
+    this.state = {accounts: [], network: 'unknown', signedIn: false};
+
+    if (window.web3) {
       window.web3.eth.getAccounts((err, accounts) => {
         if (err != null) {
           console.error("An error occurred: " + err);
@@ -54,12 +89,12 @@ class App extends Component {
             default:
               console.log('This is an unknown network.')
           }
-          if(this.state.network !== "Ropsten"){
-              toast.error("You're logged into the "+this.state.network+" network " +
-                  "please make sure you're logged into the Ropsten network",
-                {
-                  position: toast.POSITION.BOTTOM_CENTER
-                });
+          if (this.state.network !== "Ropsten") {
+            toast.error("You're logged into the " + this.state.network + " network " +
+              "please make sure you're logged into the Ropsten network",
+              {
+                position: toast.POSITION.BOTTOM_CENTER
+              });
           }
           this.setState(Object.assign(this.state, {network: networkName}))
         }
@@ -70,8 +105,25 @@ class App extends Component {
   componentDidMount() {
     ReactGA.pageview(window.location.pathname + window.location.search);
     this.context.mixpanel.track("App Mounted")
+
+    // See https://github.com/firebase/firebaseui-web-react#using-firebaseauth-with-local-state
+    this.unregisterAuthObserver = firebase.auth().onAuthStateChanged(
+      (user) => {
+        this.setState({signedIn: !!user})
+
+        if(!user) {
+          jwtAuth.clearJwt()
+        }
+      }
+    );
   }
 
+
+  // Make sure we un-register Firebase observers when the component unmounts.
+  // See https://github.com/firebase/firebaseui-web-react#using-firebaseauth-with-local-state
+  componentWillUnmount() {
+    this.unregisterAuthObserver();
+  }
 
 
   renderNoAccounts() {
@@ -96,7 +148,7 @@ class App extends Component {
   }
 
   render() {
-    const content = this.state.accounts.length === 0 ? 
+    const content = this.state.accounts.length === 0 ?
       this.renderNoAccounts() :
       this.renderWithAccounts()
 
@@ -104,18 +156,28 @@ class App extends Component {
       <BrowserRouter>
         <div className="App">
           <header className="App-header">
-            <h1 className="App-title"><Link to= "/projects">Mycro</Link></h1>
+            <h1 className="App-title"><Link to="/projects">Mycro</Link></h1>
             <p className="App-intro">
               - The future is open
             </p>
+            {/*TODO disable sign in until the user is logged into metamask*/}
+            {!this.state.signedIn ?
+              (<StyledFirebaseAuth uiConfig={this.uiConfig}
+                                   firebaseAuth={auth.getAuth()}/>) :
+              (
+                <div>
+                  <p>Hello {auth.getAuth().currentUser.displayName}!</p>
+                  <button onClick={() => auth.getAuth().signOut()}>Sign-out
+                  </button>
+                </div>)}
 
           </header>
           <div className="App-body">
             {content}
           </div>
-          <ToastContainer 
-            autoClose={false} 
-            position={ toast.POSITION.BOTTOM_RIGHT }/>
+          <ToastContainer
+            autoClose={false}
+            position={toast.POSITION.BOTTOM_RIGHT}/>
         </div>
       </BrowserRouter>
     </ApolloProvider>

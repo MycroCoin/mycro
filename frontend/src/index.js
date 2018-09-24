@@ -8,6 +8,9 @@ import './index.css';
 import ReactGA from 'react-ga';
 import mixpanel from 'mixpanel-browser';
 import MixpanelProvider from 'react-mixpanel';
+import firebase from './firebase/firebase';
+import * as auth from './firebase/auth';
+
 
 
 ReactGA.initialize('UA-123324766-1'); // google analytics
@@ -22,3 +25,5 @@ ReactDOM.render(
     </MixpanelProvider>,
     document.getElementById('root'));
 registerServiceWorker();
+
+export { firebase, auth };

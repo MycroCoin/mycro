@@ -5,6 +5,8 @@
   "dependencies": {
     "apollo-boost": "^0.1.10",
     "chart.js": "^1.1.1",
+    "firebase": "^5.5.1",
+    "firebaseui": "^3.4.1",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.9.2",
     "mixpanel-browser": "^2.22.4",
@@ -13,6 +15,7 @@
     "react-chartjs": "^1.2.0",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.4.1",
+    "react-firebaseui": "^3.0.7",
     "react-ga": "^2.5.3",
     "react-mixpanel": "0.0.11",
     "react-modal": "^3.5.1",

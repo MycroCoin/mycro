@@ -30,6 +30,18 @@ const createAsc = (checksumDaoAddress,
         }
     }`});
 
+const loginUser = (provider, accessToken) => {
+  return client.mutate({mutation: gql`
+    mutation {
+      socialAuth(provider: "${provider}", accessToken: "${accessToken}") {
+        social {
+          uid
+        }
+        token
+      }
+    }`});
+}
+
 //VIEWS
 const listProjectsQuery = () => {
   return gql`
@@ -74,4 +86,5 @@ export default {
   createProject,
   listProjectsQuery,
   getProjectQuery,
+  loginUser,
 };
