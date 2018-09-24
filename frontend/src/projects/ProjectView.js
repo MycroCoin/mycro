@@ -4,6 +4,7 @@ import { Pie } from 'react-chartjs';
 import Spinner from '../shared/Spinner.js';
 import AscList from './AscList.js';
 import CreatePullRequestAsc from './CreatePullRequestAsc.js';
+import AddressShortener from '../shared/AddressShortener.js';
 import { Query } from "react-apollo";
 import Api from '../services/Api.js';
 import ReactGA from 'react-ga';
@@ -42,17 +43,6 @@ class Project extends Component {
   }
 
   renderPullRequestForm() {
-    if(this.stateHasPendingAscCreation) 
-      return <div>
-        <Spinner />
-        <h1>Creating ASC</h1>
-        <p>This could take a few minutes while your ASC is posted to 
-        the Ethereum blockchain. Now might be a good time to get a coffee &nbsp;
-          <span role="img" aria-label="coffee">
-            ☕
-          </span>
-          </p>
-        </div>
     return <div>
         <button 
             onClick={() => this.showAscModal()}
@@ -62,29 +52,49 @@ class Project extends Component {
       </div>
   }
 
-  renderBalancesChart(balances){
+  renderBalanceBlock(balances){
+    const shortenAddress = 
+        address => address.slice(0,6) + "..." + address.slice(-4);
     const pieData = balances.map((account, index) => {
+      const shortenedAddress = shortenAddress(account.address);
       return {
         value: account.balance,
-        label: account.address,
+        label: shortenedAddress,
         color: colors[index%colors.length].lowlight, 
         highlight: colors[index%colors.length].highlight, 
       }
     });
+    const balancesList = balances.map((account, index) => {
+      return <div key={account.address}>
+        <span className="BalanceColor"
+            style={{backgroundColor: colors[index%colors.length].lowlight}}></span>
+        <AddressShortener address={account.address} />
+        <span>{account.balance}</span>
+      </div>
+    });
 
-    return <div>
-      <h2>Token Stakeholders</h2>
-      <Pie data={pieData} />
+    return <div className="InfoBlock">
+      <div className="InfoHeader">
+        <h2>Token Stakeholders</h2>
+      </div>
+      <div className="InfoBody BalanceBlockBody">
+        <div className="BalanceChartWrapper">
+          <Pie data={pieData} width={200} height={200}/>
+        </div>
+        <div className="BalanceListWrapper">
+          {balancesList}
+        </div>
+      </div>
     </div>;
   }
 
   renderAscs(project){
     const content = project.ascs.length ? <div>
-        <h2>Open ASCs</h2>
+        <h2>Open Pull Request ASCs</h2>
         <AscList ascs={project.ascs} daoAddress={project.daoAddress}
             gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/> 
       </div> :
-        <h2> No ASCs open </h2>
+        <h2> No Pull Request ASCs open </h2>
     return <div className="Ascs">
       {content}
     </div>
@@ -95,27 +105,35 @@ class Project extends Component {
 
     return (
       <div className="Page">
-        <h1>{project.repoName}</h1>
         <div className="PanelContainer">
           <div className="LeftPanel">
+            <h1>{project.repoName}</h1>
             <div className="InfoBlock">
-              <div className="InfoLine">
-                <span className="Descriptor">symbol</span>
-                <span className="Value">{project.symbol}</span>
+
+              <div className="InfoHeader">
+                <h2>Summary</h2>
               </div>
-              <div className="InfoLine">
-                <span className="Descriptor">address</span>
-                <span className="Value">{project.daoAddress}</span>
+              <div className="InfoBody">
+                <div className="InfoLine">
+                  <span className="Descriptor">symbol</span>
+                  <span className="Value">{project.symbol}</span>
+                </div>
+                <div className="InfoLine">
+                  <span className="Descriptor">address</span>
+                  <span className="Value">
+                    <AddressShortener address={project.daoAddress} /></span>
+                </div>
+                <div className="InfoLine">
+                  <span className="Descriptor">total supply</span>
+                  <span className="Value">TODO</span>
+                </div>
+                <a href={"http://github.com/mycrocoin/" + project.repoName}
+                    target="blank_">
+                  View Github Project <span className="GitHubLogo"></span></a>
               </div>
-              <div className="InfoLine">
-                <span className="Descriptor">total supply</span>
-                <span className="Value">TODO</span>
-              </div>
-              <a href={"http://github.com/mycrocoin/" + project.repoName} target="blank_">
-                View Github Project <span className="GitHubLogo"></span></a>
             </div>
 
-            {this.renderBalancesChart(project.balances)}
+            {this.renderBalanceBlock(project.balances)}
           </div>
           <div className="RightPanel">
             {this.renderAscs(project)}

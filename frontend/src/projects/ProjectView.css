@@ -1,14 +1,27 @@
 .Page{
 }
 .InfoBlock{
-  width: 400px;
   border-style: solid;
   border-radius: 3px;
   border-width: 1px;
   border-color: #aaa;
-  padding: 10px;
   margin-bottom: 20px;
-  font-size: 13px
+  font-size: 13px;
+  padding: 0 10px;
+}
+
+.InfoHeader{
+  margin-left: -10px;
+  margin-right: -10px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  padding: 10px;
+  background: linear-gradient(-50deg, #6ed0f7, #4068bf);
+}
+
+.InfoHeader h2{
+  margin:0;
+  color: white;
 }
 
 .InfoLine .Descriptor{
@@ -23,6 +36,7 @@
 
 .InfoLine .Value {
   font-size: 14px;
+  color: rgba(0,0,0,0.5);
 }
 
 .InfoBlock a{
@@ -30,15 +44,32 @@
   text-align: center;
 }
 
+.InfoBody{
+  padding: 10px 0px 20px 0px;
+}
+
 .PanelContainer{
+  padding-top: 30px;
   display: flex;
 }
 .LeftPanel {
   margin-right: 20px;
 }
+.LeftPanel h1{
+  margin-top: 0;
+}
 .RightPanel {
   flex-grow: 1;
 }
 .RightPanel h2{
-  margin-top: 0;
+  margin-top: 8px;
+  margin-bottom: 22px;
+}
+.BalanceColor {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+}
+.BalanceBlockBody {
+  display: flex;
 }
