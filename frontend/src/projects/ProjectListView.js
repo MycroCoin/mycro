@@ -37,7 +37,8 @@ class Projects extends Component {
         <span>No ASCs are open</span> :
         props.project.ascs.length === 1 ?
         <span><span className="NumberTag">1</span>ASC open for review</span> :
-        <span><span className="NumberTag">{props.project.ascs.length}</span>ASCs open for review</span>
+        <span><span className="NumberTag">
+            {props.project.ascs.length}</span>ASCs open for review</span>
 
       return <div className="ProjectListItem">
         <Link to={"/projects/" + props.project.daoAddress}>

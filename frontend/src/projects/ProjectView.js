@@ -93,7 +93,9 @@ class Project extends Component {
   renderAscs(project){
     const content = project.ascs.length ? <div>
         <h2>Open Pull Request ASCs</h2>
-        <AscList ascs={project.ascs} daoAddress={project.daoAddress}
+        <hr/>
+        <AscList ascs={project.ascs} 
+            symbol={project.symbol}
             gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/> 
       </div> :
         <h2> No Pull Request ASCs open </h2>

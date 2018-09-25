@@ -12,6 +12,7 @@
   border: 1px solid rgba(0,0,0,0.3);
   border-radius: 3px;
   position: absolute;
+  z-index: 1000;
   top: 20px;
   left: 5px;
   text-align: center;
