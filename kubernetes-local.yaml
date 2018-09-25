@@ -220,6 +220,13 @@ spec:
           value: db
         - name: DJANGO_DB_PORT
           value: "5432"
+        - name: GITHUB_ORGANIZATION
+          value: MycroCoin-dev
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-token
+              key: value
         - name: ETHEREUM_PRIVATE_KEY
           valueFrom:
             secretKeyRef:

@@ -84,6 +84,13 @@ spec:
           valueFrom:
             secretKeyRef:
               name: eth-private-key
+        - name: GITHUB_ORGANIZATION
+          value: MycroCoin
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-token
+              key: value
               key: value
         - name: INFURA_API_KEY
           valueFrom:
