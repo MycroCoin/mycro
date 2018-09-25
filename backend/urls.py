@@ -49,7 +49,7 @@ if 'runserver' in sys.argv:
         private_key = settings.ethereum_private_key()
         w3, mycro_contract, mycro_address, mycro_instance = deploy(
             compiler.get_contract_interface('mycro.sol', 'MycroCoin'), private_key=private_key, timeout=None)
-        Project.create_mycro_dao(mycro_address)
+        Project.create_mycro_dao(mycro_address, symbol=mycro_instance.symbol(), decimals=mycro_instance.decimals())
     elif len(mycro_project) > 1:
         raise ValueError("Shit there are two mycro DAOs")
 
