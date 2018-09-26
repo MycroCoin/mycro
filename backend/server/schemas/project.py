@@ -18,16 +18,6 @@ class ProjectException(Exception):
     """Exception for Project related problems"""
 
 
-def _get_dao_contract(dao_address):
-    compiler = ContractCompiler()
-    w3 = deploy.get_w3()
-
-    base_dao_interface = compiler.get_contract_interface('base_dao.sol',
-                                                         'BaseDao')
-    base_dao_contract = w3.eth.contract(abi=base_dao_interface['abi'],
-                                        address=dao_address)
-
-    return base_dao_contract
 
 
 class BalanceType(graphene.ObjectType):
@@ -93,7 +83,7 @@ class ProjectType(DjangoObjectType):
         if self is None:
             return None
 
-        base_dao_contract = _get_dao_contract(self.dao_address)
+        base_dao_contract = deploy.get_dao_contract(self.dao_address)
 
         return base_dao_contract.functions.threshold().call()
 
@@ -103,7 +93,7 @@ class ProjectType(DjangoObjectType):
 
         balances = {}
 
-        base_dao_contract = _get_dao_contract(self.dao_address)
+        base_dao_contract = deploy.get_dao_contract(self.dao_address)
 
         transactors = base_dao_contract.functions.getTransactors().call()
 

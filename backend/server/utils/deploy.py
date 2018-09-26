@@ -1,4 +1,5 @@
 from web3 import Web3, Account
+from backend.server.utils.contract_compiler import ContractCompiler
 from web3.providers import HTTPProvider
 from web3.middleware import geth_poa_middleware
 from web3.contract import ConciseContract
@@ -140,3 +141,18 @@ def get_or_create_event_loop():
         yield loop
     finally:
         loop.close()
+
+def _get_contract(address, filename, contract_name):
+    compiler = ContractCompiler()
+    w3 = get_w3()
+
+    interface = compiler.get_contract_interface(filename, contract_name)
+    contract = w3.eth.contract(abi=interface['abi'], address=address)
+
+    return contract
+
+def get_dao_contract(dao_address):
+    return _get_contract(dao_address, 'base_dao.sol', 'BaseDao')
+
+def get_asc_contract(asc_address):
+    return _get_contract(asc_address, 'base_asc.sol', 'BaseASC')
