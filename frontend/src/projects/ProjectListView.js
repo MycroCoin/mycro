@@ -43,7 +43,8 @@ class Projects extends Component {
       return <div className="ProjectListItem">
         <Link to={"/projects/" + props.project.daoAddress}>
           <div className="Header">
-            {props.project.symbol}
+            <div className="Background"></div>
+            <div className="Content">{props.project.symbol}</div>
           </div>
         </Link>
         <div className="Body">
@@ -75,7 +76,8 @@ class Projects extends Component {
         return <div>
           <div className="ProjectList">
             <h1>Projects</h1>
-            {data.allProjects.map(
+            {/*TODO once Mycro is running as a full DMOP we can stop filtering it here*/}
+            {data.allProjects.filter(p => !p.isMycroDao).map(
               project => (<Project key={project.id} project={project}/>)) }
 
             <button onClick={this.showCreateModal.bind(this)}>Create New Project</button>

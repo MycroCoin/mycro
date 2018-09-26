@@ -25,12 +25,12 @@ if(window.web3){
 
   deployHelper = (contract, ...args) => {
     //TODO use a promise here to avoid race condition
-    var a = window.web3.eth.accounts[0];
+    let a = window.web3.eth.accounts[0];
     // a = undefined;
     return deployer.deploy(contract, ...args, {from: a});
   };
 
-  var deployer = null;
+  let deployer = null;
   web3.version.getNetwork(function (err, id) {
     const network_id = id;
 

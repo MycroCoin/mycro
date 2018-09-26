@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import ReactGA from 'react-ga';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 import Spinner from '../shared/Spinner.js';
 import Api from '../services/Api.js';
@@ -45,11 +46,11 @@ class CreateProject extends Component {
       });
 
     Api.createProject(name).then(({data}) => {
-      const link = '/projects/' + data.createProject.projectAddress.address;
+      const link = '/projects/' + data.createProject.projectAddress;
+      console.log(data);
       toast.update(toastId, {
         render: <div>
-            <p>Project <em>{name}</em> created</p>
-            <a href={link}>View</a>
+            <p>Project <em>{name}</em> created [<Link to={link}>View</Link>]</p>
           </div>,
         type: toast.TYPE.SUCCESS,
         className: 'rotateY animated'

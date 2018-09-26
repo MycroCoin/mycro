@@ -1,11 +1,11 @@
 .AscList{
   border-radius: 3px;
-  /* border: 1px solid #aaa; */
-  padding: 5px 10px;
+  padding: 0 10px;
+  margin: 0;
 }
 
 .AscList li {
-  margin-bottom: 25px;
+  padding: 12px 0;
 }
 .AscList li .Body{
   display: flex;
@@ -49,7 +49,7 @@ ul{
   position: absolute;
   border-radius: 3px;
   z-index: 1;
-  transition: width 0.3s ease-out;
+  transition: width 0.15s ease-out 0.3s;
 }
 
 .AscList .ProgressBar .Message {

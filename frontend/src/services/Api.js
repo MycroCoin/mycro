@@ -51,6 +51,7 @@ const listProjectsQuery = () => {
         repoName,
         daoAddress,
         symbol,
+        isMycroDao,
         ascs{
           id
         },

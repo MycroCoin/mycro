@@ -15,6 +15,13 @@
   padding: 20px;
 }
 
+.App-header h1{
+  transition: 0.1s letter-spacing;
+}
+.App-header h1:hover{
+  letter-spacing: 1px;
+}
+
 .App-title {
   font-size: 1.5em;
   margin: 0;
@@ -23,6 +30,10 @@
 
 .App-title a {
   padding: 0;
+  text-decoration: none;
+}
+
+.App-title a:hover {
   text-decoration: none;
 }
 
@@ -38,14 +49,18 @@
   padding: 0 60px;
 }
 
-.App-body a {
+a {
   color: #4ac;
   font-weight: normal;
   text-decoration: none;
 }
 
-.App-body a:hover{
+a:hover{
   text-decoration: underline;
+}
+
+.Toastify a{
+  color: white;
 }
 
 .App-body button{
@@ -103,8 +118,12 @@ em {
   font-weight: bold;
 }
 
+h1 {
+  font-weight: 300;
+}
+
 h2 {
-  font-weight: 400;
+  font-weight: 300;
   color: #666;
 }
 

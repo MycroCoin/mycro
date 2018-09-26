@@ -161,15 +161,17 @@ class App extends Component {
               - The future is open
             </p>
             {/*TODO disable sign in until the user is logged into metamask*/}
-            {!this.state.signedIn ?
-              (<StyledFirebaseAuth uiConfig={this.uiConfig}
-                                   firebaseAuth={auth.getAuth()}/>) :
-              (
-                <div>
-                  <p>Hello {auth.getAuth().currentUser.displayName}!</p>
-                  <button onClick={() => auth.getAuth().signOut()}>Sign-out
-                  </button>
-                </div>)}
+            <div className="SignIn" style={{display: "none"}}>
+              {!this.state.signedIn ?
+                (<StyledFirebaseAuth uiConfig={this.uiConfig}
+                                     firebaseAuth={auth.getAuth()}/>) :
+                (
+                  <div>
+                    <p>Hello {auth.getAuth().currentUser.displayName}!</p>
+                    <button onClick={() => auth.getAuth().signOut()}>Sign-out
+                    </button>
+                  </div>)}
+            </div>
 
           </header>
           <div className="App-body">

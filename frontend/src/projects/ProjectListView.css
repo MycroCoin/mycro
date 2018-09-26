@@ -15,15 +15,35 @@
 
 .ProjectListItem .Header {
   color: white;
-  background: linear-gradient(-50deg, #6ed0f7, #4068bf);
   padding: 29px 8px;
   text-align: center;
   width: 40px;
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
   font-size: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.ProjectListItem .Header .Background{
+  background: linear-gradient(-50deg, #6ed0f7, #4068bf);
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  top: -20px;
+  bottom: -20px;
+  transition: 0.2s transform;
+  z-index: 5;
 }
 
+.ProjectListItem .Header:hover .Background{
+  background: linear-gradient(130deg, #6ed0f7, #4068bf);
+  transform: rotate(1turn);
+}
+
+.ProjectListItem .Header .Content {
+  position: relative;
+  z-index: 10;
+}
 
 .ProjectListItem .Body {
   padding: 10px 10px 5px 10px;
