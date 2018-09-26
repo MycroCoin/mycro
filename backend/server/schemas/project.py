@@ -32,7 +32,7 @@ def _get_dao_contract(dao_address):
 
 class BalanceType(graphene.ObjectType):
     address = graphene.String()
-    balance = graphene.Int()
+    balance = graphene.Float()  # float because sometimes balances exceed graphene.Int's max value of 2^53
 
 
 class PullRequestType(graphene.ObjectType):
@@ -117,6 +117,9 @@ class ProjectType(DjangoObjectType):
     def resolve_pull_requests(self: Project, info) -> List[
                                                           PullRequestType] or None:
         if self is None:
+            return None
+
+        if self.is_mycro_dao:
             return None
 
         pull_requests = []
