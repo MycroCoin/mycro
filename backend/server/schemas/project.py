@@ -122,7 +122,8 @@ class ProjectType(DjangoObjectType):
         pull_requests = []
         for pull_request in github.get_pull_requests(self.repo_name,
                                                      settings.github_organization(),
-                                                     settings.github_token()):
+                                                     settings.github_token(),
+                                                     state='all'):
             pull_requests.append(
                 PullRequestType(
                     additions=pull_request.additions,
