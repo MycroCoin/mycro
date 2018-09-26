@@ -8,10 +8,28 @@ from backend.server.utils.contract_compiler import ContractCompiler
 import backend.server.utils.deploy as deploy
 import backend.settings as settings
 
+def _get_asc_contract(asc_address):
+    compiler = ContractCompiler()
+    w3 = deploy.get_w3()
+
+    asc_interface = compiler.get_contract_interface('base_asc.sol',
+                                                         'BaseASC')
+    asc_contract = w3.eth.contract(abi=asc_interface['abi'],
+                                        address=asc_address)
+
+    return asc_contract
 
 class AscType(DjangoObjectType):
     class Meta:
         model = ASC
+
+    has_executed = graphene.Boolean()
+
+    def resolve_has_executed(self: ASC, info):
+
+        asc_contract = _get_asc_contract(self.address)
+
+        return asc_contract.functions.hasExecuted().call()
 
 
 class Query(ObjectType):
