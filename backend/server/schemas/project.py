@@ -72,6 +72,7 @@ class ProjectType(DjangoObjectType):
     threshold = graphene.Int()
     balances = graphene.List(BalanceType)
     pull_requests = graphene.List(PullRequestType)
+    url = graphene.String()
 
     def resolve_ascs(self: Project, info) -> List or None:
         if self is None:
@@ -151,6 +152,11 @@ class ProjectType(DjangoObjectType):
             )
 
         return pull_requests
+    def resolve_url(self: Project, info) -> str or None:
+        if self is None:
+            return None
+
+        return f'https://www.github.com/{settings.github_organization()}/{self.repo_name}'
 
 
 class Query(ObjectType):

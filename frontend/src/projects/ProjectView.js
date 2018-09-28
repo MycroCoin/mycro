@@ -96,7 +96,7 @@ class Project extends Component {
         <hr/>
         <AscList ascs={project.ascs} 
             symbol={project.symbol}
-            gitHubProject={"http://github.com/mycrocoin/" + project.repoName}/> 
+            gitHubProject={project.url}/>
       </div> :
         <h2> No Pull Request ASCs open </h2>
     return <div className="Ascs">
@@ -131,7 +131,7 @@ class Project extends Component {
                   <span className="Descriptor">total supply</span>
                   <span className="Value">TODO</span>
                 </div>
-                <a href={"http://github.com/mycrocoin/" + project.repoName}
+                <a href={project.url}
                     target="blank_">
                   View Github Project <span className="GitHubLogo"></span></a>
               </div>

@@ -57,7 +57,7 @@ class Projects extends Component {
             {ascMessage}
           </p>
           <div className="GithubLink">
-            <a href={"http://github.com/mycroin/"+props.project.repoName}
+            <a href={props.project.url}
                 target="blank_">
               [view on GitHub]<span className="GitHubLogo"></span></a>
           </div>
