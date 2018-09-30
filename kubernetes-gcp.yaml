@@ -5,6 +5,7 @@
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: mycro-app
   labels:
     service: server
   name: server
@@ -23,6 +24,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: mycro-app
   labels:
     service: frontend
   name: frontend
@@ -45,6 +47,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: mycro-app
   annotations:
   labels:
     service: server
@@ -65,7 +68,7 @@ spec:
         - name: DEPLOY_ENV
           value: ropsten
         - name: DJANGO_DB_NAME
-          value: django
+          value: mycro-app
         - name: DJANGO_DB_USER
           valueFrom:
             secretKeyRef:
@@ -84,13 +87,13 @@ spec:
           valueFrom:
             secretKeyRef:
               name: eth-private-key
+              key: value
         - name: GITHUB_ORGANIZATION
           value: MycroCoin
         - name: GITHUB_TOKEN
           valueFrom:
             secretKeyRef:
               name: github-token
-              key: value
               key: value
         - name: INFURA_API_KEY
           valueFrom:
@@ -99,7 +102,7 @@ spec:
               key: value
         - name: PYTHONUNBUFFERED
           value: "1"
-        image: gcr.io/mycrocoin/mycro-backend:v15
+        image: gcr.io/mycrocoin/mycro-backend:<MYCRO_IMAGE_LABEL>
         imagePullPolicy: IfNotPresent
         name: server
         ports:
@@ -127,6 +130,7 @@ status: {}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: mycro-app
   name: frontend
   labels:
     service: frontend
@@ -142,7 +146,7 @@ spec:
         env:
         - name: REACT_APP_GRAPHQL_ENDPOINT
           value: "http://35.230.122.2:8001/graphql"
-        image: gcr.io/mycrocoin/mycro-frontend:v12
+        image: gcr.io/mycrocoin/mycro-frontend:<MYCRO_IMAGE_LABEL>
         imagePullPolicy: IfNotPresent
         name: frontend
         ports:
@@ -154,6 +158,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: mycro-app
   labels:
     service: worker
   name: worker
@@ -182,7 +187,7 @@ spec:
         - name: DEPLOY_ENV
           value: ropsten
         - name: DJANGO_DB_NAME
-          value: django
+          value: mycro-app
         - name: DJANGO_DB_USER
           valueFrom:
             secretKeyRef:
@@ -209,7 +214,7 @@ spec:
             secretKeyRef:
               name: infura-api-key
               key: value
-        image: gcr.io/mycrocoin/mycro-backend:v15
+        image: gcr.io/mycrocoin/mycro-backend:<MYCRO_IMAGE_LABEL>
         imagePullPolicy: IfNotPresent
         name: worker
         resources: {}

@@ -2,25 +2,63 @@ image: docker:latest
 
 variables:
   DOCKER_DRIVER: overlay2
+  DOCKER_HOST: tcp://localhost:2375
 
-  TEST_IMAGE: registry.gitlab.com/mycro/mycro/tests
+  BASE_IMAGE_REGISTRY: gcr.io/mycrocoin
+  BACKEND_IMAGE: ${BASE_IMAGE_REGISTRY}/mycro-backend
+  FRONTEND_IMAGE: ${BASE_IMAGE_REGISTRY}/mycro-frontend
+  TEST_IMAGE: ${BASE_IMAGE_REGISTRY}/test
+
 
 stages:
   - test
+  - deploy
+
+before_script:
+  - docker login -u _json_key -p "$(echo $GCR_REGSITRY_SERVICE_ACCOUNT | base64 -d)" https://gcr.io
 
 unit_test_backend:
   stage: test
   services:
     - docker:dind
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-
     # need to support branches with / in the their name. Do this by replacing / with -
-    - TAG=$(echo $CI_COMMIT_REF_NAME | sed "s/\//-/g")
-    - IMAGE_WITH_TAG=$TEST_IMAGE:$TAG
+    - IMAGE_WITH_TAG=$TEST_IMAGE:$CI_COMMIT_REF_SLUG
 
     - docker pull $IMAGE_WITH_TAG || docker pull $TEST_IMAGE:latest || true
     - docker build --cache-from $IMAGE_WITH_TAG --cache-from $TEST_IMAGE:latest -t $IMAGE_WITH_TAG -t $TEST_IMAGE:latest -f server.Dockerfile .
     - docker push $IMAGE_WITH_TAG # push this first so we don't have to rebuild if tests fail
     - docker run $IMAGE_WITH_TAG python manage.py test -v 2
     - docker push $TEST_IMAGE:latest
+
+deploy to main cluster:
+  image: google/cloud-sdk:218.0.0
+  stage: deploy
+  services:
+    - docker:dind
+
+  script:
+    # warm up the cache
+    - docker pull ${BACKEND_IMAGE}:latest || true
+    - docker pull ${FRONTEND_IMAGE}:latest || true
+
+    # build the images
+    - docker build --cache-from ${BACKEND_IMAGE}:latest -f server.Dockerfile -t ${BACKEND_IMAGE}:pipeline-${CI_PIPELINE_ID} -t ${BACKEND_IMAGE}:sha-${CI_COMMIT_SHA} -t ${BACKEND_IMAGE}:latest .
+    - docker build --cache-from ${FRONTEND_IMAGE}:latest -f frontend.Dockerfile -t ${FRONTEND_IMAGE}:pipeline-${CI_PIPELINE_ID} -t ${FRONTEND_IMAGE}:sha-${CI_COMMIT_SHA} -t ${FRONTEND_IMAGE}:latest .
+
+    # push the new images
+    - docker push ${BACKEND_IMAGE}:latest
+    - docker push ${BACKEND_IMAGE}:sha-${CI_COMMIT_SHA}
+    - docker push ${BACKEND_IMAGE}:pipeline-${CI_PIPELINE_ID}
+
+    - docker push ${FRONTEND_IMAGE}:latest
+    - docker push ${FRONTEND_IMAGE}:sha-${CI_COMMIT_SHA}
+    - docker push ${FRONTEND_IMAGE}:pipeline-${CI_PIPELINE_ID}
+
+    # perform the deployment with the new images
+    - sed -e "s/<MYCRO_IMAGE_LABEL>/pipeline-${CI_PIPELINE_ID}/g" kubernetes-gcp.yaml | kubectl apply -f -
+
+  when: manual
+  only:
+    - master
+
