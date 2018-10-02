@@ -36,6 +36,8 @@ deploy to main cluster:
   stage: deploy
   services:
     - docker:dind
+  environment:
+    name: prod
 
   script:
     # warm up the cache
