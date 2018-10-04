@@ -10,6 +10,8 @@ import Api from '../services/Api.js';
 import ReactGA from 'react-ga';
 import PropTypes from 'prop-types'
 import './ProjectView.css';
+import Joyride from "react-joyride";
+import {ACTIONS, EVENTS, LIFECYCLE, STATUS} from 'react-joyride/es/constants';
 
 const colors = [
   {lowlight: "#f22929", highlight: "#ff7272"},
@@ -19,6 +21,9 @@ const colors = [
   {lowlight: "#3186d6", highlight: "#5dadf7"},
   {lowlight: "#442bd1", highlight: "#745df7"},
 ]
+const JOYRIDE_STATUS_STORAGE_KEY = 'project-view-joyride-status';
+const PROJECT_POLL_INTERVAL = 1000;
+
 
 class Project extends Component {
   constructor(props) {
@@ -26,8 +31,55 @@ class Project extends Component {
 
     this.state = {
       hasPendingAscCreation: false,
+      projectPollInterval: PROJECT_POLL_INTERVAL
     }
+    Object.assign(this.state, this.getInitialJoyrideState());
   }
+
+  getInitialJoyrideState() {
+    return {
+      joyrideRun: false,
+      joyrideSteps: [
+        {
+          target: "#repo-name",
+          content: "This is the name of this project",
+          placement: "bottom",
+        },
+        {
+          target: "#repo-summary",
+          content: "This is where you can find summary information about the repo like it's blockchain address, it's symbol and a link to it's GitHub repository.",
+          placement: "bottom",
+        },
+        {
+          target: "#dao-balances",
+          content: "This is where you can find token distribution information for the project. You can see who owns how many coins.",
+          placement: "bottom",
+        },
+        {
+          target: "#asc-list",
+          content: "Here are all the ASCs, open and closed.",
+          placement: "bottom",
+        },
+        {
+          target: "#create-pr-asc-button",
+          content: "This is how you can create your own ASC which we'll submit to the blockchain.",
+          placement: "bottom",
+        },
+      ],
+    };
+  }
+
+  handleJoyrideCallback = (data) => {
+    const {action, index, type, lifecycle, status} = data;
+
+    if (type === EVENTS.TOUR_END) {
+      // mark joyride as complete and resume regular project polling
+      // we use the presence of this item in localstorage to mark completion
+      localStorage.setItem(JOYRIDE_STATUS_STORAGE_KEY, 'finished')
+      this.setState({projectPollInterval: 1000})
+    }
+
+  };
 
   showAscModal() {
     this.setState(Object.assign(this.state, { showAscModal: true }));
@@ -40,13 +92,20 @@ class Project extends Component {
   componentDidMount() {
     ReactGA.pageview(window.location.pathname + window.location.search);
     this.context.mixpanel.track("ProjectView", this.state);
+
+    if (!localStorage.getItem(JOYRIDE_STATUS_STORAGE_KEY)) {
+      // start the joyride if we haven't marked it as complete
+      // also disable polling so that the page doesn't change during the joyride
+      this.setState({joyrideRun: true, projectPollInterval: 0})
+    }
   }
 
   renderPullRequestForm() {
     return <div>
         <button 
             onClick={() => this.showAscModal()}
-            disabled={this.state.hasPendingAscCreation}>
+            disabled={this.state.hasPendingAscCreation || !this.state.projectPollInterval}
+            id="create-pr-asc-button">
           Create Pull Request Proposal
         </button>
       </div>
@@ -75,7 +134,7 @@ class Project extends Component {
       </div>
     });
 
-    return <div className="InfoBlock">
+    return <div className="InfoBlock" id="dao-balances">
       <div className="InfoHeader">
         <h2>Token Stakeholders</h2>
       </div>
@@ -115,7 +174,7 @@ class Project extends Component {
         <hr/>
         {completedAscsList}
       </div>
-    return <div className="Ascs">
+    return <div className="Ascs" id="asc-list">
       {content}
     </div>
   }
@@ -127,8 +186,8 @@ class Project extends Component {
       <div className="Page">
         <div className="PanelContainer">
           <div className="LeftPanel">
-            <h1>{project.repoName}</h1>
-            <div className="InfoBlock">
+            <h1 id="repo-name">{project.repoName}</h1>
+            <div className="InfoBlock" id="repo-summary">
 
               <div className="InfoHeader">
                 <h2>Summary</h2>
@@ -185,7 +244,20 @@ class Project extends Component {
         if(loading && (!data || !data.project)) return <Spinner />
         if(error) return <p>
           Something went wrong. Please contact support@mycrocoin.org</p>
-        return this.renderProject(data.project);
+        return (
+          <div>
+            <Joyride
+              continuous
+              scrollToFirstStep
+              showProgress
+              showSkipButton
+              run={this.state.joyrideRun}
+              steps={this.state.joyrideSteps}
+              callback={this.handleJoyrideCallback}
+            />
+            {this.renderProject(data.project)}
+          </div>
+          );
       }}
     </Query>
   }

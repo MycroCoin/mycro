@@ -24,7 +24,7 @@ class Projects extends Component {
       showCreateModal: false,
       projectListPollInterval: PROJECT_LIST_POLL_INTERVAL,
     };
-    Object.assign(this.state, this.getInitialJoyrideState())
+    Object.assign(this.state, this.getInitialJoyrideState());
   }
 
   getInitialJoyrideState() {
@@ -71,7 +71,7 @@ class Projects extends Component {
     if (type === EVENTS.TOUR_END) {
       // mark joyride as complete and resume regular project polling
       // we use the presence of this item in localstorage to mark completion
-      localStorage.setItem(JOYRIDE_STATUS_STORAGE_KEY, '')
+      localStorage.setItem(JOYRIDE_STATUS_STORAGE_KEY, 'finished')
       this.setState({projectListPollInterval: 1000})
     }
 
