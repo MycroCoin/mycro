@@ -33,12 +33,14 @@ class Projects extends Component {
 
   render() {
     const Project = (props) => {
-      const ascMessage = props.project.ascs.length === 0 ? 
-        <span>No ASCs are open</span> :
-        props.project.ascs.length === 1 ?
-        <span><span className="NumberTag">1</span>ASC open for review</span> :
-        <span><span className="NumberTag">
-            {props.project.ascs.length}</span>ASCs open for review</span>
+      const numOpenAscs = 
+        props.project.ascs.filter(asc => asc.state === "open").length;
+      const ascMessage = numOpenAscs === 0 ? 
+            <span>No ASCs are open</span> :
+            numOpenAscs === 1 ?
+            <span><span className="NumberTag">1</span>ASC open for review</span> :
+            <span><span className="NumberTag">
+                {props.project.ascs.length}</span>ASCs open for review</span>
 
       return <div className="ProjectListItem">
         <Link to={"/projects/" + props.project.daoAddress}>

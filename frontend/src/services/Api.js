@@ -54,7 +54,7 @@ const listProjectsQuery = () => {
         isMycroDao,
         url,
         ascs{
-          id
+          state
         },
       }
     }
@@ -75,10 +75,17 @@ const getProjectQuery = (address) => {
         reward,
         prId,
         address,
+        voters,
+        hasExecuted,
       },
       balances {
-        address
+        address,
         balance
+      },
+      pullRequests {
+        number,
+        title,
+        state
       }
     }
   }`

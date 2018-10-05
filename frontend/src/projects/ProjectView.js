@@ -91,14 +91,30 @@ class Project extends Component {
   }
 
   renderAscs(project){
-    const content = project.ascs.length ? <div>
-        <h2>Open Pull Request ASCs</h2>
+    const ascsWithPrData = project.ascs.map(asc => {
+      const prData = project.pullRequests.find(pr => pr.number === asc.prId);
+      return Object.assign({}, asc, prData);
+    });
+    const openAscs = ascsWithPrData.filter(asc => !asc.hasExecuted);
+    const completedAscs = ascsWithPrData.filter(asc => asc.hasExecuted);
+    const openAscsList = openAscs.length ? <AscList ascs={openAscs} 
+        symbol={project.symbol}
+        projectAddress={project.daoAddress}
+        gitHubProject={project.url}/> :
+        <h3>No Pull Request ASCs are open</h3>
+    const completedAscsList = completedAscs.length ? <AscList ascs={completedAscs} 
+        symbol={project.symbol}
+        projectAddress={project.daoAddress}
+        gitHubProject={project.url}/> : 
+        <h3>No Recently Merged Pull Requests</h3>
+    const content = <div>
+        <h2>Open Pull Request Proposals</h2>
         <hr/>
-        <AscList ascs={project.ascs} 
-            symbol={project.symbol}
-            gitHubProject={project.url}/>
-      </div> :
-        <h2> No Pull Request ASCs open </h2>
+        {openAscsList}
+        <h2>Recently Merged Pull Requests</h2>
+        <hr/>
+        {completedAscsList}
+      </div>
     return <div className="Ascs">
       {content}
     </div>
@@ -150,6 +166,7 @@ class Project extends Component {
               <CreatePullRequestAsc 
                 symbol={project.symbol}
                 daoAddress={project.daoAddress}
+                pullRequests={project.pullRequests}
                 onAscCreateRequest={this.closeAscModal.bind(this)}
               />
             </Modal>

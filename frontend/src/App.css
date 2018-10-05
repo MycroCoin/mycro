@@ -62,6 +62,9 @@ a:hover{
 .Toastify a{
   color: white;
 }
+.Toastify h3{
+  color: white;
+}
 
 .App-body button{
   font-size: 20px;
@@ -127,6 +130,11 @@ h2 {
   color: #666;
 }
 
+h3{
+  font-weight: 300;
+  color: #888;
+}
+
 .Modal{
   padding: 0px;
 }
@@ -160,7 +168,7 @@ button:disabled, button:disabled:hover{
 }
 
 .Modal h3{
-  font-weight: 300;
+  color: white;
 }
 
 .animated{

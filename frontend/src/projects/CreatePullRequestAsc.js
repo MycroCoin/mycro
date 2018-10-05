@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {toChecksumAddress} from 'web3-utils';
 import Api from '../services/Api.js';
 import { toast } from 'react-toastify';
+import Select from 'react-select';
 
 class CreatePullRequestAsc extends Component {
   constructor(props){
@@ -57,11 +58,10 @@ class CreatePullRequestAsc extends Component {
     this.props.onAscCreateRequest();
   }
 
-  handlePrIdChange(event){
-    let num = parseInt(event.target.value, 10);
-    if(isNaN(num) || num + '' !== event.target.value) num = null;
+  handlePrIdChange(prId){
+    console.log(prId);
     this.setState(
-      Object.assign(this.state, {prId: num}));
+      Object.assign(this.state, {prId: prId.value}));
   }
   handleRewardChange(event){
     let num = parseInt(event.target.value, 10);
@@ -71,19 +71,23 @@ class CreatePullRequestAsc extends Component {
   }
 
   render() {
+    const pullRequestOptions = this.props.pullRequests
+        .filter(pr => pr.state === "open")
+        .map(pr => 
+            ( {value: pr.number, label: pr.title + " (#" + pr.number +")"} ));
     return <div className="Modal">
       <div className="Header">
         <h2>Create Pull Request ASC</h2>
       </div>
       <div className="Body">
         <h3>Pull Request ID:</h3>
-        <input 
-          placeholder="Pull request ID"
-          onChange={(event) => this.handlePrIdChange(event)} />
+        <Select 
+            onChange={this.handlePrIdChange.bind(this)}
+            options={pullRequestOptions}/>
         <h3>Reward in <em>{this.props.symbol}</em>:</h3>
         <input
           placeholder="Reward Value"
-          onChange={(event) => this.handleRewardChange(event)} />
+          onChange={this.handleRewardChange.bind(this)} />
         <button 
             disabled={!this.state.reward  || !this.state.prId}
             onClick={() => this.createPullRequest()}>
