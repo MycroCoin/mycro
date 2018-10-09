@@ -10,6 +10,9 @@ class AscList extends Component {
     const gitHubProject = this.props.gitHubProject;
     const symbol = this.props.symbol;
     const projectAddress = this.props.projectAddress;
+    const userBalance = this.props.userBalance;
+    const threshold = this.props.threshold;
+    const projectTotalSupply = this.props.projectTotalSupply;
 
     const renderedASCs = ascs.map(asc => {
       return <AscListItem 
@@ -17,7 +20,10 @@ class AscList extends Component {
           gitHubProject={gitHubProject}
           projectAddress={projectAddress}
           symbol={symbol}
-          asc={asc} />
+          asc={asc}
+          userBalance={userBalance}
+          threshold={threshold}
+          projectTotalSupply={projectTotalSupply}/>
     });
 
     return <ul className="AscList">{renderedASCs}</ul>;
@@ -60,7 +66,7 @@ class AscListItem extends Component {
     const disabled = hasVoted || this.state.pendingVote;
     const message = hasVoted ? <span>Already<br/>voted</span> :
       this.state.pendingVote ? <span>Voting<br/>(please wait)</span> : <span>
-          Vote to Accept <br/>(with 512 {this.props.symbol})</span>;
+          Vote to Accept <br/>(with {this.props.userBalance} {this.props.symbol})</span>;
     return <button
         disabled={disabled}
         onClick={this.voteAccept.bind(this)}
@@ -71,17 +77,20 @@ class AscListItem extends Component {
   }
 
   renderProgressBar(){
-    const progress = 20.5;
+    const progress = this.props.asc.voteAmount;
     const potentialProgress = Math.min(progress + 
-        (this.state.showPotentialProgress ? 13 : 0), 100);
+        (this.state.showPotentialProgress ? this.props.userBalance: 0), this.props.projectTotalSupply);
+
+    const progressPercentage = progress / this.props.projectTotalSupply * 100;
+    const potentialProgressPercentage = potentialProgress / this.props.projectTotalSupply * 100;
     return <div className="ProgressBar">
-              <div className="Progress" style={{width: progress + "%"}}>
+              <div className="Progress" style={{width: progressPercentage + "%"}}>
               </div>
               <div className="PotentialProgress" 
-                  style={{width: potentialProgress + "%"}}>
+                  style={{width: potentialProgressPercentage + "%"}}>
               </div>
               <div className="Message">
-                <em>123</em> votes of <em>600</em> (20.5%)
+                <em>{progress}</em> votes of <em>{this.props.projectTotalSupply}</em> ({progressPercentage}%)
               </div>
           </div>
   }

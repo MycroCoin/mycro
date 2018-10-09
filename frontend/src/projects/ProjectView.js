@@ -12,6 +12,7 @@ import PropTypes from 'prop-types'
 import './ProjectView.css';
 import Joyride from "react-joyride";
 import {ACTIONS, EVENTS, LIFECYCLE, STATUS} from 'react-joyride/es/constants';
+import {toChecksumAddress} from 'web3-utils';
 
 const colors = [
   {lowlight: "#f22929", highlight: "#ff7272"},
@@ -149,23 +150,41 @@ class Project extends Component {
     </div>;
   }
 
-  renderAscs(project){
-    const ascsWithPrData = project.ascs.map(asc => {
+  renderAscList(project, ascs) {
+    let userBalance = project.balances.find(balance => balance.address === toChecksumAddress(window.web3.eth.accounts[0]));
+    if(userBalance) {
+      userBalance = userBalance.balance;
+    } else {
+      userBalance = 0;
+    }
+
+    const threshold = project.threshold;
+    return <AscList ascs={ascs}
+        symbol={project.symbol}
+        projectAddress={project.daoAddress}
+        gitHubProject={project.url}
+        userBalance={userBalance}
+        threshold={threshold}
+        projectTotalSupply={project.totalSupply}/>
+  }
+
+  renderAllAscs(project){
+    const ascs = project.ascs.map(asc => {
       const prData = project.pullRequests.find(pr => pr.number === asc.prId);
       return Object.assign({}, asc, prData);
     });
-    const openAscs = ascsWithPrData.filter(asc => !asc.hasExecuted);
-    const completedAscs = ascsWithPrData.filter(asc => asc.hasExecuted);
-    const openAscsList = openAscs.length ? <AscList ascs={openAscs} 
-        symbol={project.symbol}
-        projectAddress={project.daoAddress}
-        gitHubProject={project.url}/> :
-        <h3>No Pull Request ASCs are open</h3>
-    const completedAscsList = completedAscs.length ? <AscList ascs={completedAscs} 
-        symbol={project.symbol}
-        projectAddress={project.daoAddress}
-        gitHubProject={project.url}/> : 
-        <h3>No Recently Merged Pull Requests</h3>
+
+
+
+    const openAscs = ascs.filter(asc => !asc.hasExecuted);
+    const completedAscs = ascs.filter(asc => asc.hasExecuted);
+
+    const openAscsList = openAscs.length ? this.renderAscList(project, openAscs) :
+        <h3>No Pull Request ASCs are open</h3>;
+
+    const completedAscsList = completedAscs.length ? this.renderAscList(project, completedAscs) :
+        <h3>No Recently Merged Pull Requests</h3>;
+
     const content = <div>
         <h2>Open Pull Request Proposals</h2>
         <hr/>
@@ -204,7 +223,7 @@ class Project extends Component {
                 </div>
                 <div className="InfoLine">
                   <span className="Descriptor">total supply</span>
-                  <span className="Value">TODO</span>
+                  <span className="Value">{project.totalSupply}</span>
                 </div>
                 <a href={project.url}
                     target="blank_">
@@ -215,7 +234,7 @@ class Project extends Component {
             {this.renderBalanceBlock(project.balances)}
           </div>
           <div className="RightPanel">
-            {this.renderAscs(project)}
+            {this.renderAllAscs(project)}
 
             <Modal
               show={this.state.showAscModal}

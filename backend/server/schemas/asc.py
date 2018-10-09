@@ -1,3 +1,5 @@
+from typing import List
+
 import graphene
 from graphene import ObjectType
 from graphene_django.types import DjangoObjectType
@@ -13,6 +15,11 @@ class ASCError(Exception):
     """Dummy class for ASC problems"""
     pass
 
+def _get_voters_for_asc(asc: ASC) -> List[str]:
+    dao_contract = deploy.get_dao_contract(asc.project.dao_address)
+
+    return dao_contract.functions.getAscVotes(asc.address).call()
+
 
 class AscType(DjangoObjectType):
     class Meta:
@@ -20,16 +27,25 @@ class AscType(DjangoObjectType):
 
     has_executed = graphene.Boolean()
     voters = graphene.List(graphene.String)
+    vote_amount = graphene.Float()
 
     def resolve_has_executed(self: ASC, info):
         asc_contract = deploy.get_asc_contract(self.address)
 
         return asc_contract.functions.hasExecuted().call()
 
-    def resolve_voters(self: ASC, info):
+    def resolve_voters(self: ASC, info) -> List[str]:
+        return _get_voters_for_asc(self)
+
+    def resolve_vote_amount(self: ASC, info) -> float:
+        voters = _get_voters_for_asc(self)
         dao_contract = deploy.get_dao_contract(self.project.dao_address)
 
-        return dao_contract.functions.getAscVotes(self.address).call()
+        vote_counts = 0.0
+        for voter in voters:
+            vote_counts += dao_contract.functions.balanceOf(voter).call()
+
+        return vote_counts
 
 
 class Query(ObjectType):

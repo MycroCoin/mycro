@@ -70,6 +70,8 @@ const getProjectQuery = (address) => {
       repoName,
       symbol,
       url, 
+      threshold,
+      totalSupply,
       ascs{
         id,
         reward,
@@ -77,6 +79,7 @@ const getProjectQuery = (address) => {
         address,
         voters,
         hasExecuted,
+        voteAmount,
       },
       balances {
         address,

@@ -69,10 +69,12 @@ class ProjectType(DjangoObjectType):
         model = Project
 
     ascs = graphene.List(AscType)
-    threshold = graphene.Int()
+    threshold = graphene.Float()
+    total_supply = graphene.Float()
     balances = graphene.List(BalanceType)
     pull_requests = graphene.List(PullRequestType)
     url = graphene.String()
+
 
     def resolve_ascs(self: Project, info) -> List or None:
         if self is None:
@@ -80,7 +82,15 @@ class ProjectType(DjangoObjectType):
 
         return ASC.objects.filter(project__dao_address=self.dao_address)
 
-    def resolve_threshold(self: Project, info) -> int or None:
+    def resolve_total_supply(self: Project, info) -> float or None:
+        if self is None:
+            return None
+
+        base_dao_contract = deploy.get_dao_contract(self.dao_address)
+
+        return base_dao_contract.functions.totalSupply().call()
+
+    def resolve_threshold(self: Project, info) -> float or None:
         if self is None:
             return None
 
