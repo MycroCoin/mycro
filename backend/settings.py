@@ -165,7 +165,7 @@ CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000'
     '192.168.99.100:30080' # ip of paymahn's minikube
-    '35.197.14.86:80' # ip of frontend load balancer for production
+    '35.230.10.99:80' # ip of frontend load balancer for production
     'app.mycrocoin.org:80'
 )
 

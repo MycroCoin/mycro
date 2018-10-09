@@ -11,6 +11,7 @@ metadata:
   name: server
 spec:
   type: LoadBalancer
+#  loadBalancerIP: "YOUR.IP.ADDRESS.HERE" # TODO fill this out once we upgrade from free plan in GCP
   ports:
   - name: "8001"
     port: 8001
@@ -30,6 +31,7 @@ metadata:
   name: frontend
 spec:
   type: LoadBalancer
+  loadBalancerIP: "35.230.10.99"
   ports:
   - name: "3000"
     port: 80

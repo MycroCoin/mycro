@@ -54,7 +54,6 @@ class Projects extends Component {
       // also disable polling so that the project list doesn't change during the joyride
       this.setState({joyrideRun: true, projectListPollInterval: 0})
     }
-    let a = 'c';
   }
 
   showCreateModal() {
