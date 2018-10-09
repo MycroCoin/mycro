@@ -174,14 +174,11 @@ class Project extends Component {
       return Object.assign({}, asc, prData);
     });
 
-
-
     const openAscs = ascs.filter(asc => !asc.hasExecuted);
     const completedAscs = ascs.filter(asc => asc.hasExecuted);
 
     const openAscsList = openAscs.length ? this.renderAscList(project, openAscs) :
-        <h3>No Pull Request ASCs are open</h3>;
-
+        <h3>No Pull Request Proposals are open</h3>
     const completedAscsList = completedAscs.length ? this.renderAscList(project, completedAscs) :
         <h3>No Recently Merged Pull Requests</h3>;
 
@@ -189,7 +186,7 @@ class Project extends Component {
         <h2>Open Pull Request Proposals</h2>
         <hr/>
         {openAscsList}
-        <h2>Recently Merged Pull Requests</h2>
+        <h2>Recently Merged Pull Requests Proposals</h2>
         <hr/>
         {completedAscsList}
       </div>
