@@ -54,7 +54,7 @@ const listProjectsQuery = () => {
         isMycroDao,
         url,
         ascs{
-          state
+          hasExecuted
         },
       }
     }

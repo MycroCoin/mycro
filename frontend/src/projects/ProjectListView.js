@@ -34,7 +34,7 @@ class Projects extends Component {
   render() {
     const Project = (props) => {
       const numOpenAscs = 
-        props.project.ascs.filter(asc => asc.state === "open").length;
+        props.project.ascs.filter(asc => !asc.hasExecuted).length;
       const ascMessage = numOpenAscs === 0 ? 
             <span>No ASCs are open</span> :
             numOpenAscs === 1 ?
