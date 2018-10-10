@@ -62,6 +62,35 @@ class TestDeploy(unittest.TestCase):
         w3.eth.waitForTransactionReceipt.assert_called_once_with(tx_hash, timeout=10)
 
     @patch('backend.server.utils.deploy.Account')
+    def test_deploy_contract_with_private_key_on_genesis_block(self, account_mock):
+        w3 = MagicMock()
+        latest_block = w3.eth.getBlock.return_value
+        latest_block.number = 0
+        latest_block.gasLimit = 1024
+
+        contract_interface = MagicMock()
+        args = (1,)
+        private_key = 'abcde'
+        account = MagicMock()
+        account_mock.privateKeyToAccount.return_value = account
+
+        deploy._deploy_contract(w3, contract_interface, *args, private_key=private_key, timeout=10)
+
+        contract_interface.__getitem__.assert_has_calls([call('abi'), call('bin'), call('abi')])
+
+        w3.eth.contract.return_value.constructor.assert_called_with(*args)
+        account_mock.privateKeyToAccount.assert_called_once_with(private_key)
+
+        txn = w3.eth.contract.return_value.constructor.return_value.buildTransaction
+        txn.assert_called_once_with(
+            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 1022, 'gasPrice': 5000000000})
+
+        w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, private_key)
+        tx_hash = w3.eth.sendRawTransaction.return_value
+
+        w3.eth.waitForTransactionReceipt.assert_called_once_with(tx_hash, timeout=10)
+
+    @patch('backend.server.utils.deploy.Account')
     def test_deploy_contract_with_private_key(self, account_mock):
         w3 = MagicMock()
         contract_interface = MagicMock()
@@ -79,7 +108,7 @@ class TestDeploy(unittest.TestCase):
 
         txn = w3.eth.contract.return_value.constructor.return_value.buildTransaction
         txn.assert_called_once_with(
-            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 6000000, 'gasPrice': 5000000000})
+            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': w3.eth.getBlock.return_value.gasLimit, 'gasPrice': 5000000000})
 
         w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, private_key)
         tx_hash = w3.eth.sendRawTransaction.return_value
