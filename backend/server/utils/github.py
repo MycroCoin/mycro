@@ -2,7 +2,9 @@ import github
 import github.PaginatedList
 import backend.settings as settings
 import re
+import cachetools.func
 
+CACHE_TTL = 3
 
 def create_repo(repo_name, organization):
     check_repo_name(repo_name)
@@ -13,6 +15,7 @@ def create_repo(repo_name, organization):
     org.create_repo(name=repo_name, auto_init=True)
 
 
+@cachetools.func.ttl_cache(ttl=CACHE_TTL)
 def get_pull_requests(repo_name: str, organization: str, token: str,
                       **kwargs) -> github.PaginatedList:
     """
@@ -46,6 +49,7 @@ def check_repo_name(repo_name: str):
             f"'{repo_name}' is invalid. It must match the regex '{regex}'")
 
 
+@cachetools.func.ttl_cache(ttl=CACHE_TTL)
 def list_repos(organization_name: str, github_token: str):
     gh = github.Github(github_token)
     org = gh.get_organization(organization_name)
