@@ -156,10 +156,13 @@ class App extends Component {
       <BrowserRouter>
         <div className="App">
           <header className="App-header">
-            <h1 className="App-title"><Link to="/projects">Mycro</Link></h1>
-            <p className="App-intro">
-              - The future is open
-            </p>
+            <div style={{display: 'flex'}}>
+              <h1 className="App-title"><Link to="/projects">Mycro</Link></h1>
+              <p className="App-intro">
+                - The future is open
+              </p>
+            </div>
+            <a className="button" href="./whitepaper.pdf" target="_blank">Read the Whitepaper</a>
             {/*TODO disable sign in until the user is logged into metamask*/}
             <div className="SignIn" style={{display: "none"}}>
               {!this.state.signedIn ?

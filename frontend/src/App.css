@@ -8,11 +8,17 @@
   padding: 20px 60px;
   color: white;
   display: flex;
+  justify-content: space-between;
 }
 
 .App-header a{
   color: white;
-  padding: 20px;
+  border-color: white;
+}
+
+.App-header a:hover{
+  border-color: rgba(200,255,200,1);
+  color: rgba(200,255,200,1);
 }
 
 .App-header h1{
@@ -66,7 +72,7 @@ a:hover{
   color: white;
 }
 
-.App-body button{
+button{
   font-size: 20px;
   font-weight: 300;
   background-color: white;
@@ -78,7 +84,7 @@ a:hover{
   cursor: pointer;
 }
 
-.App-body .button{
+.button{
   font-size: 20px;
   font-weight: bold;
   border-color: #3a1;
@@ -90,12 +96,16 @@ a:hover{
   padding: 1px 7px 2px 7px;
 }
 
-.App-body button:hover{
+.App-header .button{
+  margin: 0;
+}
+
+button:hover{
   color: #69dc49;
   border-color: #69dc49;
   text-decoration: none;
 }
-.App-body .button:hover{
+.button:hover{
   color: #69dc49;
   border-color: #69dc49;
   text-decoration: none;
