@@ -58,12 +58,12 @@ class Project extends Component {
         },
         {
           target: "#asc-list",
-          content: "Here are all the ASCs, open and closed.",
+          content: "Here are all the proposals, open and closed.",
           placement: "bottom",
         },
         {
           target: "#create-pr-asc-button",
-          content: "This is how you can create your own ASC which we'll submit to the blockchain.",
+          content: "This is how you can create your own proposals which we'll submit to the blockchain.",
           placement: "bottom",
         },
       ],

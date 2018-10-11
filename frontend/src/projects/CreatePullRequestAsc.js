@@ -20,8 +20,8 @@ class CreatePullRequestAsc extends Component {
 
 
     const toastId = toast.info(<div>
-        <h3>Creating ASC</h3>
-        <p>This could take a few minutes while your ASC is added to 
+        <h3>Creating Proposal</h3>
+        <p>This could take a few minutes while your proposal is added to
         the Ethereum blockchain. Now might be a good time to get a coffee &nbsp;
           <span role="img" aria-label="coffee">
             ☕
@@ -39,7 +39,7 @@ class CreatePullRequestAsc extends Component {
     ).then((data) => {
       toast.update(toastId, {
         render: <div>
-            <p>ASC created.</p>
+            <p>Proposal created.</p>
           </div>,
         type: toast.TYPE.SUCCESS,
         className: 'rotateY animated'
@@ -48,7 +48,7 @@ class CreatePullRequestAsc extends Component {
       console.error(err);
       toast.update(toastId, {
         render: <div>
-            <p>Failed to create ASC</p>
+            <p>Failed to create proposal</p>
           </div>,
         type: toast.TYPE.ERROR,
         className: 'rotateY animated'
@@ -77,7 +77,7 @@ class CreatePullRequestAsc extends Component {
             ( {value: pr.number, label: pr.title + " (#" + pr.number +")"} ));
     return <div className="Modal">
       <div className="Header">
-        <h2>Create Pull Request ASC</h2>
+        <h2>Create Pull Request Proposal</h2>
       </div>
       <div className="Body">
         <h3>Pull Request ID:</h3>
