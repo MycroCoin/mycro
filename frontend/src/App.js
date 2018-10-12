@@ -162,7 +162,7 @@ class App extends Component {
                 - The future is open
               </p>
             </div>
-            <a className="button" href="./whitepaper.pdf" target="_blank">Read the Whitepaper</a>
+            {/*<a className="button" href="./whitepaper.pdf" target="_blank">Read the Whitepaper</a>*/}
             {/*TODO disable sign in until the user is logged into metamask*/}
             <div className="SignIn" style={{display: "none"}}>
               {!this.state.signedIn ?
