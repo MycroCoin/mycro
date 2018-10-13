@@ -83,7 +83,7 @@ class TestDeploy(unittest.TestCase):
 
         txn = w3.eth.contract.return_value.constructor.return_value.buildTransaction
         txn.assert_called_once_with(
-            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 1022, 'gasPrice': 5000000000})
+            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 1022, 'gasPrice': 25000000000})
 
         w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, private_key)
         tx_hash = w3.eth.sendRawTransaction.return_value
