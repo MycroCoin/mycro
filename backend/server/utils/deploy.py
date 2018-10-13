@@ -38,7 +38,7 @@ def call_contract_function(contract_func, *args, private_key=None, timeout=120):
             call_contract_function_async(contract_func, *args, private_key=private_key, timeout=timeout))
 
 
-def _call_contract_func(w3: Web3, contract_func, *args, private_key=None, timeout=120):
+def _call_contract_func(w3: Web3, contract_func, *args, private_key=None, timeout=600):
     """
     Call a function on a contract
     :param w3: a w3 instance to use
@@ -106,7 +106,7 @@ def _build_transaction_dict(w3, private_key, gas=None, gasPrice=5000000000):
     return {'nonce': nonce, 'gas': gas, 'gasPrice': gasPrice}
 
 
-def _deploy_contract(w3, contract_interface, *args, private_key=None, timeout=120):
+def _deploy_contract(w3, contract_interface, *args, private_key=None, timeout=600):
     # Instantiate and deploy contract
     contract = w3.eth.contract(abi=contract_interface['abi'], bytecode=contract_interface['bin'])
 
