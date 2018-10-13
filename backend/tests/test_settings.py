@@ -6,7 +6,6 @@ class TestSettings(unittest.TestCase):
 
     @patch.dict('backend.settings.os.environ', {'DEPLOY_ENV': 'invalid'})
     def test_error_raised_on_bad_deploy_env(self):
-        # with self.assertRaisesRegex(ValueError, "must be one of ['parity', 'ropsten', 'mainnet'] "):
         with self.assertRaisesRegex(ValueError, "must be one of"):
             settings.deploy_env()
 

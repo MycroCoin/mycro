@@ -197,7 +197,7 @@ CSRF_TRUSTED_ORIGINS = (
 
 CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_DEPLOY_ENVS = ['parity', 'ropsten', 'mainnet']
+ALLOWED_DEPLOY_ENVS = ['parity', 'ropsten', 'rinkeby', 'mainnet']
 
 SOCIAL_AUTH_PIPELINE = [
     # Get the information we can about the user and return it in a simple

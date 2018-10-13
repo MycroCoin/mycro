@@ -73,6 +73,8 @@ def get_w3():
         return _get_parity_w3()
     elif deploy_env == 'ropsten':
         return _get_ropsten_w3()
+    elif deploy_env == 'rinkeby':
+        return _get_rinkeby_w3()
     else:
         raise EnvironmentError(f'{deploy_env} is an invalid value for DEPLOY_ENV')
 
@@ -81,24 +83,49 @@ def _get_ropsten_w3():
     logging.debug('Getting ropsten w3 through infura')
     return Web3(HTTPProvider(f'https://ropsten.infura.io/v3/{settings.get_infura_api_key()}'))
 
+def _get_rinkeby_w3():
+    logging.debug('Getting rinkeby w3 through infura')
+
+    w3 = Web3(HTTPProvider(
+        f'https://rinkeby.infura.io/v3/{settings.get_infura_api_key()}'))
+    w3.middleware_stack.inject(geth_poa_middleware, layer=0)
+    return w3
 
 def _get_parity_w3():
     logging.debug('Getting parity w3')
     return Web3(HTTPProvider(settings.parity_endpoint()))
 
+def _calculate_gas_limit(w3):
+    """
+    Sometimes this calculates an average value bigger than the current gasLimit
+    picking a good gasLimit is really fucking hard.
+
+    NOTE: this is untested and unused.
+
+    TODO: clean/correct this unused tech debt
+    :param w3:
+    :return:
+    """
+    num_blocks = 0
+    total_gas = 0
+    block = w3.eth.getBlock('latest')
+    while block and num_blocks < 50:
+        total_gas += block.gasLimit
+        num_blocks += 1
+        block = w3.eth.getBlock(block.number - 1)
+
+    avg_gas = int(total_gas / num_blocks)
+    adjustment = int(avg_gas / 1024)
+    adjusted = avg_gas - adjustment - 1
+    return adjusted
 
 def _build_transaction_dict(w3, private_key, gas=None, gasPrice=25000000000):
     acc = Account.privateKeyToAccount(private_key)
+    nonce = w3.eth.getTransactionCount(acc.address, 'pending')
     nonce = w3.eth.getTransactionCount(acc.address)
     latest_block = w3.eth.getBlock('latest')
     if not gas:
-        gas = latest_block.gasLimit
-
-        # the gasLimit must be at least one adjustment unit less than the latest
-        # block gasLimit
-        adjustment = int(latest_block.gasLimit / 1024)
-        gas -= adjustment
-        gas -= 1 # just for good measure in case there's an off by 1 with the adjustment
+        gas = 7000000 # tech debt until we figure out how to always pick a good gas limit
 
     # TODO make gas price based on the latest_block. Right now we can't do that because when using a private chain
     # during dev the latest_block the first time round is the genesis block and using it's gas limit messes things up

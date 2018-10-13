@@ -89,9 +89,9 @@ class App extends Component {
             default:
               console.log('This is an unknown network.')
           }
-          if (networkName !== "Ropsten") {
+          if (networkName !== "Rinkeby") {
             toast.error("You're logged into the " + networkName + " network " +
-              "please make sure you're logged into the Ropsten network",
+              "please make sure you're logged into the Rinkeby network",
               {
                 position: toast.POSITION.BOTTOM_CENTER
               });
