@@ -7,7 +7,7 @@ import Modal, {closeStyle} from 'simple-react-modal';
 
 import Spinner from '../shared/Spinner.js';
 import CreateProjectForm from './CreateProjectForm.js';
-import Api from '../services/Api.js';
+import Api from '../../services/Api.js';
 import './ProjectListView.css';
 import Joyride from "react-joyride";
 import {EVENTS} from 'react-joyride/es/constants';
@@ -22,7 +22,6 @@ class Projects extends Component {
 
     this.state = {
       showCreateModal: false,
-      projectListPollInterval: PROJECT_LIST_POLL_INTERVAL,
     };
     Object.assign(this.state, this.getInitialJoyrideState());
   }
@@ -52,7 +51,7 @@ class Projects extends Component {
     if (!localStorage.getItem(JOYRIDE_STATUS_STORAGE_KEY)) {
       // start the joyride if we haven't marked it as complete
       // also disable polling so that the project list doesn't change during the joyride
-      this.setState({joyrideRun: true, projectListPollInterval: 0})
+      this.setState(Object.assign({}, this.state, {joyrideRun: true}));
     }
   }
 
@@ -71,7 +70,7 @@ class Projects extends Component {
       // mark joyride as complete and resume regular project polling
       // we use the presence of this item in localstorage to mark completion
       localStorage.setItem(JOYRIDE_STATUS_STORAGE_KEY, 'finished')
-      this.setState({projectListPollInterval: 1000})
+      this.setState(Object.assign({}, this.state, {joyrideRun: false}))
     }
 
   };
@@ -113,7 +112,7 @@ class Projects extends Component {
     };
 
     return (<Query
-      pollInterval={this.state.projectListPollInterval}
+      pollInterval={this.state.joyrideRun ? 0 : PROJECT_LIST_POLL_INTERVAL}
       query={Api.listProjectsQuery()}>
       {({loading, error, data}) => {
         if (loading) return <Spinner/>
@@ -130,7 +129,13 @@ class Projects extends Component {
             run={this.state.joyrideRun}
             steps={this.state.joyrideSteps}
             callback={this.handleJoyrideCallback}
+            styles={{
+              options: {
+                overlayColor: 'rgba(0, 0, 0, 0)',
+              }
+            }}
           />
+          {this.state.joyrideRun ? <div className="TutorialSlate"></div> : null}
           <div>
             <div className="ProjectList">
               {/* NOTE: joyride depends on the id of this div */}
@@ -146,7 +151,7 @@ class Projects extends Component {
               button until the tour is over so that it's impossible for new
               projects to appear in the UI until the tour has completed. */}
               <button onClick={this.showCreateModal.bind(this)}
-                      disabled={!this.state.projectListPollInterval}
+                      disabled={this.state.joyrideRun}
                       id='create-project-button'>Create New
                 Project
               </button>

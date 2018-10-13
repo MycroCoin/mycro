@@ -6,7 +6,7 @@ import AscList from './AscList.js';
 import CreatePullRequestAsc from './CreatePullRequestAsc.js';
 import AddressShortener from '../shared/AddressShortener.js';
 import { Query } from "react-apollo";
-import Api from '../services/Api.js';
+import Api from '../../services/Api.js';
 import ReactGA from 'react-ga';
 import PropTypes from 'prop-types'
 import './ProjectView.css';
@@ -32,7 +32,6 @@ class Project extends Component {
 
     this.state = {
       hasPendingAscCreation: false,
-      projectPollInterval: PROJECT_POLL_INTERVAL
     }
     Object.assign(this.state, this.getInitialJoyrideState());
   }
@@ -77,7 +76,7 @@ class Project extends Component {
       // mark joyride as complete and resume regular project polling
       // we use the presence of this item in localstorage to mark completion
       localStorage.setItem(JOYRIDE_STATUS_STORAGE_KEY, 'finished')
-      this.setState({projectPollInterval: 1000})
+      this.setState(Object.assign({}, this.state, {joyrideRun: false}))
     }
 
   };
@@ -97,7 +96,7 @@ class Project extends Component {
     if (!localStorage.getItem(JOYRIDE_STATUS_STORAGE_KEY)) {
       // start the joyride if we haven't marked it as complete
       // also disable polling so that the page doesn't change during the joyride
-      this.setState({joyrideRun: true, projectPollInterval: 0})
+      this.setState(Object.assign({}, this.state, {joyrideRun: true, }));
     }
   }
 
@@ -105,7 +104,7 @@ class Project extends Component {
     return <div>
         <button 
             onClick={() => this.showAscModal()}
-            disabled={this.state.hasPendingAscCreation || !this.state.projectPollInterval}
+            disabled={this.state.hasPendingAscCreation || this.state.joyrideRun}
             id="create-pr-asc-button">
           Create Pull Request Proposal
         </button>
@@ -254,7 +253,7 @@ class Project extends Component {
 
   render() {
     return <Query
-      pollInterval={1000}
+      pollInterval={PROJECT_POLL_INTERVAL}
       query={Api.getProjectQuery(this.props.match.params.id)}>
       {({ loading, error, data}) => {
         if(loading && (!data || !data.project)) return <Spinner />
@@ -270,7 +269,13 @@ class Project extends Component {
               run={this.state.joyrideRun}
               steps={this.state.joyrideSteps}
               callback={this.handleJoyrideCallback}
+              styles={{
+                options: {
+                  overlayColor: 'rgba(0, 0, 0, 0)',
+                }
+              }}
             />
+            {this.state.joyrideRun ? <div className="TutorialSlate"></div> : null}
             {this.renderProject(data.project)}
           </div>
           );

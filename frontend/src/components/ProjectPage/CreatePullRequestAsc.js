@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {toChecksumAddress} from 'web3-utils';
-import Api from '../services/Api.js';
+import Api from '../../services/Api.js';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
 

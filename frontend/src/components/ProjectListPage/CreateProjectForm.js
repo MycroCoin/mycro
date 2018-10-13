@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 
 import Spinner from '../shared/Spinner.js';
-import Api from '../services/Api.js';
+import Api from '../../services/Api.js';
 import './CreateProjectForm.css';
 
 class CreateProject extends Component {

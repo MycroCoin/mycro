@@ -9,7 +9,7 @@ import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import Api from './services/Api.js'
 import * as jwtAuth from './services/Jwt.js'
 import './App.css';
-import {AscView, ProjectListView, ProjectView} from './projects';
+import {ProjectListView, ProjectView} from './components';
 import ReactGA from 'react-ga';
 import {auth, firebase} from "./firebase";
 
@@ -64,7 +64,7 @@ class App extends Component {
           console.error("An error occurred: " + err);
           return
         }
-        this.setState(Object.assign(this.state, {accounts: accounts}));
+        this.setState(Object.assign({}, this.state, {accounts}));
       });
 
       window.web3.version.getNetwork((err, networkId) => {
@@ -96,7 +96,7 @@ class App extends Component {
                 position: toast.POSITION.BOTTOM_CENTER
               });
           }
-          this.setState(Object.assign(this.state, {network: networkName}))
+          this.setState(Object.assign({}, this.state, {network: networkName}))
         }
       );
     }
@@ -137,7 +137,6 @@ class App extends Component {
 
     return (
       <Switch>
-        <Route path="/projects/:projectId/asc/:ascId" component={AscView}/>
         <Route path="/projects/:id" component={ProjectView}/>
         <Route path="/projects" component={ProjectListView}/>
         <Route exact path="/">
