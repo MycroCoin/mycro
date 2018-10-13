@@ -10,7 +10,7 @@ import CreateProjectForm from './CreateProjectForm.js';
 import Api from '../services/Api.js';
 import './ProjectListView.css';
 import Joyride from "react-joyride";
-import {ACTIONS, EVENTS, LIFECYCLE, STATUS} from 'react-joyride/es/constants';
+import {EVENTS} from 'react-joyride/es/constants';
 
 
 const JOYRIDE_STATUS_STORAGE_KEY = 'project-list-joyride-status';
@@ -65,7 +65,7 @@ class Projects extends Component {
   }
 
   handleJoyrideCallback = (data) => {
-    const {action, index, type, lifecycle, status} = data;
+    const {type} = data;
 
     if (type === EVENTS.TOUR_END) {
       // mark joyride as complete and resume regular project polling

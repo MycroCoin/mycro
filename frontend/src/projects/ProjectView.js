@@ -11,7 +11,7 @@ import ReactGA from 'react-ga';
 import PropTypes from 'prop-types'
 import './ProjectView.css';
 import Joyride from "react-joyride";
-import {ACTIONS, EVENTS, LIFECYCLE, STATUS} from 'react-joyride/es/constants';
+import {EVENTS} from 'react-joyride/es/constants';
 import {toChecksumAddress} from 'web3-utils';
 
 const colors = [
@@ -71,7 +71,7 @@ class Project extends Component {
   }
 
   handleJoyrideCallback = (data) => {
-    const {action, index, type, lifecycle, status} = data;
+    const {type} = data;
 
     if (type === EVENTS.TOUR_END) {
       // mark joyride as complete and resume regular project polling
