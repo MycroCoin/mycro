@@ -2,16 +2,17 @@ import React, {Component} from 'react';
 import {BrowserRouter, Link, Redirect, Route, Switch} from 'react-router-dom'
 import PropTypes from 'prop-types'
 import {ApolloProvider} from "react-apollo";
-import client from './GraphqlClient.js';
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import Api from './services/Api.js'
-import * as jwtAuth from './services/Jwt.js'
+import Api from '../services/Api.js'
+import * as jwtAuth from '../services/Jwt.js'
+import Web3Service from '../services/Web3Service.js'
 import './App.css';
-import {ProjectListView, ProjectView} from './components';
+import {ProjectListView, ProjectView} from './';
+import client from '../GraphqlClient.js';
 import ReactGA from 'react-ga';
-import {auth, firebase} from "./firebase";
+import {auth, firebase} from "../firebase";
 
 
 class App extends Component {
@@ -54,52 +55,23 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-
     // TODO the jwt and firebase auth may be out sync and should probably be normalized here
-    this.state = {accounts: [], network: 'unknown', signedIn: false};
+    this.state = {account: null, network: 'unknown', signedIn: false};
 
-    if (window.web3) {
-      window.web3.eth.getAccounts((err, accounts) => {
-        if (err != null) {
-          console.error("An error occurred: " + err);
-          return
-        }
-        this.setState(Object.assign({}, this.state, {accounts}));
-      });
+    Web3Service.getAccount().then((account) => {
+      this.setState(Object.assign({}, this.state, {account}));
+    });
 
-      window.web3.version.getNetwork((err, networkId) => {
-          if (err != null) {
-            console.log("Error when getting network: " + err)
-            return
-          }
-          let networkName = 'unknown';
-          switch (networkId) {
-            case "1":
-              networkName = 'MainNet';
-              break
-            case "2":
-              networkName = 'Morden'
-              break
-            case "3":
-              networkName = 'Ropsten'
-              break
-            case "4":
-              networkName = 'Rinkeby'
-              break
-            default:
-              console.log('This is an unknown network.')
-          }
-          if (networkName !== "Rinkeby") {
-            toast.error("You're logged into the " + networkName + " network " +
-              "please make sure you're logged into the Rinkeby network",
-              {
-                position: toast.POSITION.BOTTOM_CENTER
-              });
-          }
-          this.setState(Object.assign({}, this.state, {network: networkName}))
-        }
-      );
-    }
+    Web3Service.getNetworkName().then((networkName) => {
+      if (networkName !== "Ropsten") {
+        toast.error("You're logged into the " + networkName + " network " +
+          "please make sure you're logged into the Ropsten network",
+          {
+            position: toast.POSITION.BOTTOM_CENTER
+          });
+      }
+      this.setState(Object.assign({}, this.state, {network: networkName}))
+    });
   }
 
   componentDidMount() {
@@ -126,15 +98,14 @@ class App extends Component {
   }
 
 
-  renderNoAccounts() {
+  renderNoAccount() {
     return <div className="NoWeb3">
       <p>Please login to <em>MetaMask</em> then refresh the page</p>
       <a href="https://metamask.io/" target="blank_">Get MetaMask</a>
     </div>
   }
 
-  renderWithAccounts() {
-
+  renderWithAccount() {
     return (
       <Switch>
         <Route path="/projects/:id" component={ProjectView}/>
@@ -147,9 +118,9 @@ class App extends Component {
   }
 
   render() {
-    const content = this.state.accounts.length === 0 ?
-      this.renderNoAccounts() :
-      this.renderWithAccounts()
+    const content = this.state.account === null ?
+      this.renderNoAccount() :
+      this.renderWithAccount()
 
     return <ApolloProvider client={client}>
       <BrowserRouter>
@@ -161,7 +132,8 @@ class App extends Component {
                 - The future is open
               </p>
             </div>
-            {/*<a className="button" href="./whitepaper.pdf" target="_blank">Read the Whitepaper</a>*/}
+            <a className="button" 
+              href="//mycrocoin.org/whitepaper.pdf">Read the Whitepaper</a>
             {/*TODO disable sign in until the user is logged into metamask*/}
             <div className="SignIn" style={{display: "none"}}>
               {!this.state.signedIn ?

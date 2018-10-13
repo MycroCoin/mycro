@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import AscListItem from './AscListItem.js';
 
-
 class AscList extends Component {
   render(){
     const ascs = this.props.ascs;

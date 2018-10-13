@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import AddressShortener from '../shared/AddressShortener.js';
-import {getProjectForAddress} from '../../services/ProjectHelpers.js';
+import {Contracts} from '../../services/Contracts.js';
 import './AscList.css';
 
 class AscListItem extends Component {
@@ -26,7 +26,7 @@ class AscListItem extends Component {
     const projectAddress = this.props.projectAddress;
     const checksumAscAddress = window.web3.toChecksumAddress(ascAddress);
 
-    getProjectForAddress(projectAddress).then(projectContract => {
+    Contracts.BaseDao.at(projectAddress).then(projectContract => {
       return projectContract.vote(checksumAscAddress, 
         {from: window.web3.eth.accounts[0]});
     });
