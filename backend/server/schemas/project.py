@@ -220,48 +220,32 @@ class CreateProject(graphene.Mutation):
         merge_module_interface = compiler.get_contract_interface(
             'merge_module.sol', 'MergeModule')
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
         symbol = project_name[:3]
         decimals = 18  # todo acccept this as a parameter
         total_supply = 1000  # todo accept this as a parameter
-        deploy_dao_task: asyncio.Task = asyncio.ensure_future(
-            deploy.deploy_async(base_dao_interface,
-                                symbol,
-                                project_name,
-                                decimals,
-                                total_supply,
-                                [creator_address],  # inital addresses
-                                [total_supply],  # initial balance
-                                private_key=settings.ethereum_private_key()))
 
-        deploy_merge_module_task: asyncio.Task = asyncio.ensure_future(
-            deploy.deploy_async(merge_module_interface,
-                                private_key=settings.ethereum_private_key()))
+        w3, dao_contract, dao_address, _ = deploy.deploy(base_dao_interface,
+                      symbol,
+                      project_name,
+                      decimals,
+                      total_supply,
+                      [creator_address],  # inital addresses
+                      [total_supply],  # initial balance
+                      private_key=settings.ethereum_private_key())
 
-        # deploy the new DAO and it's merge module
-        loop.run_until_complete(
-            asyncio.gather(deploy_dao_task, deploy_merge_module_task))
+        _, _, merge_module_address, _ = deploy.deploy(merge_module_interface,
+                      private_key=settings.ethereum_private_key())
 
-        # get the results of the async deployment
-        w3, dao_contract, dao_address, _ = deploy_dao_task.result()
-        _, _, merge_module_address, _ = deploy_merge_module_task.result()
 
-        register_module_task: asyncio.Task = deploy.call_contract_function_async(
+        deploy.call_contract_function(
             dao_contract.functions.registerModule,
             merge_module_address,
             private_key=settings.ethereum_private_key())
-        register_dao_task: asyncio.Task = deploy.call_contract_function_async(
+        deploy.call_contract_function(
             mycro_contract.functions.registerProject,
             dao_address,
             private_key=settings.ethereum_private_key())
 
-        # register the DAO with mycro and register the merge module with the DAO
-        loop.run_until_complete(
-            asyncio.gather(register_module_task, register_dao_task))
-
-        loop.close()
 
         # create a row in the a db and a repository in github
         Project.objects.create(

@@ -13,7 +13,7 @@ from contextlib import contextmanager
 logger = logging.getLogger(__name__)
 
 
-async def deploy_async(contract_interface, *args, private_key=None, timeout=120):
+async def deploy_async(contract_interface, *args, private_key=None, timeout=600):
     w3 = get_w3()
     contract, address, instance = _deploy_contract(w3, contract_interface, *args, private_key=private_key,
                                                    timeout=timeout)
@@ -21,18 +21,18 @@ async def deploy_async(contract_interface, *args, private_key=None, timeout=120)
     return w3, contract, address, instance
 
 
-def deploy(contract_interface, *args, private_key=None, timeout=120):
+def deploy(contract_interface, *args, private_key=None, timeout=600):
     with get_or_create_event_loop() as loop:
         return loop.run_until_complete(
             deploy_async(contract_interface, *args, private_key=private_key, timeout=timeout))
 
 
-async def call_contract_function_async(contract_func, *args, private_key=None, timeout=120):
+async def call_contract_function_async(contract_func, *args, private_key=None, timeout=600):
     w3 = get_w3()
     return _call_contract_func(w3, contract_func, *args, private_key=private_key, timeout=timeout)
 
 
-def call_contract_function(contract_func, *args, private_key=None, timeout=120):
+def call_contract_function(contract_func, *args, private_key=None, timeout=600):
     with get_or_create_event_loop() as loop:
         return loop.run_until_complete(
             call_contract_function_async(contract_func, *args, private_key=private_key, timeout=timeout))
