@@ -1,9 +1,17 @@
 from backend.server.utils.contract_compiler import ContractCompiler
 from web3 import Web3
 from web3.providers.eth_tester import EthereumTesterProvider
+from eth_tester import EthereumTester
 
+WALLET_PRIVATE_KEY = 'f49e1216edac9a5b0fab36f28037bfe8d5eb104b13f049b59decfac446e56ab4' # default private key with a different final character (4 instead of 3)
 COMPILER = ContractCompiler()
-W3 = Web3(EthereumTesterProvider())
+TESTER = EthereumTester()
+TESTER.add_account(WALLET_PRIVATE_KEY)
+W3 = Web3(EthereumTesterProvider(ethereum_tester=TESTER))
+
+# fund the account made with WALLET_PRIVATE_KEY
+TESTER.send_transaction({'from': W3.eth.accounts[0], 'to': W3.eth.accounts[-1], 'gas': 21000, 'value': int(10e18)})
+
 PROJECT_NAME = 'mycro'
 DAO_ADDRESS = '123'
 GITHUB_ACCESS_TOKEN = 'fake'

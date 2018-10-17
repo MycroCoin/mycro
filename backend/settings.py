@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'corsheaders',
     'social_django',
+    'encrypted_model_fields',
 ]
 
 AUTH_USER_MODEL = 'server.User'
@@ -243,6 +244,11 @@ SOCIAL_AUTH_PIPELINE = [
     # Update the user record with any changed info from the auth service.
     'social_core.pipeline.user.user_details',
 ]
+
+# Make sure this is set in production.
+# TODO: we need a better story for enforcing variables in prod vs non-prod
+FIELD_ENCRYPTION_KEY = os.environ.get("FIELD_ENCRYPTION_KEY", "p098ck9XEUuGrzMtk0z06afANmAQ3iKTujGtaPZwzBM=")
+
 
 # Application config
 def deploy_env():

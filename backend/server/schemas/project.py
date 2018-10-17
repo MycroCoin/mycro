@@ -10,14 +10,12 @@ import asyncio
 from backend.server.utils.contract_compiler import ContractCompiler
 import backend.server.utils.deploy as deploy
 from backend.server.schemas.asc import AscType
-from backend.server.models import ASC
+from backend.server.models import ASC, Wallet
 from typing import List
 
 
 class ProjectException(Exception):
     """Exception for Project related problems"""
-
-
 
 
 class BalanceType(graphene.ObjectType):
@@ -74,7 +72,6 @@ class ProjectType(DjangoObjectType):
     balances = graphene.List(BalanceType)
     pull_requests = graphene.List(PullRequestType)
     url = graphene.String()
-
 
     def resolve_ascs(self: Project, info) -> List or None:
         if self is None:
@@ -162,6 +159,7 @@ class ProjectType(DjangoObjectType):
             )
 
         return pull_requests
+
     def resolve_url(self: Project, info) -> str or None:
         if self is None:
             return None
@@ -225,27 +223,25 @@ class CreateProject(graphene.Mutation):
         total_supply = 1000  # todo accept this as a parameter
 
         w3, dao_contract, dao_address, _ = deploy.deploy(base_dao_interface,
-                      symbol,
-                      project_name,
-                      decimals,
-                      total_supply,
-                      [creator_address],  # inital addresses
-                      [total_supply],  # initial balance
-                      private_key=settings.ethereum_private_key())
+                                                         symbol,
+                                                         project_name,
+                                                         decimals,
+                                                         total_supply,
+                                                         [creator_address], # inital addresses
+                                                         [total_supply], # initial balance
+                                                         private_key=Wallet.objects.first().private_key)
 
         _, _, merge_module_address, _ = deploy.deploy(merge_module_interface,
-                      private_key=settings.ethereum_private_key())
-
+                                                      private_key=Wallet.objects.first().private_key)
 
         deploy.call_contract_function(
             dao_contract.functions.registerModule,
             merge_module_address,
-            private_key=settings.ethereum_private_key())
+            private_key=Wallet.objects.first().private_key)
         deploy.call_contract_function(
             mycro_contract.functions.registerProject,
             dao_address,
-            private_key=settings.ethereum_private_key())
-
+            private_key=Wallet.objects.first().private_key)
 
         # create a row in the a db and a repository in github
         Project.objects.create(

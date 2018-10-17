@@ -13,7 +13,8 @@ class TestMycro(unittest.TestCase):
             "mycro.sol", "MycroCoin")
         self.mycro_contract, self.mycro_address, self.mycro_instance = _deploy_contract(
             constants.W3,
-            self.contract_interface)
+            self.contract_interface,
+            private_key=constants.WALLET_PRIVATE_KEY)
 
     def test_give_initial_balance(self):
         balance = self.mycro_instance.balanceOf(
@@ -48,13 +49,13 @@ class TestMycro(unittest.TestCase):
             "merge_asc.sol", "MergeASC")
         _, asc_address, _ = _deploy_contract(constants.W3, merge_asc_interface,
                                              constants.W3.eth.accounts[0], 15,
-                                             constants.PR_ID)
+                                             constants.PR_ID, private_key=constants.WALLET_PRIVATE_KEY)
         self.mycro_instance.propose(asc_address,
                                     transact={'from': constants.W3.eth.accounts[0]})
 
         # create a new mycro dao
         new_mycro_contract, new_mycro_address, new_mycro_instance = _deploy_contract(
-            constants.W3, self.contract_interface)
+            constants.W3, self.contract_interface, private_key=constants.WALLET_PRIVATE_KEY)
 
         # we want to check if any RegisterProject events are emitted
         event_filter = new_mycro_contract.events.RegisterProject.createFilter(
@@ -76,7 +77,7 @@ class TestMycro(unittest.TestCase):
 
     def test_cannot_upgrade_non_mycro_dao(self):
         __, __, new_mycro_instance = _deploy_contract(
-            constants.W3, self.contract_interface)
+            constants.W3, self.contract_interface, private_key=constants.WALLET_PRIVATE_KEY)
 
         with self.assertRaises(TransactionFailed):
             new_mycro_instance.upgradeFrom(constants.W3.eth.accounts[1], transact={

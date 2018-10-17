@@ -7,7 +7,7 @@ from graphene_django.types import DjangoObjectType
 import backend.server.utils.deploy as deploy
 import backend.server.utils.github as github
 import backend.settings as settings
-from backend.server.models import ASC, Project
+from backend.server.models import ASC, Project, Wallet
 from backend.server.utils.contract_compiler import ContractCompiler
 
 
@@ -124,11 +124,11 @@ class CreateMergeASC(graphene.Mutation):
         # with the base dao
         _, _, asc_address, _ = deploy.deploy(asc_interface, rewardee, reward,
                                              pr_id,
-                                             private_key=settings.ethereum_private_key())
+                                             private_key=Wallet.objects.first().private_key)
 
         deploy.call_contract_function(dao_contract.functions.propose,
                                       asc_address,
-                                      private_key=settings.ethereum_private_key())
+                                      private_key=Wallet.objects.first().private_key)
 
         asc = project.asc_set.create(address=asc_address, project=project,
                                      rewardee=rewardee, reward=reward,

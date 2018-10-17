@@ -7,7 +7,8 @@ class TestMergeModule(unittest.TestCase):
     def setUp(self):
 
         self.merge_module_interface = constants.COMPILER.get_contract_interface("merge_module.sol", "MergeModule")
-        _, _, self.merge_module_instance = _deploy_contract(constants.W3, self.merge_module_interface)
+        _, _, self.merge_module_instance = _deploy_contract(constants.W3, self.merge_module_interface,
+            private_key=constants.WALLET_PRIVATE_KEY)
 
 
     def test_get_name(self):

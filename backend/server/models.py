@@ -1,6 +1,8 @@
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser
+from encrypted_model_fields.fields import EncryptedCharField
+
 
 class User(AbstractUser):
     pass
@@ -48,3 +50,9 @@ class ASC(models.Model):
     rewardee = models.CharField(max_length=42)
     reward = models.IntegerField()
     pr_id = models.IntegerField(null=True, blank=True)
+
+class Wallet(models.Model):
+    private_key = EncryptedCharField(max_length=66, unique=True, blank=False, null=False)
+    address = models.CharField(max_length=42, unique=True, blank=False, null=False)
+
+

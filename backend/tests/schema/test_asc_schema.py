@@ -94,6 +94,7 @@ mutation {{
         w3 = get_w3_mock.return_value
         w3.eth.waitForTransactionReceipt.return_value = {
             'contractAddress': constants.ASC_ADDRESS}
+        w3.eth.getBalance.return_value = int(10e18)
 
         # need to double up on braces because of f-strings
         resp = self.query(f"""

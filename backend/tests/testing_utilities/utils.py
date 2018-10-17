@@ -1,5 +1,6 @@
 import backend.tests.testing_utilities.constants as constants
 from backend.server.utils.deploy import _deploy_contract
+from backend.tests.testing_utilities.constants import WALLET_PRIVATE_KEY
 
 
 def deploy_base_dao(w3=constants.W3,
@@ -17,14 +18,15 @@ def deploy_base_dao(w3=constants.W3,
                             decimals,
                             totalSupply,
                             initalAddresses,
-                            initialBalances)
+                            initialBalances,
+                            private_key=WALLET_PRIVATE_KEY)
 
 
 def create_and_register_merge_module(base_dao_instance, w3=constants.W3):
     merge_module_interface = constants.COMPILER.get_contract_interface(
         "merge_module.sol", "MergeModule")
     merge_contract, merge_address, merge_instance = _deploy_contract(w3,
-                                                                     merge_module_interface)
+                                                                     merge_module_interface, private_key=constants.WALLET_PRIVATE_KEY)
     base_dao_instance.registerModule(merge_address,
                                      transact={'from': w3.eth.accounts[0]})
 
@@ -52,4 +54,4 @@ def create_merge_asc(w3=constants.W3,
         "merge_asc.sol", "MergeASC")
 
     return _deploy_contract(w3, merge_asc_interface,
-                            rewardee, reward, pr_id)
+                            rewardee, reward, pr_id, private_key=constants.WALLET_PRIVATE_KEY)

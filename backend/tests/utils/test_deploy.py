@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock, call, ANY
 import backend.server.utils.deploy as deploy
 from web3.middleware import geth_poa_middleware
 from web3.providers import HTTPProvider
@@ -46,25 +46,21 @@ class TestDeploy(unittest.TestCase):
 
     def test_deploy_contract_without_private_key(self):
         w3 = MagicMock()
+        w3.eth.getBalance.return_value = int(10e18)
         contract_interface = MagicMock()
         args = (1,)
 
-        contract, address, contract_instance = deploy._deploy_contract(w3, contract_interface, *args, private_key=None,
-                                                                       timeout=10)
 
-        contract_interface.__getitem__.assert_has_calls([call('abi'), call('bin'), call('abi')])
+        with self.assertRaisesRegex(ValueError, 'cannot be none'):
+            deploy._deploy_contract(w3, contract_interface, *args, private_key=None,
+                                                                           timeout=10)
 
-        w3.eth.contract.return_value.constructor.assert_called_with(*args)
-        w3.eth.contract.return_value.constructor.return_value.transact.assert_called_once_with(
-            transaction={'from': w3.eth.accounts[0]})
-
-        tx_hash = w3.eth.contract.return_value.constructor.return_value.transact.return_value
-        w3.eth.waitForTransactionReceipt.assert_called_once_with(tx_hash, timeout=10)
 
 
     @patch('backend.server.utils.deploy.Account')
     def test_deploy_contract_with_private_key(self, account_mock):
         w3 = MagicMock()
+        w3.eth.getBalance.return_value = int(10e18)
         latest_block = w3.eth.getBlock.return_value
         latest_block.gasLimit = 1024
 
@@ -79,11 +75,12 @@ class TestDeploy(unittest.TestCase):
         contract_interface.__getitem__.assert_has_calls([call('abi'), call('bin'), call('abi')])
 
         w3.eth.contract.return_value.constructor.assert_called_with(*args)
-        account_mock.privateKeyToAccount.assert_called_once_with(private_key)
+        # account_mock.privateKeyToAccount.assert_called_once_with(private_key)
+        self.assertEqual(3, account_mock.privateKeyToAccount.call_count)
 
         txn = w3.eth.contract.return_value.constructor.return_value.buildTransaction
         txn.assert_called_once_with(
-            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 7000000, 'gasPrice': 25000000000})
+            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 7000000, 'gasPrice': 1})
 
         w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, private_key)
         tx_hash = w3.eth.sendRawTransaction.return_value
@@ -93,6 +90,7 @@ class TestDeploy(unittest.TestCase):
     @patch('backend.server.utils.deploy.get_w3')
     def test_call_contract_func(self, get_w3_mock):
         w3 = get_w3_mock.return_value
+        w3.eth.getBalance.return_value = int(10e18)
 
         private_key = settings.ethereum_private_key()
         timeout = 1
@@ -107,7 +105,50 @@ class TestDeploy(unittest.TestCase):
                                                                  timeout=timeout)
 
         deploy.call_contract_function(contract.functions.registerProject, constants.DAO_ADDRESS,
-                                      timeout=timeout)
+                                      timeout=timeout, private_key=settings.ethereum_private_key())
 
-        # no transaction is made if a private key isn't given
-        self.assertEqual(1, w3.eth.waitForTransactionReceipt.call_count)
+        self.assertEqual(2, w3.eth.waitForTransactionReceipt.call_count)
+
+    def test_transfer_between_accounts(self):
+        source_account_key = constants.WALLET_PRIVATE_KEY
+        destination_account_key = settings.ethereum_private_key()
+        amount = 100
+        w3 = MagicMock()
+        destination_address = Account.privateKeyToAccount(destination_account_key)
+
+        deploy.transfer_between_accounts(w3, source_account_key, destination_account_key, amount)
+
+        w3.eth.account.signTransaction.assert_called_once_with(dict(nonce=ANY, gasPrice=ANY, gas=ANY, to=destination_address.address, value=amount), source_account_key)
+        w3.eth.sendRawTransaction.assert_called_once_with(w3.eth.account.signTransaction.return_value.rawTransaction)
+        w3.eth.waitForTransactionReceipt.assert_called_once_with(w3.eth.sendRawTransaction.return_value, timeout=120)
+
+    @patch('backend.server.utils.deploy.get_wallet_balance')
+    @patch('backend.server.utils.deploy.transfer_between_accounts')
+    def test_fund_account_if_needed_happy_case(self, transfer_mock, get_balance_mock):
+        get_balance_mock.side_effect = [int(10e18), 0]
+        w3 = MagicMock()
+
+        deploy.fund_account_if_needed(w3, 'lol', 'fake')
+
+        transfer_mock.assert_called_once_with(w3, 'lol', 'fake', int(1e18))
+
+    @patch('backend.server.utils.deploy.get_wallet_balance')
+    @patch('backend.server.utils.deploy.transfer_between_accounts')
+    def test_fund_account_source_doesnt_have_enough(self,transfer_mock,  get_balance_mock):
+        get_balance_mock.side_effect = [0, 0]
+        w3 = MagicMock()
+
+        with self.assertRaisesRegex(deploy.TransferError, 'does not have enough'):
+            deploy.fund_account_if_needed(w3, 'lol', 'fake')
+
+        transfer_mock.assert_not_called()
+
+    @patch('backend.server.utils.deploy.get_wallet_balance')
+    @patch('backend.server.utils.deploy.transfer_between_accounts')
+    def test_fund_account_source_destination_already_has_enough(self,transfer_mock,  get_balance_mock):
+        get_balance_mock.side_effect = [0, int(10e18)]
+        w3 = MagicMock()
+
+        deploy.fund_account_if_needed(w3, 'lol', 'fake')
+
+        transfer_mock.assert_not_called()
