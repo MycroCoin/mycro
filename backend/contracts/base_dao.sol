@@ -276,20 +276,18 @@ contract BaseDao is ERC20Interface, Owned, SafeMath {
     }
 
     function performTransfer(address from, address to, uint tokens) internal {
-        // add addresses to list of transactors if they have a balance of 0
-        // note: this will double count addresses who's balance goes from x -> 0 -> y
-        // this happens because 0 is a valid balance and also how map values are initialized.
-        if(from != address(0) && balances[from] == 0) {
-            transactors.push(from);
-        }
-        if(to != address(0) && balances[to] == 0) {
+        // only allowed to mint tokens. Transfers are not allowed yet.
+        require(from == address(0));
+
+        // can't send tokens to the dao itself
+        require(to != address(0));
+
+        // if the destination doesn't have tokens yet, remember them as a transactor
+        if(balances[to] == 0) {
             transactors.push(to);
         }
 
         // perform the transfer
-        if(from != address(0)) {
-            balances[from] = safeSub(balances[from], tokens);
-        }
         balances[to] = safeAdd(balances[to], tokens);
         emit Transfer(from, to, tokens);
     }

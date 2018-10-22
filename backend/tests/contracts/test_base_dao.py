@@ -171,7 +171,7 @@ class TestBaseDao(unittest.TestCase):
 
         self.assertEqual(3, len(events))
 
-    def test_transfer_adds_to_transactors(self):
+    def test_transfer_fails(self):
         event_filter = self.dao_contract.events.Transfer.createFilter(
             argument_filters={'filter': {'event': 'Transfer'}},
             fromBlock=0)
@@ -179,19 +179,20 @@ class TestBaseDao(unittest.TestCase):
         event_filter.get_new_entries()
 
         # transfer 10 tokens to accounts[6] from accounts[7]
-        self.dao_instance.transfer(constants.W3.eth.accounts[6], 10, transact={
-            'from': constants.W3.eth.accounts[7]})
+        with self.assertRaises(TransactionFailed):
+            self.dao_instance.transfer(constants.W3.eth.accounts[6], 10, transact={
+                'from': constants.W3.eth.accounts[7]})
 
-        self.assertEqual(10, self.dao_instance.balanceOf(
+        self.assertEqual(0, self.dao_instance.balanceOf(
             constants.W3.eth.accounts[6]))
         self.assertEqual(
-            constants.INITIAL_ADDRESSES + [constants.W3.eth.accounts[6]],
+            constants.INITIAL_ADDRESSES,
             self.dao_instance.getTransactors())
-        self.assertEqual(23, self.dao_instance.balanceOf(
+        self.assertEqual(33, self.dao_instance.balanceOf(
             constants.W3.eth.accounts[7]))
-        self.assertEqual(1, len(event_filter.get_new_entries()))
+        self.assertEqual(0, len(event_filter.get_new_entries()))
 
-    def test_transfer_from_adds_to_transactors(self):
+    def test_transfer_from_fails(self):
         event_filter = self.dao_contract.events.Transfer.createFilter(
             argument_filters={'filter': {'event': 'Transfer'}},
             fromBlock=0)
@@ -204,31 +205,22 @@ class TestBaseDao(unittest.TestCase):
                                   transact={
                                       'from': constants.W3.eth.accounts[7]})
 
-        self.dao_instance.transferFrom(constants.W3.eth.accounts[7],
-                                       constants.W3.eth.accounts[6], num_tokens,
-                                       transact={
-                                           'from': constants.W3.eth.accounts[
-                                               6]})
+        with self.assertRaises(TransactionFailed):
+            self.dao_instance.transferFrom(constants.W3.eth.accounts[7],
+                                           constants.W3.eth.accounts[6], num_tokens,
+                                           transact={
+                                               'from': constants.W3.eth.accounts[
+                                                   6]})
 
-        self.assertEqual(num_tokens, self.dao_instance.balanceOf(
+        self.assertEqual(0, self.dao_instance.balanceOf(
             constants.W3.eth.accounts[6]))
         self.assertEqual(
-            constants.INITIAL_ADDRESSES + [constants.W3.eth.accounts[6]],
+            constants.INITIAL_ADDRESSES,
             self.dao_instance.getTransactors())
-        self.assertEqual(23, self.dao_instance.balanceOf(
+        self.assertEqual(33, self.dao_instance.balanceOf(
             constants.W3.eth.accounts[7]))
-        self.assertEqual(1, len(event_filter.get_new_entries()))
+        self.assertEqual(0, len(event_filter.get_new_entries()))
 
-    def test_duplicate_account_in_transactors_when_balance_emptied_then_filled(
-            self):
-        self.dao_instance.transfer(constants.W3.eth.accounts[8], 33, transact={
-            'from': constants.W3.eth.accounts[7]})
-        self.dao_instance.transfer(constants.W3.eth.accounts[7], 33, transact={
-            'from': constants.W3.eth.accounts[8]})
-
-        self.assertEqual(
-            constants.INITIAL_ADDRESSES + [constants.W3.eth.accounts[7]],
-            self.dao_instance.getTransactors())
 
     def test_upgrade_symbol_not_the_same(self):
         __, __, new_dao_instance = deploy_base_dao(symbol='dif')

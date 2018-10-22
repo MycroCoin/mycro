@@ -20,6 +20,7 @@ class TestMycro(unittest.TestCase):
             "0x364ca3F935E88Fbc9e041d2032F996CAc69452e6")
 
         self.assertEqual(self.mycro_instance.totalSupply(), balance)
+        self.assertEqual(100000000, self.mycro_instance.totalSupply())
 
     def test_register_project(self):
         project_address = constants.W3.eth.accounts[1]

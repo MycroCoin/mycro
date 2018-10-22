@@ -26,9 +26,11 @@ contract MycroCoin is BaseDao{
 
     address[] public registeredProjects;
 
+    uint public constant INITIAL_TOTAL_SUPPLY = 100000000;
+
     event RegisterProject(address projectAddress);
 
-    constructor() BaseDao("myc", "MycroCoin", 18, 100000000000000000000000000, getInitialAddresses(), getInitialBalances()) public{
+    constructor() BaseDao("myc", "MycroCoin", 18, INITIAL_TOTAL_SUPPLY, getInitialAddresses(), getInitialBalances()) public{
         initialized = true;
     }
 
@@ -47,7 +49,7 @@ contract MycroCoin is BaseDao{
             return initialBalances;
         }
 
-        initialBalances.push(100000000000000000000000000);
+        initialBalances.push(INITIAL_TOTAL_SUPPLY);
 
         return initialBalances;
     }
