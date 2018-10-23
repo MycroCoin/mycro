@@ -1,4 +1,3 @@
-from backend.server.utils.deploy import _deploy_contract
 from eth_tester.exceptions import TransactionFailed
 import unittest
 from backend.tests.testing_utilities.utils import *
@@ -59,8 +58,8 @@ class TestBaseDao(unittest.TestCase):
 
         dummy_module_interface = constants.COMPILER.get_contract_interface(
             "dummy_module.sol", "DummyModule")
-        _, dummy_module_address, _ = _deploy_contract(constants.W3,
-                                                      dummy_module_interface, private_key=constants.WALLET_PRIVATE_KEY)
+        _, dummy_module_address, _ = deploy_contract(constants.W3,
+                                                      dummy_module_interface)
 
         self.assertTrue(self.dao_instance.isModuleRegistered(merge_address))
         self.assertFalse(

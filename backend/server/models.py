@@ -1,7 +1,9 @@
 from django.db import models
 
 from django.contrib.auth.models import AbstractUser
-from encrypted_model_fields.fields import EncryptedCharField
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from encrypted_model_fields.fields import EncryptedCharField, encrypt_str
+from django.contrib.postgres.fields import JSONField
 
 
 class User(AbstractUser):
@@ -51,8 +53,34 @@ class ASC(models.Model):
     reward = models.IntegerField()
     pr_id = models.IntegerField(null=True, blank=True)
 
+
+
 class Wallet(models.Model):
+    """
+    NOTE!! Since private_key is encrypted no filtering of any sort works on it
+    If you need to query for specific wallets, use their address for the query
+    """
     private_key = EncryptedCharField(max_length=66, unique=True, blank=False, null=False)
     address = models.CharField(max_length=42, unique=True, blank=False, null=False)
+
+
+
+class Transaction(models.Model):
+    wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
+    hash = models.CharField(max_length=66, unique=True)
+    value = models.IntegerField()
+    chain_id = models.IntegerField()
+    nonce = models.IntegerField()
+    gas_limit = models.IntegerField()
+    gas_price = models.IntegerField()
+    data = models.TextField()
+    to = models.TextField()
+    block_number = models.IntegerField()
+    contract_address = models.CharField(max_length=44, unique=True)
+    cumulative_gas_used = models.IntegerField()
+    gas_used = models.IntegerField()
+    status = models.IntegerField()
+
+
 
 

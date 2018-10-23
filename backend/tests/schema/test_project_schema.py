@@ -1,7 +1,7 @@
-from backend.server.models import Project, ASC
+from unittest.mock import patch, MagicMock, call, ANY
+
+from backend.server.models import Project, ASC, Wallet
 from backend.tests.mycro_django_test import MycroDjangoTest
-import backend.tests.testing_utilities.constants as constants
-from unittest.mock import patch
 from backend.tests.testing_utilities.utils import *
 
 
@@ -28,15 +28,20 @@ query {
             'allProjects': [{'daoAddress': constants.DAO_ADDRESS,
                              'repoName': constants.PROJECT_NAME}]})
 
+    @patch('backend.server.utils.deploy.Transaction')
     @patch('backend.server.utils.deploy.get_w3')
     @patch('backend.server.utils.github.create_repo')
     @patch('backend.settings.github_organization')
-    def test_create_project(self, github_organization_mock, create_repo_mock, get_w3_mock):
+    def test_create_project(self, github_organization_mock, create_repo_mock, get_w3_mock, transaction_mock: MagicMock):
         project_name = 'testing'
         dao_address = '0x1111111111111111111111111111111111111118'
         w3 = get_w3_mock.return_value
         w3.eth.waitForTransactionReceipt.return_value = {
-            'contractAddress': dao_address}
+            'contractAddress': dao_address,
+            'cumulativeGasUsed': 2,
+            'gasUsed': 1,
+            'blockNumber': 3,
+            'status': 4}
         w3.eth.getBalance.return_value = int(10e18)
 
         # need to double up on braces because of f-strings
@@ -56,6 +61,24 @@ mutation {{
             all_projects))
         self.assertEqual(constants.PROJECT_NAME, all_projects[0].repo_name)
         self.assertEqual(project_name, all_projects[1].repo_name)
+
+        # two transactions, one for deploying and once for registering
+        transaction_mock.objects.create.assert_any_call(
+                wallet=self.wallet,
+                hash=get_w3_mock.return_value.eth.sendRawTransaction.return_value,
+                value=ANY,
+                chain_id=ANY,
+                nonce=ANY,
+                gas_limit=ANY,
+                gas_price=ANY,
+                data=ANY,
+                to=ANY,
+                contract_address=dao_address,
+                cumulative_gas_used=2,
+                gas_used=1,
+                block_number=3,
+                status=4
+        )
 
         # called twice for deployment and twice for registrations
         self.assertEqual(4,

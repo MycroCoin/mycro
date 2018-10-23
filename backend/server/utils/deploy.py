@@ -9,6 +9,8 @@ import os
 import backend.settings as settings
 import asyncio
 from contextlib import contextmanager
+from backend.server.models import Transaction, Wallet
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -61,24 +63,50 @@ def _call_contract_func(w3: Web3, contract_func, *args, private_key,
     :param timeout: how long to wait for a transaction to be mined
     :return: a transaction receipt when mutating or the results of the function call when not mutating
     """
-    if private_key is None:
-        raise ValueError('Private key cannot be none')
     fund_account_if_needed(w3, settings.ethereum_private_key(), private_key)
 
     # TODO: this has been unittested but it not integration tested, it would be good to set that up
     if private_key is not None:
+        # create the transaction
         transaction_dict = _build_transaction_dict(w3, private_key)
 
         txn = contract_func(*args).buildTransaction(transaction_dict)
-        signed = w3.eth.account.signTransaction(txn, private_key)
 
-        tx_hash = w3.eth.sendRawTransaction(signed.rawTransaction)
 
-        tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash, timeout=timeout)
+        tx_receipt = submit_sign_and_wait_for_transaction(w3, txn, private_key,
+                                                          timeout)
 
         return tx_receipt
     else:
         return contract_func(*args).call()
+
+
+def submit_sign_and_wait_for_transaction(w3: Web3, txn: Dict, private_key: str, timeout: int):
+    signed = w3.eth.account.signTransaction(txn, private_key)
+    tx_hash = w3.eth.sendRawTransaction(signed.rawTransaction)
+    tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash, timeout=timeout)
+
+    # after the transaction is confirmed, save it
+    account_address = Account.privateKeyToAccount(private_key).address
+    wallet = Wallet.objects.get(address=account_address)
+    Transaction.objects.create(
+        block_number=tx_receipt['blockNumber'],
+        chain_id=txn['chainId'],
+        contract_address=tx_receipt['contractAddress'],
+        cumulative_gas_used=tx_receipt['cumulativeGasUsed'],
+        data=txn['data'],
+        gas_limit=txn['gas'],
+        gas_price=txn['gasPrice'],
+        gas_used=tx_receipt['gasUsed'],
+        hash=tx_hash,
+        nonce=txn['nonce'],
+        status=tx_receipt['status'],
+        to=txn['to'].decode('utf-8'),
+        value=txn['value'],
+        wallet=wallet,
+    )
+
+    return tx_receipt
 
 
 def get_w3():
@@ -140,11 +168,13 @@ def _calculate_gas_limit(w3):
     adjusted = avg_gas - adjustment - 1
     return adjusted
 
+def get_nonce_for_wallet(private_key: str) -> int:
+    address = Account.privateKeyToAccount(private_key).address
+    return len(Transaction.objects.filter(wallet__address=address))
 
 def _build_transaction_dict(w3, private_key, gas=None, gas_price=None):
     acc = Account.privateKeyToAccount(private_key)
-    nonce = w3.eth.getTransactionCount(acc.address, 'pending')
-    nonce = w3.eth.getTransactionCount(acc.address)
+    nonce = get_nonce_for_wallet(private_key)
     latest_block = w3.eth.getBlock('latest')
     if not gas:
         gas = 7000000  # tech debt until we figure out how to always pick a good gas limit
@@ -163,7 +193,7 @@ def _deploy_contract(w3, contract_interface, *args, private_key,
 
     fund_account_if_needed(w3, settings.ethereum_private_key(), private_key)
 
-    # Instantiate and deploy contract
+    # Instantiate contract
     contract = w3.eth.contract(abi=contract_interface['abi'],
                                bytecode=contract_interface['bin'])
 
@@ -171,12 +201,8 @@ def _deploy_contract(w3, contract_interface, *args, private_key,
     contract_constructor = contract.constructor(*args)
     transaction_dict = _build_transaction_dict(w3, private_key)
     txn = contract_constructor.buildTransaction(transaction_dict)
-    signed = w3.eth.account.signTransaction(txn, private_key)
 
-    tx_hash = w3.eth.sendRawTransaction(signed.rawTransaction)
-
-    # Get tx receipt to get contract address
-    tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash, timeout=timeout)
+    tx_receipt = submit_sign_and_wait_for_transaction(w3, txn, private_key, timeout)
     contract_address = tx_receipt['contractAddress']
 
     # Contract instance in concise mode

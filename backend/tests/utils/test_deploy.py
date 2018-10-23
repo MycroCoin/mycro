@@ -57,8 +57,9 @@ class TestDeploy(unittest.TestCase):
 
 
 
-    @patch('backend.server.utils.deploy.Account')
-    def test_deploy_contract_with_private_key(self, account_mock):
+    @patch('backend.server.utils.deploy.Transaction')
+    @patch('backend.server.utils.deploy.Wallet')
+    def test_deploy_contract_with_private_key(self, wallet_mock, transaction_mock):
         w3 = MagicMock()
         w3.eth.getBalance.return_value = int(10e18)
         latest_block = w3.eth.getBlock.return_value
@@ -66,43 +67,48 @@ class TestDeploy(unittest.TestCase):
 
         contract_interface = MagicMock()
         args = (1,)
-        private_key = 'abcde'
-        account = MagicMock()
-        account_mock.privateKeyToAccount.return_value = account
 
-        deploy._deploy_contract(w3, contract_interface, *args, private_key=private_key, timeout=10)
+        deploy._deploy_contract(w3, contract_interface, *args, private_key=constants.WALLET.privateKey, timeout=10)
+
+        wallet_mock.objects.get.assert_called_once_with(address=constants.WALLET.address)
+        transaction_mock.objects.create.assert_called_once()
 
         contract_interface.__getitem__.assert_has_calls([call('abi'), call('bin'), call('abi')])
 
         w3.eth.contract.return_value.constructor.assert_called_with(*args)
-        # account_mock.privateKeyToAccount.assert_called_once_with(private_key)
-        self.assertEqual(3, account_mock.privateKeyToAccount.call_count)
 
         txn = w3.eth.contract.return_value.constructor.return_value.buildTransaction
         txn.assert_called_once_with(
-            {'nonce': w3.eth.getTransactionCount.return_value, 'gas': 7000000, 'gasPrice': 1})
+            {'nonce': 0, 'gas': 7000000, 'gasPrice': 1})
 
-        w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, private_key)
+        w3.eth.account.signTransaction.assert_called_once_with(txn.return_value, constants.WALLET.privateKey)
         tx_hash = w3.eth.sendRawTransaction.return_value
 
         w3.eth.waitForTransactionReceipt.assert_called_once_with(tx_hash, timeout=10)
 
+    @patch('backend.server.utils.deploy.Transaction')
+    @patch('backend.server.utils.deploy.Wallet')
     @patch('backend.server.utils.deploy.get_w3')
-    def test_call_contract_func(self, get_w3_mock):
+    def test_call_contract_func(self, get_w3_mock, wallet_mock, transaction_mock):
         w3 = get_w3_mock.return_value
         w3.eth.getBalance.return_value = int(10e18)
 
-        private_key = settings.ethereum_private_key()
         timeout = 1
         contract = MagicMock()
 
         receipt = deploy.call_contract_function(contract.functions.registerProject,
                                                 constants.DAO_ADDRESS,
-                                                private_key=private_key, timeout=timeout)
+                                                private_key=constants.WALLET.privateKey, timeout=timeout)
 
         self.assertEqual(receipt, w3.eth.waitForTransactionReceipt.return_value)
         w3.eth.waitForTransactionReceipt.assert_called_once_with(w3.eth.sendRawTransaction.return_value,
                                                                  timeout=timeout)
+        wallet_mock.objects.get.assert_called_once_with(address=constants.WALLET.address)
+        transaction_mock.objects.create.assert_called_once()
+
+        txn = contract.functions.registerProject.return_value.buildTransaction
+        txn.assert_called_once_with(
+            {'nonce': 0, 'gas': 7000000, 'gasPrice': 1})
 
         deploy.call_contract_function(contract.functions.registerProject, constants.DAO_ADDRESS,
                                       timeout=timeout, private_key=settings.ethereum_private_key())
@@ -110,7 +116,7 @@ class TestDeploy(unittest.TestCase):
         self.assertEqual(2, w3.eth.waitForTransactionReceipt.call_count)
 
     def test_transfer_between_accounts(self):
-        source_account_key = constants.WALLET_PRIVATE_KEY
+        source_account_key = constants.WALLET.privateKey
         destination_account_key = settings.ethereum_private_key()
         amount = 100
         w3 = MagicMock()

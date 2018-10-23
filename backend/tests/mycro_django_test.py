@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 import json
 from backend.server.models import Wallet
-from backend.tests.testing_utilities.constants import WALLET_PRIVATE_KEY
+from backend.tests.testing_utilities.constants import WALLET
 
 
 class MycroDjangoTest(TestCase):
@@ -11,7 +11,7 @@ class MycroDjangoTest(TestCase):
 
     def setUp(self):
         self._client = Client()
-        Wallet.objects.create(private_key=WALLET_PRIVATE_KEY, address='fake')
+        self.wallet = Wallet.objects.create(private_key=WALLET.privateKey.hex(), address=WALLET.address)
 
 
     def query(self, query: str, op_name: str = None, input: dict = None):

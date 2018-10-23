@@ -53,8 +53,7 @@ if 'runserver' in sys.argv:
 
     # if the wallet isn't funded, fund it
     main_wallet = Wallet.objects.first()
-    if deploy.get_wallet_balance(w3, main_wallet.private_key) < 1e18:
-        deploy.transfer_between_accounts(w3, settings.ethereum_private_key(), main_wallet.private_key, 1)
+    deploy.fund_account_if_needed(w3, settings.ethereum_private_key(), main_wallet.private_key)
 
     # TODO remove this when we no longer need to deploy the mycro contract on init
     # maybe we should hide this behind an env variable because this is useful for testing

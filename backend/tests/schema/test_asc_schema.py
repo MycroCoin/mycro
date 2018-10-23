@@ -1,7 +1,8 @@
-from backend.server.models import Project, ASC
-from backend.tests.mycro_django_test import MycroDjangoTest
+from unittest.mock import patch, MagicMock, ANY, call
+
 import backend.tests.testing_utilities.constants as constants
-from unittest.mock import patch, MagicMock
+from backend.server.models import Project, ASC, Wallet
+from backend.tests.mycro_django_test import MycroDjangoTest
 
 
 class TestASCSchema(MycroDjangoTest):
@@ -11,10 +12,9 @@ class TestASCSchema(MycroDjangoTest):
         self.project = Project.objects.create(repo_name=constants.PROJECT_NAME,
                                               dao_address=constants.DAO_ADDRESS)
         self.asc = self.project.asc_set.create(address=constants.ASC_ADDRESS,
-                                      project=self.project,
-                                      reward=constants.REWARD,
-                                      pr_id=constants.PR_ID)
-
+                                               project=self.project,
+                                               reward=constants.REWARD,
+                                               pr_id=constants.PR_ID)
 
     def test_get_all_ascs(self):
         resp = self.query(
@@ -86,14 +86,20 @@ mutation {{
 
         self.assertErrorNoResponse(resp, "Project matching query")
 
+    @patch('backend.server.utils.deploy.Transaction')
     @patch('backend.server.utils.deploy.get_w3')
     @patch('backend.server.schemas.asc.CreateMergeASC._validate_asc_creation')
-    def test_create_asc(self, validate_mock, get_w3_mock):
+    def test_create_asc(self, validate_mock: MagicMock, get_w3_mock: MagicMock,
+                        transaction_mock: MagicMock):
         ASC.objects.filter().delete()
         self.assertEqual(0, self.project.asc_set.count())
         w3 = get_w3_mock.return_value
         w3.eth.waitForTransactionReceipt.return_value = {
-            'contractAddress': constants.ASC_ADDRESS}
+            'contractAddress': constants.ASC_ADDRESS,
+            'cumulativeGasUsed': 2,
+            'gasUsed': 1,
+            'blockNumber': 3,
+            'status': 4}
         w3.eth.getBalance.return_value = int(10e18)
 
         # need to double up on braces because of f-strings
@@ -116,6 +122,20 @@ mutation {{
         self.assertEqual(constants.ASC_ADDRESS, all_ascs[0].address)
 
         # called once for deployment and once for registration
+        transaction_mock.objects.create.assert_any_call(wallet=self.wallet,
+                                                        hash=get_w3_mock.return_value.eth.sendRawTransaction.return_value,
+                                                        value=ANY,
+                                                        chain_id=ANY,
+                                                        nonce=ANY,
+                                                        gas_limit=ANY,
+                                                        gas_price=ANY,
+                                                        data=ANY,
+                                                        to=ANY,
+                                                        contract_address=constants.ASC_ADDRESS,
+                                                        cumulative_gas_used=2,
+                                                        gas_used=1,
+                                                        block_number=3,
+                                                        status=4)
         self.assertEqual(2,
                          get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
         self.assertEqual(2, w3.eth.sendRawTransaction.call_count)
@@ -149,7 +169,9 @@ query {
         self.assertErrorNoResponse(resp, 'already exists')
 
     @patch('backend.server.schemas.asc.github')
-    @patch.dict('backend.settings.os.environ', {'GITHUB_TOKEN': constants.GITHUB_ACCESS_TOKEN, 'GITHUB_ORGANIZATION': constants.GITHUB_ORGANIZATION})
+    @patch.dict('backend.settings.os.environ',
+                {'GITHUB_TOKEN': constants.GITHUB_ACCESS_TOKEN,
+                 'GITHUB_ORGANIZATION': constants.GITHUB_ORGANIZATION})
     def test_create_asc_no_open_pr(self, github_mock):
         pr_id = constants.PR_ID + 1
 
@@ -169,4 +191,6 @@ query {
             """)
 
         self.assertErrorNoResponse(resp, 'open PR with')
-        github_mock.get_pull_requests.assert_called_once_with(self.project.repo_name, constants.GITHUB_ORGANIZATION, constants.GITHUB_ACCESS_TOKEN, state='open')
+        github_mock.get_pull_requests.assert_called_once_with(
+            self.project.repo_name, constants.GITHUB_ORGANIZATION,
+            constants.GITHUB_ACCESS_TOKEN, state='open')

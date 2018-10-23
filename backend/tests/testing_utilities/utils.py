@@ -1,6 +1,28 @@
 import backend.tests.testing_utilities.constants as constants
-from backend.server.utils.deploy import _deploy_contract
-from backend.tests.testing_utilities.constants import WALLET_PRIVATE_KEY
+from web3.contract import ConciseContract
+
+def deploy_contract(w3, contract_interface, *args):
+
+
+    # Instantiate contract
+    contract = w3.eth.contract(abi=contract_interface['abi'],
+                               bytecode=contract_interface['bin'])
+    tx_hash = contract.constructor(*args).transact(transaction={'from': w3.eth.accounts[0]})
+
+
+    tx_receipt = w3.eth.waitForTransactionReceipt(tx_hash)
+    contract_address = tx_receipt['contractAddress']
+
+    # Contract instance in concise mode
+    abi = contract_interface['abi']
+    contract_instance = w3.eth.contract(address=contract_address, abi=abi,
+                                        ContractFactoryClass=ConciseContract)
+
+    # need to recreate the contract now that we've successfully deployed and have a contract address
+    contract = w3.eth.contract(address=contract_address,
+                               abi=contract_interface['abi'])
+
+    return contract, contract_address, contract_instance
 
 
 def deploy_base_dao(w3=constants.W3,
@@ -12,21 +34,20 @@ def deploy_base_dao(w3=constants.W3,
                     initialBalances=constants.INITIAL_BALANCES):
     base_dao_interface = constants.COMPILER.get_contract_interface(
         "base_dao.sol", "BaseDao")
-    return _deploy_contract(w3, base_dao_interface,
+    return deploy_contract(w3, base_dao_interface,
                             symbol,
                             name,
                             decimals,
                             totalSupply,
                             initalAddresses,
-                            initialBalances,
-                            private_key=WALLET_PRIVATE_KEY)
+                            initialBalances)
 
 
 def create_and_register_merge_module(base_dao_instance, w3=constants.W3):
     merge_module_interface = constants.COMPILER.get_contract_interface(
         "merge_module.sol", "MergeModule")
-    merge_contract, merge_address, merge_instance = _deploy_contract(w3,
-                                                                     merge_module_interface, private_key=constants.WALLET_PRIVATE_KEY)
+    merge_contract, merge_address, merge_instance = deploy_contract(w3,
+                                                                     merge_module_interface)
     base_dao_instance.registerModule(merge_address,
                                      transact={'from': w3.eth.accounts[0]})
 
@@ -53,5 +74,5 @@ def create_merge_asc(w3=constants.W3,
     merge_asc_interface = constants.COMPILER.get_contract_interface(
         "merge_asc.sol", "MergeASC")
 
-    return _deploy_contract(w3, merge_asc_interface,
-                            rewardee, reward, pr_id, private_key=constants.WALLET_PRIVATE_KEY)
+    return deploy_contract(w3, merge_asc_interface,
+                            rewardee, reward, pr_id)
