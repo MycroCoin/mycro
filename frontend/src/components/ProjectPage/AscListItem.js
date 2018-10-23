@@ -67,7 +67,7 @@ class AscListItem extends Component {
       <button
         disabled={disabled}
         onClick={this.voteAccept.bind(this)}
-        onMouseEnter={this.showPotentialProgress.bind(this)}
+        onMouseEnter={!disabled && this.showPotentialProgress.bind(this)}
         onMouseLeave={this.hidePotentialProgress.bind(this)}
       >
         {message}
@@ -76,12 +76,16 @@ class AscListItem extends Component {
   }
 
   renderProgressBar() {
+    const threshold = this.props.threshold;
     const progress = this.props.asc.voteAmount;
     const potentialProgress = Math.min(
       progress +
         (this.state.showPotentialProgress ? this.props.userBalance : 0),
       this.props.projectTotalSupply
     );
+    const maybeTransitionIn = this.state.showPotentialProgress
+      ? 'transitionIn'
+      : '';
 
     const progressPercentage = (progress / this.props.projectTotalSupply) * 100;
     const potentialProgressPercentage =
@@ -90,8 +94,12 @@ class AscListItem extends Component {
       <div className="ProgressBar">
         <div className="Progress" style={{ width: progressPercentage + '%' }} />
         <div
-          className="PotentialProgress"
-          style={{ width: potentialProgressPercentage + '%' }}
+          className={`PotentialProgress ${maybeTransitionIn}`}
+          style={{
+            width: potentialProgressPercentage + '%',
+            background:
+              progress + potentialProgress > threshold ? '#4fd433' : '#cf0d1e'
+          }}
         />
         <div className="Message">
           <em>{progress}</em> votes of <em>{this.props.projectTotalSupply}</em>{' '}

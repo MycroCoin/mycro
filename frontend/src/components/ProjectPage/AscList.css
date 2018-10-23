@@ -45,11 +45,13 @@ ul {
 
 .AscList .PotentialProgress {
   height: 100%;
-  background: #4fd433;
   position: absolute;
   border-radius: 3px;
   z-index: 1;
-  transition: width 0.15s ease-out 0.3s;
+}
+
+.transitionIn {
+  transition: width 0.3s ease-out 0.15s;
 }
 
 .AscList .ProgressBar .Message {
