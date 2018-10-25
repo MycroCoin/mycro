@@ -1,4 +1,4 @@
-.AscList{
+.AscList {
   border-radius: 3px;
   padding: 0 10px;
   margin: 0;
@@ -7,12 +7,12 @@
 .AscList li {
   padding: 12px 0;
 }
-.AscList li .Body{
+.AscList li .Body {
   display: flex;
   justify-content: space-between;
 }
 
-.AscList button{
+.AscList button {
   margin: 0px;
   font-size: 12px;
   padding: 4px;
@@ -20,22 +20,22 @@
   border-width: 1px;
 }
 
-ul{
+ul {
   list-style: none;
 }
 
-.AscList p{
+.AscList p {
   margin: 0;
 }
 
-.AscList .ProgressBar{
-  background-color:#444;
+.AscList .ProgressBar {
+  background-color: #444;
   border-radius: 3px;
   position: relative;
   margin-top: 5px;
 }
 
-.AscList .Progress{
+.AscList .Progress {
   height: 100%;
   background: #4997d4;
   position: absolute;
@@ -43,7 +43,7 @@ ul{
   z-index: 2;
 }
 
-.AscList .PotentialProgress{
+.AscList .PotentialProgress {
   height: 100%;
   background: #4fd433;
   position: absolute;

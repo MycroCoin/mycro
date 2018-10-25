@@ -4,9 +4,9 @@ import 'firebase/auth';
 // TODO split out dev and prod config
 const config = {
   apiKey: 'AIzaSyCYf-jdVEFlOQ1PvaeaHPmVpoqyjsj03vU',
-  authDomain: "mycrocoin.firebaseapp.com",
-  projectId: "mycrocoin",
-  storageBucket: "mycrocoin.appspot.com",
+  authDomain: 'mycrocoin.firebaseapp.com',
+  projectId: 'mycrocoin',
+  storageBucket: 'mycrocoin.appspot.com'
 };
 
 if (!firebase.apps.length) {
@@ -15,7 +15,4 @@ if (!firebase.apps.length) {
 
 const auth = firebase.auth;
 
-export {
-  auth,
-};
-
+export { auth };

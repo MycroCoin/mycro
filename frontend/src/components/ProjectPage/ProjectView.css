@@ -1,6 +1,6 @@
-.Page{
+.Page {
 }
-.InfoBlock{
+.InfoBlock {
   border-style: solid;
   border-radius: 3px;
   border-width: 1px;
@@ -10,7 +10,7 @@
   padding: 0 10px;
 }
 
-.InfoHeader{
+.InfoHeader {
   margin-left: -10px;
   margin-right: -10px;
   border-top-left-radius: 3px;
@@ -19,49 +19,49 @@
   background: linear-gradient(-50deg, #6ed0f7, #4068bf);
 }
 
-.InfoHeader h2{
-  margin:0;
+.InfoHeader h2 {
+  margin: 0;
   color: white;
 }
 
-.InfoLine .Descriptor{
+.InfoLine .Descriptor {
   font-weight: bold;
   display: inline-block;
   text-align: right;
 }
-.InfoLine .Descriptor:after{
+.InfoLine .Descriptor:after {
   content: ':';
   padding-right: 5px;
 }
 
 .InfoLine .Value {
   font-size: 14px;
-  color: rgba(0,0,0,0.5);
+  color: rgba(0, 0, 0, 0.5);
 }
 
-.InfoBlock a{
+.InfoBlock a {
   margin-top: 30px;
   text-align: center;
 }
 
-.InfoBody{
+.InfoBody {
   padding: 10px 0px 20px 0px;
 }
 
-.PanelContainer{
+.PanelContainer {
   padding-top: 30px;
   display: flex;
 }
 .LeftPanel {
   margin-right: 20px;
 }
-.LeftPanel h1{
+.LeftPanel h1 {
   margin-top: 0;
 }
 .RightPanel {
   flex-grow: 1;
 }
-.RightPanel h2{
+.RightPanel h2 {
   margin-top: 8px;
   margin-bottom: 22px;
 }

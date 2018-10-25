@@ -3,7 +3,7 @@
 
 .App-header {
   background: linear-gradient(-50deg, #4ff0ff, #0039b5);
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   height: 30px;
   padding: 20px 60px;
   color: white;
@@ -11,20 +11,20 @@
   justify-content: space-between;
 }
 
-.App-header a{
+.App-header a {
   color: white;
   border-color: white;
 }
 
-.App-header a:hover{
-  border-color: rgba(200,255,200,1);
-  color: rgba(200,255,200,1);
+.App-header a:hover {
+  border-color: rgba(200, 255, 200, 1);
+  color: rgba(200, 255, 200, 1);
 }
 
-.App-header h1{
+.App-header h1 {
   transition: 0.1s letter-spacing;
 }
-.App-header h1:hover{
+.App-header h1:hover {
   letter-spacing: 1px;
 }
 
@@ -46,7 +46,7 @@
 .App-intro {
   font-size: large;
   margin: 0;
-  color: rgba(255,255,255,0.85);
+  color: rgba(255, 255, 255, 0.85);
   padding-top: 5px;
 }
 
@@ -61,18 +61,18 @@ a {
   text-decoration: none;
 }
 
-a:hover{
+a:hover {
   text-decoration: underline;
 }
 
-.Toastify a{
+.Toastify a {
   color: white;
 }
-.Toastify h3{
+.Toastify h3 {
   color: white;
 }
 
-button{
+button {
   font-size: 20px;
   font-weight: 300;
   background-color: white;
@@ -84,7 +84,7 @@ button{
   cursor: pointer;
 }
 
-.button{
+.button {
   font-size: 20px;
   font-weight: bold;
   border-color: #3a1;
@@ -96,23 +96,23 @@ button{
   padding: 1px 7px 2px 7px;
 }
 
-.App-header .button{
+.App-header .button {
   margin: 0;
 }
 
-button:hover{
+button:hover {
   color: #69dc49;
   border-color: #69dc49;
   text-decoration: none;
 }
-.button:hover{
+.button:hover {
   color: #69dc49;
   border-color: #69dc49;
   text-decoration: none;
 }
 
-.GitHubLogo{
-  content: " ";
+.GitHubLogo {
+  content: ' ';
   background-image: url('./github_logo.png');
   background-size: contain;
   display: inline-block;
@@ -140,60 +140,61 @@ h2 {
   color: #666;
 }
 
-h3{
+h3 {
   font-weight: 300;
   color: #888;
 }
 
-.Modal{
+.Modal {
   padding: 0px;
 }
-.Modal .Body{
+.Modal .Body {
   margin: 20px;
 }
-.Modal input{
+.Modal input {
   font-size: 20px;
   width: 100%;
 }
 
-.Modal .Header{
+.Modal .Header {
   background-color: #2a94e0;
   margin: -5px -20px 0 -20px;
   padding: 20px 20px 10px 20px;
   text-align: center;
 }
-.Modal .Header h2{
+.Modal .Header h2 {
   color: white;
   margin: 0;
 }
 
-button:disabled, button:disabled:hover{
+button:disabled,
+button:disabled:hover {
   color: #999;
   border-color: #999;
   cursor: initial;
 }
 
-.Modal button{
+.Modal button {
   margin-left: 0px;
 }
 
-.Modal h3{
+.Modal h3 {
   color: white;
 }
 
-.animated{
+.animated {
   transition: transform 0.6s ease 0s, opacity 0.2s ease 0s;
 }
 
-.rotateY{
+.rotateY {
   transform: rotateY(360deg);
 }
 
-.TutorialSlate{
+.TutorialSlate {
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }

@@ -38,6 +38,25 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "truffle": "truffle"
+    "truffle": "truffle",
+    "prettier": "prettier --write \"**/*.{js,jsx,json,css,scss,md}\"",
+    "prettier-check": "prettier-check \"**/*.{js,jsx,json,css,scss,md}\""
+  },
+  "devDependencies": {
+    "husky": "^1.1.2",
+    "lint-staged": "^7.3.0",
+    "prettier": "^1.14.3",
+    "prettier-check": "^2.0.0"
+  },
+  "lint-staged": {
+    "*.{js,json,md,scss,yaml,yml}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   }
 }

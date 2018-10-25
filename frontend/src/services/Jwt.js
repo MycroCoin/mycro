@@ -1,20 +1,15 @@
+const JWT_KEY = 'jwt';
 
-const JWT_KEY = 'jwt'
-
-const setJwt = (newJwt) => {
+const setJwt = newJwt => {
   localStorage.setItem(JWT_KEY, newJwt);
 };
 
 const clearJwt = () => {
-  localStorage.removeItem(JWT_KEY)
-}
-
-const getJwt = () => {
-  return localStorage.getItem(JWT_KEY)
+  localStorage.removeItem(JWT_KEY);
 };
 
-export {
-  setJwt,
-  getJwt,
-  clearJwt
-}
+const getJwt = () => {
+  return localStorage.getItem(JWT_KEY);
+};
+
+export { setJwt, getJwt, clearJwt };

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import AscListItem from './AscListItem.js';
 
 class AscList extends Component {
-  render(){
+  render() {
     const ascs = this.props.ascs;
     const gitHubProject = this.props.gitHubProject;
     const symbol = this.props.symbol;
@@ -12,7 +12,8 @@ class AscList extends Component {
     const projectTotalSupply = this.props.projectTotalSupply;
 
     const renderedASCs = ascs.map(asc => {
-      return <AscListItem 
+      return (
+        <AscListItem
           key={asc.id}
           gitHubProject={gitHubProject}
           projectAddress={projectAddress}
@@ -20,7 +21,9 @@ class AscList extends Component {
           asc={asc}
           userBalance={userBalance}
           threshold={threshold}
-          projectTotalSupply={projectTotalSupply}/>
+          projectTotalSupply={projectTotalSupply}
+        />
+      );
     });
 
     return <ul className="AscList">{renderedASCs}</ul>;

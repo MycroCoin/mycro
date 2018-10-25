@@ -9,13 +9,22 @@ variables:
   FRONTEND_IMAGE: ${BASE_IMAGE_REGISTRY}/mycro-frontend
   TEST_IMAGE: ${BASE_IMAGE_REGISTRY}/test
 
-
 stages:
   - test
   - deploy
 
 before_script:
   - docker login -u _json_key -p "$(echo $GCR_REGSITRY_SERVICE_ACCOUNT | base64 -d)" https://gcr.io
+
+prettier_check_frontend:
+  stage: test
+  image: node:8
+  before_script:
+    - echo "no-op"
+  script:
+    - cd frontend
+    - npm i
+    - npm run prettier-check
 
 unit_test_backend:
   stage: test
@@ -63,4 +72,3 @@ deploy to main cluster:
   when: manual
   only:
     - master
-

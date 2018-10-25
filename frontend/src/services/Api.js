@@ -1,23 +1,23 @@
 import client from '../GraphqlClient.js';
 import gql from 'graphql-tag';
-import {toChecksumAddress} from 'web3-utils';
+import { toChecksumAddress } from 'web3-utils';
 
 //MUTATIONS
-const createProject = (projectName) => {
+const createProject = projectName => {
   const creatorAddress = toChecksumAddress(window.web3.eth.accounts[0]);
 
-  return client.mutate({mutation: gql`
+  return client.mutate({
+    mutation: gql`
     mutation {
       createProject(projectName: "${projectName}", creatorAddress: "${creatorAddress}") {
         projectAddress 
       }
-    }`});
-}
-const createAsc = (checksumDaoAddress, 
-                                checksumRewardeeAddress, 
-                                reward,
-                                prId) => 
-  client.mutate({mutation: gql`
+    }`
+  });
+};
+const createAsc = (checksumDaoAddress, checksumRewardeeAddress, reward, prId) =>
+  client.mutate({
+    mutation: gql`
     mutation {
       createMergeAsc(
         daoAddress: "${checksumDaoAddress}",
@@ -28,10 +28,12 @@ const createAsc = (checksumDaoAddress,
             address
           } 
         }
-    }`});
+    }`
+  });
 
 const loginUser = (provider, accessToken) => {
-  return client.mutate({mutation: gql`
+  return client.mutate({
+    mutation: gql`
     mutation {
       socialAuth(provider: "${provider}", accessToken: "${accessToken}") {
         social {
@@ -39,29 +41,30 @@ const loginUser = (provider, accessToken) => {
         }
         token
       }
-    }`});
-}
+    }`
+  });
+};
 
 //VIEWS
 const listProjectsQuery = () => {
   return gql`
-    query{
-        allProjects {
-        id,
-        repoName,
-        daoAddress,
-        symbol,
-        isMycroDao,
-        url,
-        ascs{
+    query {
+      allProjects {
+        id
+        repoName
+        daoAddress
+        symbol
+        isMycroDao
+        url
+        ascs {
           hasExecuted
-        },
+        }
       }
     }
   `;
-}
+};
 
-const getProjectQuery = (address) => {
+const getProjectQuery = address => {
   return gql`
   query {
     project(daoAddress:"${address}") {
@@ -91,13 +94,13 @@ const getProjectQuery = (address) => {
         state
       }
     }
-  }`
-}
+  }`;
+};
 
 export default {
   createAsc,
   createProject,
   listProjectsQuery,
   getProjectQuery,
-  loginUser,
+  loginUser
 };

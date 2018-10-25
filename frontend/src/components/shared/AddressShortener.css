@@ -2,14 +2,14 @@
   cursor: pointer;
   padding: 0 4px;
   position: relative;
-  color: rgba(0,0,0,0.5);
+  color: rgba(0, 0, 0, 0.5);
 
   transition: background-color 0.3s, border-radius 0.3s;
 }
 .ShortenedAddress .Tooltip {
   visibility: hidden;
   background-color: #333;
-  border: 1px solid rgba(0,0,0,0.3);
+  border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 3px;
   position: absolute;
   z-index: 1000;
@@ -17,24 +17,23 @@
   left: 5px;
   text-align: center;
   color: white;
-
 }
 
 .ShortenedAddress:hover {
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
 
   font-weight: bold;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
 }
 
 .ShortenedAddress:hover .Tooltip {
   visibility: visible;
 }
 
-.ShortenedAddress:Active {
-  background-color: rgba(0,0,0,0.4);
+.ShortenedAddress:active {
+  background-color: rgba(0, 0, 0, 0.4);
   font-weight: bolder;
   border-radius: 6px;
-  color: rgba(0,0,0,0.8);
+  color: rgba(0, 0, 0, 0.8);
 }
