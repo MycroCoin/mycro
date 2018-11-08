@@ -7,7 +7,7 @@ from graphene_django.types import DjangoObjectType
 import backend.server.utils.deploy as deploy
 import backend.server.utils.github as github
 import backend.settings as settings
-from backend.server.models import ASC, Project, Wallet
+from backend.server.models import ASC, Project, Wallet, BlockchainState
 from backend.server.utils.contract_compiler import ContractCompiler
 
 
@@ -132,7 +132,7 @@ class CreateMergeASC(graphene.Mutation):
 
         asc = project.asc_set.create(address=asc_address, project=project,
                                      rewardee=rewardee, reward=reward,
-                                     pr_id=pr_id)
+                                     pr_id=pr_id, blockchain_state=BlockchainState.COMPLETED.value)
 
         return CreateMergeASC(asc=asc)
 

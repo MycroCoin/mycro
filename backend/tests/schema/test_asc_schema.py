@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock, ANY, call
 
 import backend.tests.testing_utilities.constants as constants
-from backend.server.models import Project, ASC, Wallet
+from backend.server.models import Project, ASC, Wallet, BlockchainState
 from backend.tests.mycro_django_test import MycroDjangoTest
 
 
@@ -119,6 +119,7 @@ mutation {{
 
         self.assertEqual(1, len(all_ascs))
         self.assertEqual(constants.PROJECT_NAME, all_ascs[0].project.repo_name)
+        self.assertEqual(BlockchainState.COMPLETED, BlockchainState(all_ascs[0].blockchain_state))
         self.assertEqual(constants.ASC_ADDRESS, all_ascs[0].address)
 
         # called once for deployment and once for registration

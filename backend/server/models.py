@@ -4,6 +4,14 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from encrypted_model_fields.fields import EncryptedCharField, encrypt_str
 from django.contrib.postgres.fields import JSONField
+from enum import IntEnum
+
+
+class BlockchainState(IntEnum):
+    PENDING = 0
+    STARTED = 1
+    COMPLETED = 2
+    ERROR = 3
 
 
 class User(AbstractUser):
@@ -20,6 +28,10 @@ class Project(models.Model):
     symbol = models.CharField(max_length=10, default=None, blank=False,
                               null=True)
     decimals = models.IntegerField(default=-1)
+    blockchain_state = models.IntegerField(
+        choices=[(state.value, state.name) for state in BlockchainState],
+        default=BlockchainState.PENDING.value
+    )
 
     # TODO use django managers
     @staticmethod
@@ -33,11 +45,12 @@ class Project(models.Model):
     def create_mycro_dao(address, symbol, decimals):
         Project.objects.filter().update(is_mycro_dao=False)
         return Project.objects.create(
-                repo_name='mycro',
-                dao_address=address,
-                is_mycro_dao=True,
-                symbol=symbol,
-                decimals=decimals)
+            repo_name='mycro',
+            dao_address=address,
+            is_mycro_dao=True,
+            symbol=symbol,
+            decimals=decimals,
+            blockchain_state=BlockchainState.COMPLETED)
 
     def __str__(self):
         return f'{self.repo_name}@{self.dao_address}'
@@ -52,7 +65,10 @@ class ASC(models.Model):
     rewardee = models.CharField(max_length=42)
     reward = models.IntegerField()
     pr_id = models.IntegerField(null=True, blank=True)
-
+    blockchain_state = models.IntegerField(
+        choices=[(state.value, state.name) for state in BlockchainState],
+        default=BlockchainState.PENDING.value
+    )
 
 
 class Wallet(models.Model):
@@ -60,9 +76,10 @@ class Wallet(models.Model):
     NOTE!! Since private_key is encrypted no filtering of any sort works on it
     If you need to query for specific wallets, use their address for the query
     """
-    private_key = EncryptedCharField(max_length=66, unique=True, blank=False, null=False)
-    address = models.CharField(max_length=42, unique=True, blank=False, null=False)
-
+    private_key = EncryptedCharField(max_length=66, unique=True, blank=False,
+                                     null=False)
+    address = models.CharField(max_length=42, unique=True, blank=False,
+                               null=False)
 
 
 class Transaction(models.Model):
@@ -80,7 +97,3 @@ class Transaction(models.Model):
     cumulative_gas_used = models.IntegerField()
     gas_used = models.IntegerField()
     status = models.IntegerField()
-
-
-
-

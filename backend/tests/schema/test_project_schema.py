@@ -1,6 +1,6 @@
 from unittest.mock import patch, MagicMock, call, ANY
 
-from backend.server.models import Project, ASC, Wallet
+from backend.server.models import Project, ASC, Wallet, BlockchainState
 from backend.tests.mycro_django_test import MycroDjangoTest
 from backend.tests.testing_utilities.utils import *
 
@@ -61,6 +61,7 @@ mutation {{
             all_projects))
         self.assertEqual(constants.PROJECT_NAME, all_projects[0].repo_name)
         self.assertEqual(project_name, all_projects[1].repo_name)
+        self.assertEqual(BlockchainState.COMPLETED, all_projects[1].blockchain_state)
 
         # two transactions, one for deploying and once for registering
         transaction_mock.objects.create.assert_any_call(

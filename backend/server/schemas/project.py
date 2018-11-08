@@ -10,7 +10,7 @@ import asyncio
 from backend.server.utils.contract_compiler import ContractCompiler
 import backend.server.utils.deploy as deploy
 from backend.server.schemas.asc import AscType
-from backend.server.models import ASC, Wallet
+from backend.server.models import ASC, Wallet, BlockchainState
 from typing import List
 
 
@@ -251,7 +251,8 @@ class CreateProject(graphene.Mutation):
             last_merge_event_block=0,
             is_mycro_dao=False,
             symbol=symbol,
-            decimals=decimals)
+            decimals=decimals,
+            blockchain_state=BlockchainState.COMPLETED.value)
         github.create_repo(repo_name=project_name,
                            organization=settings.github_organization())
 
