@@ -2,9 +2,17 @@ from backend.server.utils.contract_compiler import ContractCompiler
 from web3 import Web3, Account
 from web3.providers.eth_tester import EthereumTesterProvider
 from eth_tester import EthereumTester
+import backend.constants as app_constants
 
 COMPILER = ContractCompiler()
-W3 = Web3(EthereumTesterProvider())
+TESTER = EthereumTester()
+TESTER.add_account(app_constants.DEFAULT_ETHEREUM_PRIVATE_KEY)
+W3 = Web3(EthereumTesterProvider(ethereum_tester=TESTER))
+
+TESTER.send_transaction({'from': W3.eth.accounts[0], 'to': app_constants.DEFAULT_ETHEREUM_ADDRESS, 'gas': 21000, 'value': int(10e18)})
+
+
+
 PROJECT_NAME = 'mycro'
 DAO_ADDRESS = '123'
 GITHUB_ACCESS_TOKEN = 'fake'

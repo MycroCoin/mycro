@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 import dj_database_url
 import os
 import sys
+import backend.constants as constants
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -251,6 +252,7 @@ FIELD_ENCRYPTION_KEY = os.environ.get("FIELD_ENCRYPTION_KEY", "p098ck9XEUuGrzMtk
 
 
 # Application config
+# TODO change these from functions to constants
 def deploy_env():
     deploy_env = os.environ.get('DEPLOY_ENV', 'parity')
     if deploy_env not in ALLOWED_DEPLOY_ENVS:
@@ -267,10 +269,10 @@ def ethereum_private_key():
         return os.environ[env_var_name]
     else:
         # ----------- WARNING: DO NOT USE THIS PRIVATE KEY IN ANY PRODUCTION SENSE. NEVER PUT REAL ETH INTO THIS ACCOUNT
-        return os.environ.get('ETHEREUM_PRIVATE_KEY', 'f49e1216edac9a5b0fab36f28037bfe8d5eb104b13f049b59decfac446e56ab3')
+        return os.environ.get('ETHEREUM_PRIVATE_KEY', constants.DEFAULT_ETHEREUM_PRIVATE_KEY)
 
 def parity_endpoint():
-    return os.environ.get('PARITY_ENDPOINT', 'http://localhost:8545')
+    return os.environ.get('PARITY_ENDPOINT', constants.DEFAULT_PARITY_ENDPOINT)
 
 def github_token():
     return os.environ['GITHUB_TOKEN']

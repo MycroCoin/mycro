@@ -39,3 +39,6 @@ class ContractCompiler:
                     return os.path.join(root, contract_file_name)
 
         return None
+
+    def get_mycro_contract(self):
+        return self.get_contract_interface("mycro.sol", "MycroCoin")

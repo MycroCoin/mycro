@@ -89,6 +89,10 @@ def submit_sign_and_wait_for_transaction(w3: Web3, txn: Dict, private_key: str, 
     # after the transaction is confirmed, save it
     account_address = Account.privateKeyToAccount(private_key).address
     wallet = Wallet.objects.get(address=account_address)
+    to = txn['to']
+    if isinstance(to, bytes):
+        to = to.decode('utf-8')
+
     Transaction.objects.create(
         block_number=tx_receipt['blockNumber'],
         chain_id=txn['chainId'],
@@ -98,10 +102,10 @@ def submit_sign_and_wait_for_transaction(w3: Web3, txn: Dict, private_key: str, 
         gas_limit=txn['gas'],
         gas_price=txn['gasPrice'],
         gas_used=tx_receipt['gasUsed'],
-        hash=tx_hash,
+        hash=tx_hash.hex(),
         nonce=txn['nonce'],
-        status=tx_receipt['status'],
-        to=txn['to'].decode('utf-8'),
+        status=tx_receipt.get('status', -1),
+        to=to,
         value=txn['value'],
         wallet=wallet,
     )

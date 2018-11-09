@@ -123,7 +123,7 @@ mutation {{
 
         # called once for deployment and once for registration
         transaction_mock.objects.create.assert_any_call(wallet=self.wallet,
-                                                        hash=get_w3_mock.return_value.eth.sendRawTransaction.return_value,
+                                                        hash=get_w3_mock.return_value.eth.sendRawTransaction.return_value.hex.return_value,
                                                         value=ANY,
                                                         chain_id=ANY,
                                                         nonce=ANY,
