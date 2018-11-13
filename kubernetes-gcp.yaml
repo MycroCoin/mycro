@@ -108,6 +108,16 @@ spec:
               key: value
         - name: PYTHONUNBUFFERED
           value: "1"
+        - name: DJANGO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret-key
+              key: value
+        - name: FIELD_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-field-encryption-key
+              key: value
         image: gcr.io/mycrocoin/mycro-backend:<MYCRO_IMAGE_LABEL>
         imagePullPolicy: IfNotPresent
         name: server
@@ -228,6 +238,16 @@ spec:
           valueFrom:
             secretKeyRef:
               name: infura-api-key
+              key: value
+        - name: DJANGO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret-key
+              key: value
+        - name: FIELD_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-field-encryption-key
               key: value
         image: gcr.io/mycrocoin/mycro-backend:<MYCRO_IMAGE_LABEL>
         imagePullPolicy: IfNotPresent
