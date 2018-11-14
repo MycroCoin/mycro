@@ -10,8 +10,10 @@ class TestProjectSchema(MycroDjangoTest):
     def setUp(self):
         super().setUp()
         self.project = Project.objects.create(repo_name=constants.PROJECT_NAME,
-                                              dao_address=constants.DAO_ADDRESS,
-                                              is_mycro_dao=True)
+                                              dao_address=constants.PROJECT_ADDRESS,
+                                              is_mycro_dao=True, initial_balances=constants.CREATORS_BALANCES)
+
+        self.assertEqual(1, Project.objects.count())
 
     def test_get_all_projects(self):
         resp = self.query(
@@ -25,68 +27,45 @@ query {
             '''
         )
         self.assertResponseNoErrors(resp, {
-            'allProjects': [{'daoAddress': constants.DAO_ADDRESS,
+            'allProjects': [{'daoAddress': constants.PROJECT_ADDRESS,
                              'repoName': constants.PROJECT_NAME}]})
 
-    @patch('backend.server.utils.deploy.Transaction')
-    @patch('backend.server.utils.deploy.get_w3')
-    @patch('backend.server.utils.github.create_repo')
-    @patch('backend.settings.github_organization')
-    def test_create_project(self, github_organization_mock, create_repo_mock, get_w3_mock, transaction_mock: MagicMock):
+    @patch('backend.server.schemas.project.create_project')
+    def test_create_project(self, create_project_mock):
         project_name = 'testing'
-        dao_address = '0x1111111111111111111111111111111111111118'
-        w3 = get_w3_mock.return_value
-        w3.eth.waitForTransactionReceipt.return_value = {
-            'contractAddress': dao_address,
-            'cumulativeGasUsed': 2,
-            'gasUsed': 1,
-            'blockNumber': 3,
-            'status': 4}
-        w3.eth.getBalance.return_value = int(10e18)
 
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createProject(projectName: "{project_name}", creatorAddress: "{constants.DAO_ADDRESS}") {{
-      projectAddress
+  createProject(projectName: "{project_name}", creatorAddress: "{constants.PROJECT_ADDRESS}") {{
+      project {{
+        daoAddress
+        symbol
+      }}
   }}
 }}
 """)
         self.assertResponseNoErrors(resp, {
-            'createProject': {'projectAddress': dao_address}})
+            'createProject': {'project':{'daoAddress': '' , 'symbol': project_name[:3]}}})
 
         all_projects = Project.objects.all()
+        new_project: Project = all_projects[1]
 
         self.assertEqual(2, len(
             all_projects))
         self.assertEqual(constants.PROJECT_NAME, all_projects[0].repo_name)
-        self.assertEqual(project_name, all_projects[1].repo_name)
-        self.assertEqual(BlockchainState.COMPLETED, all_projects[1].blockchain_state)
+        self.assertEqual({constants.PROJECT_ADDRESS: 1000}, new_project.initial_balances)
+        self.assertEqual(project_name, new_project.repo_name)
+        self.assertEqual(BlockchainState.PENDING, new_project.blockchain_state)
+        self.assertFalse(new_project.is_mycro_dao)
+        self.assertEqual(project_name[:3], new_project.symbol)
+        self.assertEqual(18, new_project.decimals)
+        self.assertEqual('', new_project.dao_address)
+        self.assertEqual('', new_project.merge_module_address)
+        self.assertEqual(0, new_project.last_merge_event_block)
 
-        # two transactions, one for deploying and once for registering
-        transaction_mock.objects.create.assert_any_call(
-                wallet=self.wallet,
-                hash=get_w3_mock.return_value.eth.sendRawTransaction.return_value.hex.return_value,
-                value=ANY,
-                chain_id=ANY,
-                nonce=ANY,
-                gas_limit=ANY,
-                gas_price=ANY,
-                data=ANY,
-                to=ANY,
-                contract_address=dao_address,
-                cumulative_gas_used=2,
-                gas_used=1,
-                block_number=3,
-                status=4
-        )
+        create_project_mock.delay.assert_called_once()
 
-        # called twice for deployment and twice for registrations
-        self.assertEqual(4,
-                         get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
-        self.assertEqual(4, w3.eth.sendRawTransaction.call_count)
-
-        create_repo_mock.assert_called_once_with(repo_name=project_name, organization=github_organization_mock.return_value)
 
     def test_create_project_mycro_dao_doesnt_exist(self):
         Project.objects.filter().delete()
@@ -95,8 +74,10 @@ mutation {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createProject(projectName: "{project_name}", creatorAddress: "{constants.DAO_ADDRESS}") {{
-      projectAddress
+  createProject(projectName: "{project_name}", creatorAddress: "{constants.PROJECT_ADDRESS}") {{
+      project {{
+        id
+      }}
   }}
 }}
 """)
@@ -110,8 +91,10 @@ mutation {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createProject(projectName: "{project_name}", creatorAddress: "{constants.DAO_ADDRESS}") {{
-      projectAddress
+  createProject(projectName: "{project_name}", creatorAddress: "{constants.PROJECT_ADDRESS}") {{
+      project {{
+        id
+      }}
   }}
 }}
 """)
@@ -121,7 +104,7 @@ mutation {{
         resp = self.query(
             f'''
             query {{
-                project(daoAddress: "{constants.DAO_ADDRESS}") {{
+                project(daoAddress: "{constants.PROJECT_ADDRESS}") {{
                     repoName
                 }}
             }}
@@ -210,7 +193,7 @@ mutation {{
         resp = self.query(
             f'''
             query {{
-                project(daoAddress: "{constants.DAO_ADDRESS}") {{
+                project(daoAddress: "{constants.PROJECT_ADDRESS}") {{
                     ascs {{
                         address
                     }}

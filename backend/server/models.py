@@ -32,6 +32,9 @@ class Project(models.Model):
         choices=[(state.value, state.name) for state in BlockchainState],
         default=BlockchainState.PENDING.value
     )
+    # TODO disable updates to this field
+    initial_balances = JSONField(null=False, blank=False)
+
 
     # TODO use django managers
     @staticmethod
@@ -50,7 +53,8 @@ class Project(models.Model):
             is_mycro_dao=True,
             symbol=symbol,
             decimals=decimals,
-            blockchain_state=BlockchainState.COMPLETED)
+            blockchain_state=BlockchainState.COMPLETED,
+            initial_balances={})
 
     def __str__(self):
         return f'{self.repo_name}@{self.dao_address}'

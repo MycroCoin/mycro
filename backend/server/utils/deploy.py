@@ -195,6 +195,8 @@ def _deploy_contract(w3, contract_interface, *args, private_key,
     if private_key is None:
         raise ValueError('Private key cannot be none')
 
+    logging.info(f'Deploy contract with args {args}')
+
     fund_account_if_needed(w3, settings.ethereum_private_key(), private_key)
 
     # Instantiate contract

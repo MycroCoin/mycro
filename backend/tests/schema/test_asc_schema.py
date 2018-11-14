@@ -10,11 +10,12 @@ class TestASCSchema(MycroDjangoTest):
     def setUp(self):
         super().setUp()
         self.project = Project.objects.create(repo_name=constants.PROJECT_NAME,
-                                              dao_address=constants.DAO_ADDRESS)
+                                              dao_address=constants.PROJECT_ADDRESS, initial_balances=constants.CREATORS_BALANCES)
         self.asc = self.project.asc_set.create(address=constants.ASC_ADDRESS,
                                                project=self.project,
                                                reward=constants.REWARD,
                                                pr_id=constants.PR_ID)
+        self.assertEqual(1, ASC.objects.count())
 
     def test_get_all_ascs(self):
         resp = self.query(
@@ -33,7 +34,7 @@ query {
         resp = self.query(
             f'''
 query {{
-  ascForProject(projectAddress: "{constants.DAO_ADDRESS}") {{
+  ascForProject(projectAddress: "{constants.PROJECT_ADDRESS}") {{
     project {{
         repoName
     }}
@@ -47,12 +48,12 @@ query {{
 
     def test_get_asc_by_id(self):
         resp = self.query(
-            '''
-query {
-  asc(ascId: "1") {
+            f'''
+query {{
+  asc(ascId: "{self.asc.id}") {{
      address
-  }
-}
+  }}
+}}
             '''
         )
 
@@ -64,13 +65,14 @@ query {
             f'''
 query {{
   asc(address: "{constants.ASC_ADDRESS}") {{
-     id
+     reward
+     prId
   }}
 }}
             '''
         )
 
-        self.assertResponseNoErrors(resp, {'asc': {'id': "1"}})
+        self.assertResponseNoErrors(resp, {'asc': {'reward': constants.REWARD, 'prId': constants.PR_ID}})
 
     def test_create_asc_project_doesnt_exist(self):
         # need to double up on braces because of f-strings
@@ -105,7 +107,7 @@ mutation {{
         # need to double up on braces because of f-strings
         resp = self.query(f"""
 mutation {{
-  createMergeAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: 1)  {{
+  createMergeAsc(daoAddress: "{constants.PROJECT_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: 1)  {{
     asc {{
       address 
     }}
@@ -159,7 +161,7 @@ query {
         resp = self.query(
             f"""
             mutation {{
-              createMergeAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: {constants.PR_ID})  {{
+              createMergeAsc(daoAddress: "{constants.PROJECT_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: {constants.PR_ID})  {{
                 asc {{
                   address 
                 }}
@@ -183,7 +185,7 @@ query {
         resp = self.query(
             f"""
             mutation {{
-              createMergeAsc(daoAddress: "{constants.DAO_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: {pr_id})  {{
+              createMergeAsc(daoAddress: "{constants.PROJECT_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: {pr_id})  {{
                 asc {{
                   address 
                 }}

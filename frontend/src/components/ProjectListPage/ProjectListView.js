@@ -93,27 +93,34 @@ class Projects extends Component {
           </span>
         );
 
+      // TODO add a spinner if the blockchain state isn't `completed`
       return (
-        <div className="ProjectListItem">
-          <Link to={'/projects/' + props.project.daoAddress}>
-            <div className="Header">
-              <div className="Background" />
-              <div className="Content">{props.project.symbol}</div>
+        <div>
+          <div className="ProjectListItem">
+            <Link to={'/projects/' + props.project.daoAddress}>
+              <div className="Header">
+                <div className="Background" />
+                <div className="Content">{props.project.symbol}</div>
+              </div>
+            </Link>
+            <div className="Body">
+              <p className="Title">
+                <Link to={'/projects/' + props.project.daoAddress}>
+                  {props.project.repoName}
+                </Link>
+              </p>
+              <p className="Subtitle">{ascMessage}</p>
+              <div className="GithubLink">
+                <a href={props.project.url} target="blank_">
+                  [view on GitHub]
+                  <span className="GitHubLogo" />
+                </a>
+              </div>
             </div>
-          </Link>
-          <div className="Body">
-            <p className="Title">
-              <Link to={'/projects/' + props.project.daoAddress}>
-                {props.project.repoName}
-              </Link>
-            </p>
-            <p className="Subtitle">{ascMessage}</p>
-            <div className="GithubLink">
-              <a href={props.project.url} target="blank_">
-                [view on GitHub]
-                <span className="GitHubLogo" />
-              </a>
-            </div>
+            {/* TODO We need to coerce blockchain state from A_x to it's human for*/}
+            {/* A_2 is `COMPLETED`*/}
+            {/* TODO make this look not so shitty */}
+            {props.project.blockchainState !== 'A_2' && <Spinner />}
           </div>
         </div>
       );

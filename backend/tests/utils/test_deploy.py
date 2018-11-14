@@ -95,7 +95,7 @@ class TestDeploy(MycroDjangoTest):
 
         receipt = deploy.call_contract_function(
             contract.functions.registerProject,
-            constants.DAO_ADDRESS,
+            constants.PROJECT_ADDRESS,
             private_key=constants.WALLET.privateKey, timeout=timeout)
 
         self.assertEqual(receipt, w3.eth.waitForTransactionReceipt.return_value)
@@ -111,7 +111,7 @@ class TestDeploy(MycroDjangoTest):
             {'nonce': 0, 'gas': 7000000, 'gasPrice': 1})
 
         deploy.call_contract_function(contract.functions.registerProject,
-                                      constants.DAO_ADDRESS,
+                                      constants.PROJECT_ADDRESS,
                                       timeout=timeout,
                                       private_key=settings.ethereum_private_key())
 

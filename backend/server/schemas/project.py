@@ -12,6 +12,7 @@ import backend.server.utils.deploy as deploy
 from backend.server.schemas.asc import AscType
 from backend.server.models import ASC, Wallet, BlockchainState
 from typing import List
+from backend.server.tasks import create_project
 
 
 class ProjectException(Exception):
@@ -186,7 +187,7 @@ class CreateProject(graphene.Mutation):
         project_name = graphene.String(required=True)
         creator_address = graphene.String(required=True)
 
-    project_address = graphene.String()
+    project = graphene.Field(ProjectType)
 
     @classmethod
     def _validate_project_name(cls, proposed_project_name):
@@ -203,60 +204,26 @@ class CreateProject(graphene.Mutation):
             raise ProjectException(
                 "Could not find mycro dao. Cannot create new project.")
 
-        compiler = ContractCompiler()
 
-        w3 = deploy.get_w3()
-
-        # get the know mycro contract
-        contract_interface = compiler.get_contract_interface('mycro.sol',
-                                                             'MycroCoin')
-        mycro_contract = w3.eth.contract(abi=contract_interface['abi'],
-                                         address=mycro_project.dao_address)
-
-        base_dao_interface = compiler.get_contract_interface('base_dao.sol',
-                                                             'BaseDao')
-        merge_module_interface = compiler.get_contract_interface(
-            'merge_module.sol', 'MergeModule')
-
+        total_supply = 1000
         symbol = project_name[:3]
-        decimals = 18  # todo acccept this as a parameter
-        total_supply = 1000  # todo accept this as a parameter
+        decimals = 18
+        initial_balances = {creator_address: total_supply}
 
-        w3, dao_contract, dao_address, _ = deploy.deploy(base_dao_interface,
-                                                         symbol,
-                                                         project_name,
-                                                         decimals,
-                                                         total_supply,
-                                                         [creator_address], # inital addresses
-                                                         [total_supply], # initial balance
-                                                         private_key=Wallet.objects.first().private_key)
-
-        _, _, merge_module_address, _ = deploy.deploy(merge_module_interface,
-                                                      private_key=Wallet.objects.first().private_key)
-
-        deploy.call_contract_function(
-            dao_contract.functions.registerModule,
-            merge_module_address,
-            private_key=Wallet.objects.first().private_key)
-        deploy.call_contract_function(
-            mycro_contract.functions.registerProject,
-            dao_address,
-            private_key=Wallet.objects.first().private_key)
 
         # create a row in the a db and a repository in github
-        Project.objects.create(
+        project = Project.objects.create(
             repo_name=project_name,
-            dao_address=dao_address,
-            merge_module_address=merge_module_address,
             last_merge_event_block=0,
             is_mycro_dao=False,
             symbol=symbol,
             decimals=decimals,
-            blockchain_state=BlockchainState.COMPLETED.value)
-        github.create_repo(repo_name=project_name,
-                           organization=settings.github_organization())
+            blockchain_state=BlockchainState.PENDING.value,
+            initial_balances=initial_balances)
 
-        return CreateProject(project_address=dao_address)
+        create_project.delay(project.id)
+
+        return CreateProject(project=project)
 
 
 class Mutation(graphene.ObjectType):

@@ -109,11 +109,6 @@ DATABASES = {
         'PORT': os.environ.get('DJANGO_DB_PORT', '5432')
     }
 }
-# https://stackoverflow.com/questions/6353124/running-django-tests-with-sqlite
-if 'test' in sys.argv or 'test_coverage' in sys.argv or 'makemigrations' in sys.argv: #Covers regular testing and django-coverage
-    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
-
-
 
 
 # Password validation

@@ -30,6 +30,11 @@ unit_test_backend:
   stage: test
   services:
     - docker:dind
+    - postgres:latest
+  variables:
+    POSTGRES_DB: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: ""
   script:
     # need to support branches with / in the their name. Do this by replacing / with -
     - IMAGE_WITH_TAG=$TEST_IMAGE:$CI_COMMIT_REF_SLUG
@@ -37,7 +42,7 @@ unit_test_backend:
     - docker pull $IMAGE_WITH_TAG || docker pull $TEST_IMAGE:latest || true
     - docker build --cache-from $IMAGE_WITH_TAG --cache-from $TEST_IMAGE:latest -t $IMAGE_WITH_TAG -t $TEST_IMAGE:latest -f server.Dockerfile .
     - docker push $IMAGE_WITH_TAG # push this first so we don't have to rebuild if tests fail
-    - docker run $IMAGE_WITH_TAG python manage.py test -v 2
+    - docker run --net=host $IMAGE_WITH_TAG python manage.py test -v 2
     - docker push $TEST_IMAGE:latest
 
 deploy to main cluster:

@@ -10,7 +10,10 @@ const createProject = projectName => {
     mutation: gql`
     mutation {
       createProject(projectName: "${projectName}", creatorAddress: "${creatorAddress}") {
-        projectAddress 
+        project {
+          repoName,
+          symbol,
+        } 
       }
     }`
   });
@@ -59,6 +62,7 @@ const listProjectsQuery = () => {
         ascs {
           hasExecuted
         }
+        blockchainState
       }
     }
   `;
@@ -92,7 +96,8 @@ const getProjectQuery = address => {
         number,
         title,
         state
-      }
+      },
+      blockchainState
     }
   }`;
 };
