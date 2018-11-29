@@ -3,5 +3,5 @@
 # mycro-backend docker context easier.
 # example usage: "./docker-manage.sh makemigrations"
 
-docker run -v `pwd`:`pwd` -w `pwd` -i -t mycro-backend ./manage.py "$@"
+docker run -v `pwd`:`pwd` -w `pwd` -i -t mycro_server ./manage.py "$@"
 
