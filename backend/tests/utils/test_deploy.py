@@ -1,14 +1,14 @@
-import unittest
-from unittest.mock import patch, MagicMock, call, ANY
-import backend.server.utils.deploy as deploy
-from web3.middleware import geth_poa_middleware
-from web3.providers import HTTPProvider
+import asyncio
+from unittest.mock import ANY, MagicMock, patch
+
 from web3 import Account
+from web3.providers import HTTPProvider
+
+import backend.server.utils.deploy as deploy
 import backend.settings as settings
 import backend.tests.testing_utilities.constants as constants
-import asyncio
-from backend.tests.mycro_django_test import MycroDjangoTest
 from backend.server.models import Transaction, Wallet
+from backend.tests.mycro_django_test import MycroDjangoTest
 
 PARITY_ENDPOINT = 'a.b.c'
 INFURA_KEY = 'lol'
@@ -61,7 +61,7 @@ class TestDeploy(MycroDjangoTest):
                                     timeout=10)
 
     def test_deploy_contract_with_private_key(self):
-        w3 = constants.W3
+        w3 = constants.create_w3()
 
         contract_interface = constants.COMPILER.get_mycro_contract()
 

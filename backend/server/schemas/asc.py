@@ -9,6 +9,7 @@ import backend.server.utils.github as github
 import backend.settings as settings
 from backend.server.models import ASC, Project, Wallet, BlockchainState
 from backend.server.utils.contract_compiler import ContractCompiler
+from backend.server.tasks import create_asc
 
 
 class ASCError(Exception):
@@ -16,6 +17,11 @@ class ASCError(Exception):
     pass
 
 def _get_voters_for_asc(asc: ASC) -> List[str]:
+    # If the asc hasn't been deployed, we can't call any functions on it because
+    # it has no address
+    if asc.blockchain_state != BlockchainState.COMPLETED:
+        return []
+
     dao_contract = deploy.get_dao_contract(asc.project.dao_address)
 
     return dao_contract.functions.getAscVotes(asc.address).call()
@@ -30,6 +36,9 @@ class AscType(DjangoObjectType):
     vote_amount = graphene.Float()
 
     def resolve_has_executed(self: ASC, info):
+        if not self.blockchain_state == BlockchainState.COMPLETED:
+            return False
+
         asc_contract = deploy.get_asc_contract(self.address)
 
         return asc_contract.functions.hasExecuted().call()
@@ -108,31 +117,12 @@ class CreateMergeASC(graphene.Mutation):
         # TODO check that a PR with the given ID exists before executing the rest of this function
         CreateMergeASC._validate_asc_creation(project, pr_id)
 
-        compiler = ContractCompiler()
 
-        w3 = deploy.get_w3()
-        base_dao_interface = compiler.get_contract_interface('base_dao.sol',
-                                                             'BaseDao')
-        dao_contract = w3.eth.contract(abi=base_dao_interface['abi'],
-                                       address=dao_address)
-
-        asc_interface = compiler.get_contract_interface('merge_asc.sol',
-                                                        'MergeASC')
-
-        # we don't use the async method here because we can't parallelize
-        # first the asc has to be deployed to get it's address then the address has to be registered
-        # with the base dao
-        _, _, asc_address, _ = deploy.deploy(asc_interface, rewardee, reward,
-                                             pr_id,
-                                             private_key=Wallet.objects.first().private_key)
-
-        deploy.call_contract_function(dao_contract.functions.propose,
-                                      asc_address,
-                                      private_key=Wallet.objects.first().private_key)
-
-        asc = project.asc_set.create(address=asc_address, project=project,
+        asc = project.asc_set.create(project=project,
                                      rewardee=rewardee, reward=reward,
-                                     pr_id=pr_id, blockchain_state=BlockchainState.COMPLETED.value)
+                                     pr_id=pr_id, blockchain_state=BlockchainState.PENDING.value)
+
+        create_asc.delay(asc.id)
 
         return CreateMergeASC(asc=asc)
 

@@ -2,6 +2,7 @@ import graphene
 
 from graphene_django.types import DjangoObjectType
 from graphene import ObjectType
+from web3 import Web3
 
 from backend.server.models import Project
 import backend.server.utils.github as github
@@ -203,6 +204,9 @@ class CreateProject(graphene.Mutation):
         if mycro_project is None:
             raise ProjectException(
                 "Could not find mycro dao. Cannot create new project.")
+
+        if not Web3.isAddress(creator_address):
+            raise ProjectException('Supplied address is not valid')
 
 
         total_supply = 1000

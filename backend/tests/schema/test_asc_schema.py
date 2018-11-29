@@ -88,21 +88,11 @@ mutation {{
 
         self.assertErrorNoResponse(resp, "Project matching query")
 
-    @patch('backend.server.utils.deploy.Transaction')
-    @patch('backend.server.utils.deploy.get_w3')
+    @patch('backend.server.schemas.asc.create_asc.delay')
     @patch('backend.server.schemas.asc.CreateMergeASC._validate_asc_creation')
-    def test_create_asc(self, validate_mock: MagicMock, get_w3_mock: MagicMock,
-                        transaction_mock: MagicMock):
+    def test_create_asc(self, validate_mock: MagicMock, create_asc_task_mock: MagicMock):
         ASC.objects.filter().delete()
         self.assertEqual(0, self.project.asc_set.count())
-        w3 = get_w3_mock.return_value
-        w3.eth.waitForTransactionReceipt.return_value = {
-            'contractAddress': constants.ASC_ADDRESS,
-            'cumulativeGasUsed': 2,
-            'gasUsed': 1,
-            'blockNumber': 3,
-            'status': 4}
-        w3.eth.getBalance.return_value = int(10e18)
 
         # need to double up on braces because of f-strings
         resp = self.query(f"""
@@ -110,41 +100,27 @@ mutation {{
   createMergeAsc(daoAddress: "{constants.PROJECT_ADDRESS}", rewardee: "{constants.REWARDEE}", reward: {constants.REWARD},  prId: 1)  {{
     asc {{
       address 
+      rewardee
+      id
     }}
   }}
 }}
 """)
         self.assertResponseNoErrors(resp, {
-            'createMergeAsc': {'asc': {'address': constants.ASC_ADDRESS}}})
+            'createMergeAsc': {'asc': {'id': ANY,'address': '', 'rewardee': constants.REWARDEE}}})
 
         all_ascs = ASC.objects.all()
 
         self.assertEqual(1, len(all_ascs))
         self.assertEqual(constants.PROJECT_NAME, all_ascs[0].project.repo_name)
-        self.assertEqual(BlockchainState.COMPLETED, BlockchainState(all_ascs[0].blockchain_state))
-        self.assertEqual(constants.ASC_ADDRESS, all_ascs[0].address)
+        self.assertEqual(BlockchainState.PENDING, BlockchainState(all_ascs[0].blockchain_state))
+        self.assertEqual('', all_ascs[0].address)
 
-        # called once for deployment and once for registration
-        transaction_mock.objects.create.assert_any_call(wallet=self.wallet,
-                                                        hash=get_w3_mock.return_value.eth.sendRawTransaction.return_value.hex.return_value,
-                                                        value=ANY,
-                                                        chain_id=ANY,
-                                                        nonce=ANY,
-                                                        gas_limit=ANY,
-                                                        gas_price=ANY,
-                                                        data=ANY,
-                                                        to=ANY,
-                                                        contract_address=constants.ASC_ADDRESS,
-                                                        cumulative_gas_used=2,
-                                                        gas_used=1,
-                                                        block_number=3,
-                                                        status=4)
-        self.assertEqual(2,
-                         get_w3_mock.return_value.eth.waitForTransactionReceipt.call_count)
-        self.assertEqual(2, w3.eth.sendRawTransaction.call_count)
 
         self.assertEqual(1, self.project.asc_set.count())
         validate_mock.assert_called_once()
+
+        create_asc_task_mock.assert_called_once_with(int(resp['data']['createMergeAsc']['asc']['id']))
 
     def test_get_merge_asc_abi(self):
         resp = self.query("""
