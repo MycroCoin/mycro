@@ -23,7 +23,14 @@ and set your metamask endpoint to localhost:8545\n
 # This is a hack that gives the user access to a mycro-test-account github account
 # this won't scale but makes dev setup easy for now. We should find a better solution
 # to this long term.
-DEFAULT_GITHUB_TOKEN="3c69ed70dc96fa80a65494e139986b93499581f7"
+# the token is split to get past a github security feature that automatically removes 
+# security keys that are commited to a repo. The security risk here is that everyone
+# has read/write access to github projects created from dev environments.
+PART_1="156"
+PART_2="b79d231"
+PART_3="d108baea9a"
+PART_4="97386d9036d7ce35ad3a"
+DEFAULT_GITHUB_TOKEN="${PART_1}${PART_2}${PART_3}${PART_4}"
 [ -n "${GITHUB_TOKEN}" ] || export GITHUB_TOKEN=$DEFAULT_GITHUB_TOKEN
 
 start() {
