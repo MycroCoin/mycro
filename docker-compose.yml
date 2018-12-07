@@ -90,7 +90,7 @@ services:
       context: .
       dockerfile: frontend.Dockerfile
     command: >
-      bash -c "truffle compile --all && npm start"
+      bash -c "truffle compile --all && cp -rf /mycro/build /mycro/src/ && npm start"
     ports:
       - "3000:3000"
     environment:
