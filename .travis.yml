@@ -1,0 +1,50 @@
+image: docker:latest
+language: python
+
+env:
+  global:
+    - DOCKER_DRIVER=overlay2
+    - DOCKER_HOST=tcp://localhost:2375
+
+    - BASE_IMAGE_REGISTRY=gcr.io/mycrocoin
+    - BACKEND_IMAGE=${BASE_IMAGE_REGISTRY}/mycro-backend
+    - FRONTEND_IMAGE=${BASE_IMAGE_REGISTRY}/mycro-frontend
+    - TEST_IMAGE=${BASE_IMAGE_REGISTRY}/test
+
+stages:
+  - test
+
+
+jobs:
+  include:
+    - stage: unit test
+      language: node_js
+      node_js: "10.4"
+      cache:
+        directories:
+        - frontend/node_modules
+      before_install:
+        - cd frontend
+      install:
+        - npm install
+      script:
+        - npm run prettier-check
+    - stage: unit test
+      services:
+        - docker
+        - postgresql
+      addons:
+        postgresql: "9.6"
+      before_script:
+        - docker login -u _json_key -p "$(echo $GCR_REGSITRY_SERVICE_ACCOUNT | base64 -d)" https://gcr.io
+        - psql -c 'create database travis_ci_test;' -U postgres
+      script:
+        # need to support branches with / in the their name. Do this by replacing / with -
+        - IMAGE_WITH_TAG=$TEST_IMAGE:${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
+
+        - docker pull $IMAGE_WITH_TAG || docker pull $TEST_IMAGE:latest || true
+        - docker build --cache-from $IMAGE_WITH_TAG --cache-from $TEST_IMAGE:latest -t $IMAGE_WITH_TAG -t $TEST_IMAGE:latest -f server.Dockerfile .
+        - docker push $IMAGE_WITH_TAG # push this first so we don't have to rebuild if tests fail
+        - docker run --net=host $IMAGE_WITH_TAG python manage.py test -v 2
+        - docker push $TEST_IMAGE:latest
+
