@@ -4,10 +4,13 @@ WORKDIR mycro
 
 RUN npm install -g truffle
 
+# used for prod environment
+RUN npm install -g serve
+
 COPY frontend/package.json .
 RUN npm install
 
-COPY wait_for_it.sh .
+COPY ./ops/wait_for_it.sh .
 
 COPY frontend .
 # TODO contracts should be taken out of the backend

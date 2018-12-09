@@ -15,6 +15,8 @@ import os
 import sys
 import backend.constants as constants
 
+_isProd = os.environ.get('PROD') == 'true'
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,24 +28,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '=*f9))56@c*dzlmm0%t@)v1=)d2*pbom51h+o7l%35xt92ya3t')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') == 'true'
+# DEBUG = not _isProd
+#TODO don't commit this!
+DEBUG = True
 
 # URLs used to talk to the backend
-ALLOWED_HOSTS = [
-    'testserver',
-    'localhost',
-    '127.0.0.1',
-    '192.168.99.100', # IP of minikube on paymahn's machine
-    '35.230.122.2',  # IP of the server load balancer in GCP
-]
+ALLOWED_HOSTS = ['server']
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.github.GithubOAuth2',
 ]
-
-
-
 
 # Application definition
 
@@ -156,14 +151,12 @@ GRAPHENE = {
 
 # Celery config
 CELERY_RESULT_BACKEND = 'django-db'
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+
 
 # Who's allowed to talk to the backend
-CORS_ORIGIN_WHITELIST = (
+CORS_ORIGIN_WHITELIST = ('https://apps.mycrocoin.org:443') if _isProd else (
     'localhost:3000'
-    '192.168.99.100:30080' # ip of paymahn's minikube
-    '35.230.10.99:80' # ip of frontend load balancer for production
-    'app.mycrocoin.org:80'
 )
 
 CORS_ALLOW_METHODS = (

@@ -1,29 +1,20 @@
 version: '2'
 
 services:
-  parity:
-    build:
-      context: .
-      dockerfile: parity-dev.Dockerfile
-    # command: --light --chain ropsten --base-path /root/.local/share/io.parity.ethereum --unsafe-expose
-    ports:
-      - "8545:8545"
-      - "8180:8180"
   postgres:
+    restart: always
     image: postgres:10
     environment:
       - POSTGRES_PASSWORD=loltesting
       - POSTGRES_USER=user
       - POSTGRES_DB=postgres
-    ports:
-      - "5432:5432"
   redis:
+    restart: always
     image: redis:4
-    ports:
-      - "6379:6379"
     command: >
         redis-server --requirepass loltesting
   worker:
+    restart: always
     environment:
       # can't use localhost because that always points to the current container. To talk to another container, its
       # network name is the service name
@@ -39,22 +30,14 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       # Infura API key isn't needed for local dev on parity
       - INFURA_API_KEY=""
-    depends_on:
-      - redis
-      - postgres
-      - server
-      - parity
     build:
-      context: .
-      dockerfile: server.Dockerfile
+      context: ..
+      dockerfile: ops/dockerfiles/server.Dockerfile
       # TODO run the beat as a separate service instead of embedding in the worker
     command: >
       bash -c './wait_for_it.sh server:8000 && celery -A backend worker -l debug -B --scheduler django_celery_beat.schedulers:DatabaseScheduler'
   server:
-    depends_on:
-      - redis
-      - postgres
-      - parity
+    restart: always
     environment:
       # can't use localhost because that always points to the current container. To talk to another container, its
       # network name is the service name
@@ -70,30 +53,37 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       # Infura API key isn't needed for local dev on parity
       - INFURA_API_KEY=""
-      # TODO I don't think we need this
-      # - ETHEREUM_PRIVATE_KEY=${ETHEREUM_PRIVATE_KEY}
       - PYTHONUNBUFFERED=1
-      - DEBUG=true
+      - PROD=false
 
     build:
-      context: .
-      dockerfile: server.Dockerfile
-    ports:
-      - "8000:8000"
+      context: ..
+      dockerfile: ops/dockerfiles/server.Dockerfile
     # https://stackoverflow.com/questions/30063907/using-docker-compose-how-to-execute-multiple-commands
     command: >
       bash -c "./wait_for_it.sh postgres:5432 && ./wait_for_it.sh parity:8545 && ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - './backend:/mycro/backend'
   frontend:
+    restart: always
     build:
-      context: .
-      dockerfile: frontend.Dockerfile
+      context: ..
+      dockerfile: ops/dockerfiles/frontend.Dockerfile
     command: >
       bash -c "truffle compile --all && cp -rf /mycro/build /mycro/src/ && npm start"
-    ports:
-      - "3000:3000"
     environment:
-      - REACT_APP_GRAPHQL_ENDPOINT=http://localhost:8000/graphql
-    volumes:
-      - './frontend/src:/mycro/src'
+      - REACT_APP_GRAPHQL_ENDPOINT=https://$API_HOST/graphql
+  nginx:
+    restart: always
+    build:
+      context: ..
+      dockerfile: ops/dockerfiles/nginx-prod.Dockerfile
+      args:
+        - FRONTEND_HOST=$FRONTEND_HOST
+        - API_HOST=$API_HOST
+    depends_on:
+      - frontend
+      - server
+    ports:
+      - "80:80"
+      - "443:443"
+    command: bash -c "./wait_for_it.sh server:8000 && ./wait_for_it.sh frontend:3000 && exec nginx -g 'daemon off;'"
+
