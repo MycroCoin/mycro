@@ -62,7 +62,10 @@ class App extends Component {
     });
 
     Web3Service.getNetworkName().then(networkName => {
-      if (networkName !== 'Ropsten') {
+      if (
+        networkName !== 'Ropsten' &&
+        window.location.hostname !== 'localhost'
+      ) {
         toast.error(
           "You're logged into the " +
             networkName +
