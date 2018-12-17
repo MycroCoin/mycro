@@ -1,6 +1,6 @@
-from unittest.mock import patch, MagicMock, call, ANY
+from unittest.mock import patch
 
-from backend.server.models import Project, ASC, Wallet, BlockchainState
+from backend.server.models import ASC, BlockchainState, Project
 from backend.tests.mycro_django_test import MycroDjangoTest
 from backend.tests.testing_utilities.utils import *
 
@@ -11,7 +11,8 @@ class TestProjectSchema(MycroDjangoTest):
         super().setUp()
         self.project = Project.objects.create(repo_name=constants.PROJECT_NAME,
                                               dao_address=constants.PROJECT_ADDRESS,
-                                              is_mycro_dao=True, initial_balances=constants.CREATORS_BALANCES)
+                                              is_mycro_dao=True,
+                                              initial_balances=constants.CREATORS_BALANCES)
 
         self.assertEqual(1, Project.objects.count())
 
@@ -28,7 +29,7 @@ query {
         )
         self.assertResponseNoErrors(resp, {
             'allProjects': [{'daoAddress': constants.PROJECT_ADDRESS,
-                             'repoName': constants.PROJECT_NAME}]})
+                             'repoName'  : constants.PROJECT_NAME}]})
 
     @patch('backend.server.schemas.project.create_project')
     def test_create_project(self, create_project_mock):
@@ -46,7 +47,8 @@ mutation {{
 }}
 """)
         self.assertResponseNoErrors(resp, {
-            'createProject': {'project':{'daoAddress': '' , 'symbol': project_name[:3]}}})
+            'createProject': {
+                'project': {'daoAddress': '', 'symbol': project_name[:3]}}})
 
         all_projects = Project.objects.all()
         new_project: Project = all_projects[1]
@@ -54,7 +56,8 @@ mutation {{
         self.assertEqual(2, len(
             all_projects))
         self.assertEqual(constants.PROJECT_NAME, all_projects[0].repo_name)
-        self.assertEqual({constants.PROJECT_ADDRESS: 1000}, new_project.initial_balances)
+        self.assertEqual({constants.PROJECT_ADDRESS: 1000},
+                         new_project.initial_balances)
         self.assertEqual(project_name, new_project.repo_name)
         self.assertEqual(BlockchainState.PENDING, new_project.blockchain_state)
         self.assertFalse(new_project.is_mycro_dao)
@@ -65,7 +68,6 @@ mutation {{
         self.assertEqual(0, new_project.last_merge_event_block)
 
         create_project_mock.delay.assert_called_once()
-
 
     def test_create_project_mycro_dao_doesnt_exist(self):
         Project.objects.filter().delete()
@@ -113,13 +115,12 @@ mutation {{
         self.assertResponseNoErrors(resp, {
             'project': {'repoName': constants.PROJECT_NAME}})
 
-
     @patch('backend.server.utils.deploy.get_w3')
     def test_get_balances(self, get_w3_mock):
-        w3 = constants.W3
+        w3 = constants.create_w3()
         get_w3_mock.return_value = w3
 
-        dao_contract, dao_address, dao_instance = deploy_base_dao()
+        dao_contract, dao_address, dao_instance = deploy_base_dao(w3)
         self.project.dao_address = dao_address
         self.project.save()
 
@@ -145,10 +146,10 @@ mutation {{
 
     @patch('backend.server.utils.deploy.get_w3')
     def test_get_threshold(self, get_w3_mock):
-        w3 = constants.W3
+        w3 = constants.create_w3()
         get_w3_mock.return_value = w3
 
-        dao_contract, dao_address, dao_instance = deploy_base_dao()
+        dao_contract, dao_address, dao_instance = deploy_base_dao(w3)
         self.project.dao_address = dao_address
         self.project.save()
 
@@ -165,10 +166,12 @@ mutation {{
 
         # now, propose, vote and pass an ASC so that the threshold is raised
         # want to make sure this is being read from the blockchain
-        create_and_register_merge_module(dao_instance)
-        _, asc_address, _ = create_and_propose_merge_asc(dao_instance)
-        dao_instance.vote(asc_address, transact={'from': constants.INITIAL_ADDRESSES[0]})
-        dao_instance.vote(asc_address, transact={'from': constants.INITIAL_ADDRESSES[1]})
+        create_and_register_merge_module(w3, dao_instance)
+        _, asc_address, _ = create_and_propose_merge_asc(w3, dao_instance)
+        dao_instance.vote(asc_address,
+                          transact={'from': constants.INITIAL_ADDRESSES[0]})
+        dao_instance.vote(asc_address,
+                          transact={'from': constants.INITIAL_ADDRESSES[1]})
 
         resp = self.query(
             f'''
@@ -179,9 +182,8 @@ mutation {{
             }}'''
         )
 
-        self.assertResponseNoErrors(resp, {'project': {'threshold': (100 + constants.REWARD) // 2 + 1}})
-
-
+        self.assertResponseNoErrors(resp, {
+            'project': {'threshold': (100 + constants.REWARD) // 2 + 1}})
 
     def test_get_ascs(self):
         ASC.objects.create(
@@ -202,7 +204,20 @@ mutation {{
             '''
         )
 
-        self.assertResponseNoErrors(resp, {'project': {'ascs': [{'address': constants.ASC_ADDRESS}]}})
+        self.assertResponseNoErrors(resp, {
+            'project': {'ascs': [{'address': constants.ASC_ADDRESS}]}})
 
+    def test_create_project_with_invalid_address(self):
+        creator_address = ''
 
-
+        # need to double up on braces because of f-strings
+        resp = self.query(f"""
+mutation {{
+  createProject(projectName: "lolwut", creatorAddress: "{creator_address}") {{
+      project {{
+        id
+      }}
+  }}
+}}
+""")
+        self.assertErrorNoResponse(resp, "address is not valid")

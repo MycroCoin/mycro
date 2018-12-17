@@ -6,10 +6,11 @@ from web3 import Web3
 import backend.server.utils.deploy as deploy
 import backend.server.utils.github as github
 import backend.settings as settings
-from backend.server.models import Project, Wallet, BlockchainState
+from backend.server.models import Project, Wallet, BlockchainState, ASC
 from backend.server.utils.contract_compiler import ContractCompiler
 
 REDIS_CLIENT = StrictRedis.from_url(settings.CELERY_BROKER_URL)
+REDIS_CREATE_CONTRACT_LOCK = 'create-contract-lock'
 logger = get_task_logger(__name__)
 
 
@@ -63,7 +64,7 @@ def create_project(self, project_id: int) -> None:
     logger.info(f'Attempting to get lock to create project {project_id}')
 
     # TODO extend to support locking based on wallets
-    with REDIS_CLIENT.lock('create-project'):
+    with REDIS_CLIENT.lock(REDIS_CREATE_CONTRACT_LOCK):
         logger.info(f'Acquired lock to create project {project_id}')
         project = Project.objects.get(pk=project_id)
 
@@ -126,3 +127,42 @@ def create_project(self, project_id: int) -> None:
                            organization=settings.github_organization())
 
     logger.info(f'Finished creating project {project_id}')
+
+@shared_task(bind=True)
+def create_asc(self, asc_id):
+
+    logger.info(f'Attempting to get lock to create asc {asc_id}')
+
+    with REDIS_CLIENT.lock(REDIS_CREATE_CONTRACT_LOCK):
+        logger.info(f'Acquired lock to create asc {asc_id}')
+
+        asc = ASC.objects.get(id=asc_id)
+
+        assert asc.blockchain_state == BlockchainState.PENDING, "Blockchain state must be pending"
+        assert not asc.address, "ASC must not already have an address"
+
+        compiler = ContractCompiler()
+
+        w3 = deploy.get_w3()
+        base_dao_interface = compiler.get_contract_interface('base_dao.sol',
+                                                             'BaseDao')
+        dao_contract = w3.eth.contract(abi=base_dao_interface['abi'],
+                                       address=asc.project.dao_address)
+
+        asc_interface = compiler.get_contract_interface('merge_asc.sol',
+                                                        'MergeASC')
+
+        # we don't use the async method here because we can't parallelize
+        # first the asc has to be deployed to get it's address then the address has to be registered
+        # with the base dao
+        _, _, asc_address, _ = deploy.deploy(asc_interface, asc.rewardee, asc.reward,
+                                             asc.pr_id,
+                                             private_key=Wallet.objects.first().private_key)
+
+        deploy.call_contract_function(dao_contract.functions.propose,
+                                      asc_address,
+                                      private_key=Wallet.objects.first().private_key)
+
+        asc.blockchain_state = BlockchainState.COMPLETED
+        asc.address = asc_address
+        asc.save()

@@ -87,6 +87,7 @@ const getProjectQuery = address => {
         voters,
         hasExecuted,
         voteAmount,
+        blockchainState,
       },
       balances {
         address,

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Spinner from '../shared/Spinner.js';
 import AddressShortener from '../shared/AddressShortener.js';
 import { Contracts } from '../../services/Contracts.js';
 import './AscList.css';
@@ -166,9 +167,13 @@ class AscListItem extends Component {
               : this.renderFutureAwardMessage()}
           </div>
           <div>{asc.hasExecuted ? null : this.renderButton()}</div>
+          {asc.hasExecuted ? null : this.renderProgressBar()}
+          {/* TODO We need to coerce blockchain state from A_x to it's human for*/}
+          {/* A_2 is `COMPLETED`*/}
+          {/* TODO make this look not so shitty */}
+          {/* TODO holy shit this css/layout needs work*/}
+          {asc.blockchainState !== 'A_2' && <Spinner />}
         </div>
-
-        {asc.hasExecuted ? null : this.renderProgressBar()}
       </li>
     );
   }
