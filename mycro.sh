@@ -164,7 +164,7 @@ case "$1" in
     rebuild
       ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|logs|status|build}"
+      echo $"Usage: $0 {start|stop|restart|logs|status|rebuild}"
       exit 1
 esac
 
