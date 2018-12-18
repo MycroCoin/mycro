@@ -21,10 +21,6 @@ Helper Script Commands:
 # runs tests
 ./mycro.sh test
 
-# runs tests
-./mycro.sh test
-
-
 # restarts the server
 ./mycro.sh restart
 

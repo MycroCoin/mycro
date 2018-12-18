@@ -58,6 +58,10 @@ case "$ENV" in
     DOCKER_COMPOSE="docker-compose -f $DOCKER_COMPOSE_BASE -f $DOCKER_COMPOSE_PROD"
     ;;
   *)
+    # .aq is the TLD for antarctica. 
+    # I seem to recall there's certain use cases where it's handy to use a real TLD in dev. 
+    # AQ is reserved for organizations working in antartica so I don't think anyone is going 
+    # to register this any time soon (unless we migrate our headquarters very far south)
     DOMAIN="mycrocoin.aq"
     DOCKER_COMPOSE="docker-compose"
     ;;
