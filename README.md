@@ -1,11 +1,16 @@
-Mycro: A Platform for Open-Source Consumer Application
+# Mycro: A Platform for Open-Source Consumer Application
 
-#Dev Requirements
+## Dev Requirements
 + Docker
 + Docker Compose
-+ Metamask
 
-#Running the Server
++ app.mycrocoin.aq and api.mycrocoin.aq should point to localhost. This means adding the following lines to your hosts file (/etc/hosts on most linux distributions, /private/etc/hosts on mac)
+```
+127.0.0.1 api.mycrocoin.aq
+127.0.0.1 app.mycrocoin.aq
+```
+
+## Running the Server
 + Mycro has a helper script in the root directory called mycro. 
 
 Helper Script Commands:
@@ -13,8 +18,8 @@ Helper Script Commands:
 # starts the server
 ./mycro.sh start
 
-# stops the server
-./mycro.sh stop
+# runs tests
+./mycro.sh test
 
 # restarts the server
 ./mycro.sh restart
@@ -32,5 +37,4 @@ Helper Script Commands:
 ./mycro.sh manage makemigrations
 ./mycro.sh manage test
 ./mycro.sh manage <any manage.py command>
-
 ```

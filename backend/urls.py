@@ -35,7 +35,8 @@ main_wallet = None
 # Terrible fucking hack to deploy the Mycro contract and register listeners for it during server startup
 # This file gets executed during all (?) of the manage.py subcommands so use os.environ and sys.argv to guard for when
 # a certain env variable is available during the runserver subcommand
-if 'runserver' in sys.argv:
+# in prod we use uwsgi instead of runserver
+if 'runserver' in sys.argv or 'uwsgi' in sys.argv:
     import backend.server.utils.deploy as deploy
     from backend.server.utils.contract_compiler import ContractCompiler
     from django_celery_beat.models import PeriodicTask, IntervalSchedule

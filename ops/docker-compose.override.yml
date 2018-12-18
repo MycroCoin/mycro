@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  parity:
+    build:
+      context: ..
+      dockerfile: ops/dockerfiles/parity-dev.Dockerfile
+    ports:
+      - "8545:8545"
+      - "8180:8180"
+  postgres:
+    ports:
+      - "5432:5432"
+  redis:
+    ports:
+      - "6379:6379"
+  worker:
+    depends_on:
+      - redis
+      - postgres
+      - server
+      - parity
+  server:
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+      - parity
+    volumes:
+      - '../backend:/mycro/backend'
+  frontend:
+    ports:
+      - "3000:3000"
+    volumes:
+      - '../frontend/src:/mycro/src'
+
