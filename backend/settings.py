@@ -15,7 +15,7 @@ import os
 import sys
 import backend.constants as constants
 
-_isProd = os.environ.get('PROD') == 'true'
+IS_PROD = os.environ.get('PROD') == 'true'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,12 +28,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '=*f9))56@c*dzlmm0%t@)v1=)d2*pbom51h+o7l%35xt92ya3t')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = not _isProd
-#TODO don't commit this!
-DEBUG = True
+DEBUG = not IS_PROD
 
 # URLs used to talk to the backend
-ALLOWED_HOSTS = ['server']
+ALLOWED_HOSTS = ['server', 'localhost']
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -155,7 +153,7 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/
 
 
 # Who's allowed to talk to the backend
-CORS_ORIGIN_WHITELIST = ('https://apps.mycrocoin.org:443') if _isProd else (
+CORS_ORIGIN_WHITELIST = ('https://apps.mycrocoin.org:443') if IS_PROD else (
     'localhost:3000'
 )
 

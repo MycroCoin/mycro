@@ -2,10 +2,8 @@ FROM node:8
 
 WORKDIR mycro
 
-RUN npm install -g truffle
-
-# used for prod environment
-RUN npm install -g serve
+# serve is used to in prod for serving built web app
+RUN npm install -g truffle serve
 
 COPY frontend/package.json .
 RUN npm install

@@ -66,8 +66,12 @@ esac
 export FRONTEND_HOST="app.$DOMAIN"
 export API_HOST="api.$DOMAIN"
 
+# ensures that SSL certs exist in $CERTS_DIR for the project. If they don't exist, self signed certs are created
 _ensure_certs() {
+  #evaluates to true if certs exist
   has_certs="[ -f $CERTS_DIR/privkey.pem ] && [ -f $CERTS_DIR/fullchain.pem ] && echo 'ssl keys found'"
+
+  #generates new certs
   get_certs="echo 'no ssl keys found, self signing' && \
     sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
       -keyout $CERTS_DIR/privkey.pem \
