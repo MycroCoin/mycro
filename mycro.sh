@@ -115,8 +115,22 @@ status() {
 }
 
 clean() {
+  case "$ENV" in
+    PROD)
+      echo "Failed - Running drop in prod will result in data loss"
+      ;;
+    *)
+      stop
+      $DOCKER_COMPOSE rm
+      ;;
+  esac
+}
+
+rebuild() {
   stop
-  $DOCKER_COMPOSE rm
+  $DOCKER_COMPOSE rm worker server frontend
+  start
+
 }
 
 manage() {
@@ -146,8 +160,11 @@ case "$1" in
   manage)
     manage
       ;;
+  rebuild)
+    rebuild
+      ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|logs|status}"
+      echo $"Usage: $0 {start|stop|restart|logs|status|build}"
       exit 1
 esac
 
