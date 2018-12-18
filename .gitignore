@@ -6,7 +6,7 @@
 backend/coverage/
 .TODO
 .env
-
+**/*.pyc
 
 # gcp service accounts
 mycrocoin-b443c4301ade.json
@@ -19,3 +19,4 @@ postgres
 
 # redis performs snapshotting if you run it locally
 dump.rdb
+
