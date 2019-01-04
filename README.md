@@ -30,8 +30,12 @@ Helper Script Commands:
 ./mycro.sh logs worker
 ./mycro.sh logs <service>
 
-# removes all stored docker images (deletes dev data)
+# removes all stored docker images
 ./mycro.sh clean
+
+# rebuilds the stored worker, server, and frontend docker images and restarts the server 
+# (does not delete dev data)
+./mycro.sh rebuild
 
 # access to django's manage.py within the backend docker image.
 ./mycro.sh manage makemigrations
