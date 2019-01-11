@@ -134,7 +134,7 @@ rebuild() {
 }
 
 manage() {
-  docker run -v `pwd`:`pwd` -w `pwd` -i -t mycro_server ./manage.py "$@"
+  docker run -v $MYCRO_ROOT_DIR:$MYCRO_ROOT_DIR -w $MYCRO_ROOT_DIR -i -t mycro_server ./manage.py "$@"
 }
 
 case "$1" in
@@ -158,13 +158,14 @@ case "$1" in
     clean
       ;;
   manage)
-    manage
+    shift
+    manage $@
       ;;
   rebuild)
     rebuild
       ;;
   *)
-      echo $"Usage: $0 {start|stop|restart|logs|status|rebuild}"
+      echo $"Usage: $0 {start|stop|restart|logs|status|rebuild|manage}"
       exit 1
 esac
 

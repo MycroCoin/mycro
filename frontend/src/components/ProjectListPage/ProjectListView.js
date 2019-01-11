@@ -9,8 +9,7 @@ import Spinner from '../shared/Spinner.js';
 import CreateProjectForm from './CreateProjectForm.js';
 import Api from '../../services/Api.js';
 import './ProjectListView.css';
-import Joyride from 'react-joyride';
-import { EVENTS } from 'react-joyride/es/constants';
+import Joyride, { EVENTS } from 'react-joyride';
 
 const JOYRIDE_STATUS_STORAGE_KEY = 'project-list-joyride-status';
 const PROJECT_LIST_POLL_INTERVAL = 1000;
