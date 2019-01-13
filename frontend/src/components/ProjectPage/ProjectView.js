@@ -10,8 +10,7 @@ import Api from '../../services/Api.js';
 import ReactGA from 'react-ga';
 import PropTypes from 'prop-types';
 import './ProjectView.css';
-import Joyride from 'react-joyride';
-import { EVENTS } from 'react-joyride/es/constants';
+import Joyride, { EVENTS } from 'react-joyride';
 import { toChecksumAddress } from 'web3-utils';
 
 const colors = [

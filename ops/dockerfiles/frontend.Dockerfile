@@ -3,7 +3,7 @@ FROM node:8
 WORKDIR mycro
 
 # serve is used to in prod for serving built web app
-RUN npm install -g truffle serve
+RUN npm install -g truffle@^4.0.0 serve
 
 COPY frontend/package.json .
 RUN npm install
