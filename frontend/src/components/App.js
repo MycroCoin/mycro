@@ -63,14 +63,14 @@ class App extends Component {
 
     Web3Service.getNetworkName().then(networkName => {
       if (
-        networkName !== 'Ropsten' &&
-        window.location.hostname !== 'localhost'
+        networkName !== 'unknown' &&
+        window.location.hostname !== 'app.mycro.aq'
       ) {
         toast.error(
           "You're logged into the " +
             networkName +
             ' network ' +
-            "please make sure you're logged into the Ropsten network",
+            "please make sure you're logged into the Localhost 8545 network",
           {
             position: toast.POSITION.BOTTOM_CENTER
           }
