@@ -113,6 +113,6 @@ vine==1.1.4
 wcwidth==0.1.7
 web3==4.3.0
 websockets>=5.0
-Werkzeug==0.14.1
+Werkzeug==0.15.3
 yarl==1.2.6
 zeroconf==0.20.0
