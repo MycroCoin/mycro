@@ -1,4 +1,4 @@
-aiohttp==2.3.10
+aiohttp==3.7.4
 amqp==2.3.2
 aniso8601==3.0.2
 appnope==0.1.0
