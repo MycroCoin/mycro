@@ -108,7 +108,7 @@ traitlets==4.3.2
 trie==1.3.8
 typing==3.6.4
 uPnPClient==0.0.8
-urllib3==1.23
+urllib3==1.26.5
 vine==1.1.4
 wcwidth==0.1.7
 web3==4.3.0
