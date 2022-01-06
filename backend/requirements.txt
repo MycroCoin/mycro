@@ -10,7 +10,7 @@ backcall==0.1.0
 billiard==3.5.0.4
 bitcoin==1.1.42
 cachetools==2.1.0
-celery==4.2.0
+celery==5.2.2
 certifi==2018.4.16
 cffi==1.11.5
 chardet==3.0.4
