@@ -32,7 +32,7 @@ django-filter==2.0.0
 django-graphql-jwt==0.1.12
 django-graphql-social-auth==0.1.1
 eth-abi==1.1.1
-eth-account==0.2.3
+eth-account==0.5.9
 eth-bloom==1.0.0
 eth-hash==0.1.4
 eth-keyfile==0.5.1
